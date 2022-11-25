@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+
+body {
+    font-family: "Roboto";
+    background: #222;
+}
+
+
+.box {
+    background: #444;
+    display: flex;
+    position: absolute;
+    padding: 1em;
+    border-radius: .4em;
+}
+
+.box.two {
+    left: 44%;
+    top: 38%;
+}
+
+.box.one {
+    left: 10em;
+    top: 8%;
+}
+
+.box.three {
+    left: 17em;
+    top: 23%;
+}
+
+.box.four {
+    left: 1em;
+    top: 8%;
+}
