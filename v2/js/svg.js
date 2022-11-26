@@ -2,11 +2,17 @@ var main = function(){
 
     var l = new LinesContext(undefined, '#container')
 
-    window.lines = l
+    window.pipes = l
     l.start()
 
-
-
+    l.addItem({
+        getCoord() {
+            let ax , ay, by, bx = 200
+            return {
+                ax , ay, bx, by
+            }
+        }
+    })
 }
 
 
@@ -17,14 +23,12 @@ var newPath = function(svg, name){
     $path.style.stroke = "#000"; //Set stroke colour
     $path.style.strokeWidth = "5px"; //Set stroke width
     svg[0].appendChild($path);
-    return $(`#${name}`)
+    return document.querySelector(name)
 }
-
 
 var rand = function(){
     return Math.random().toString(32).slice(2)
 }
-
 
 var newSVG = function(id, parent) {
     let home = parent || 'body'
@@ -33,9 +37,11 @@ var newSVG = function(id, parent) {
     $svg.id = id? id: rand()
     $svg.setAttribute('height', 0)
     $svg.setAttribute('width', 0)
-    $($svg).appendTo(home)
+    document.querySelector(home).appendChild($svg)
+
     return $svg;
 }
+
 
 
 class SVGContext {
@@ -69,14 +75,15 @@ class SVGContext {
         If the svg exists, it's reused else a new one is created. */
         console.log('Creating new SVG', this.svgName)
         let svg = newSVG(this.svgName, this.containerSelector)
+
+        svg.classList.add('pipes')
         this.$container.appendChild(svg) // $("<svg/>", {id: this.svgName})
         return svg
     }
 
     resetSVGsize(){
         /* Reset the svg size to 0 0*/
-        this.$svg.attr("height", "0");
-        this.$svg.attr("width", "0");
+        this.resize(0,0)
     }
 
 
@@ -88,39 +95,22 @@ class SVGContext {
         // $(window).resize(this.render.bind(this))
     }
 
+    resize(width, height) {
+        let $svg = this.$svg
+
+        $svg.height.baseVal.value =  height
+        $svg.width.baseVal.value =  width
+
+        $svg.setAttribute('height', height)
+        $svg.setAttribute('width', width)
+    }
+
     render(){
         //console.log('render pipes')
         this.resetSVGsize();
     }
 }
 
-
-
-var newPath = function(svg, name){
-    var $path = document.createElementNS("http://www.w3.org/2000/svg", 'path'); //Create a path in SVG's namespace
-    $path.id = name
-    $path.setAttribute("d","M 0 0 L 10 10"); //Set path's data
-    $path.style.stroke = "#000"; //Set stroke colour
-    $path.style.strokeWidth = "5px"; //Set stroke width
-    svg[0].appendChild($path);
-    return document.querySelector(name)
-}
-
-var rand = function(){
-    return Math.random().toString(32).slice(2)
-}
-
-var newSVG = function(id, parent) {
-    let home = parent || 'body'
-    //let $svg = $("<svg/>", )
-    let $svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    $svg.id = id? id: rand()
-    $svg.setAttribute('height', 0)
-    $svg.setAttribute('width', 0)
-    document.querySelector(home).appendChild($svg)
-
-    return $svg;
-}
 
 class LinesContext extends SVGContext {
     /*
@@ -141,7 +131,7 @@ class LinesContext extends SVGContext {
         context = new LinesContext(svgName, containerSelector)
         context.start()
 
-        context.addLine({
+        context.addItem({
             name: 'bob'
         })
 
@@ -154,16 +144,25 @@ class LinesContext extends SVGContext {
 
     render(){
         super.render()
-        this.renderLines(this.containerSelector, this.svgSelector)
+        this.renderStack(this.containerSelector, this.svgSelector)
     }
 
-    renderLines(){
+    warn(line) {
+        let f = function() {
+            let j = JSON.stringify(line)
+            console.warn(`unit has no render() function: ${j}`)
+        }
+        return f
+    }
+    renderStack(){
         //connectAll(this.containerSelector, this.svgSelector)
         this.adaptDrawLayer()
+        let warn = this.warn
         for(let line of this.lines) {
             /* A line representsa tidy or class instance version of the
             user config. */
-            line.render()
+            let f = (line.render == undefined? warn(line): line.render)
+            f()
         }
     }
 
@@ -174,7 +173,7 @@ class LinesContext extends SVGContext {
 
         let lines = this.lines;
         let line = lines[0]
-        if ($(this.svg).height()< $(window).height()) {
+        if (this.$svg.clientHeight < window.innerHeight) {
             //this.svg.attr("height", $(window).height() - 10)
         }
 
@@ -204,7 +203,6 @@ class LinesContext extends SVGContext {
             if(maxWidth < coord.bx) {
                 maxWidth = coord.bx
             }
-
         }
         //this.svg.attr("width", $(window).width() - 10)
         let padding = 10//line.style.padding;
@@ -222,12 +220,12 @@ class LinesContext extends SVGContext {
         doesn't account for the -offset of the SVG position. Therefore
         adding the different of the most bottom (y) indexed element,
         */
-        this.$svg.attr("height", maxHeight + padding + minTop);
-        this.$svg.attr("width", maxWidth + padding);
-
-
+        let height = maxHeight + padding + minTop
+        let width = maxWidth + padding
+        this.resize(width, height)
     }
-    addLine(config) {
+
+    addItem(config) {
         /*
             {
                 name: 'name'
@@ -242,12 +240,13 @@ class LinesContext extends SVGContext {
         // }
 
         // Object.assign(line, config)
-        let line = new Line(this.$svg, config)
-        this.lines.push(line)
-        return line
+        // let line = new Line(this.$svg, config)
+        this.lines.push(config)
+        return config
     }
 
 }
+
 
 
 ;main();
