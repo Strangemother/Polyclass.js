@@ -116,7 +116,7 @@ var dynamicRule = function(selector, path, config) {
 
 var styleEl
 
-function addStylesheetRules(rules) {
+function addStylesheetRules(rules, _sheet) {
     /*
     let v = addStylesheetRules([
         ['#ball',
@@ -125,10 +125,10 @@ function addStylesheetRules(rules) {
     ]);
     */
     if(Array.isArray(rules)) {
-        return addStylesheetRulesArray(rules)
+        return addStylesheetRulesArray(rules, _sheet)
     }
 
-    return addStylesheetRulesObject(rules)
+    return addStylesheetRulesObject(rules, _sheet)
 }
 
 const insertMethod = 'adopt'
@@ -137,22 +137,28 @@ const insertMethod = 'adopt'
 function getEnsureStyleSheet(_sheet) {
     let styleNode = _sheet || styleEl;
 
+    if(styleNode != undefined) {
+        return styleNode
+    }
+
     if(insertMethod == 'sheet') {
-        if(styleNode == undefined) {
             // Append <style> element to <head>
             styleNode = document.createElement('style');
             document.head.appendChild(styleNode);
-        }
 
         // return styleNode
-        return styleNode.sheet
+        v = styleNode.sheet
     }
 
     if(insertMethod == 'adopt') {
         const ss = new CSSStyleSheet();
         document.adoptedStyleSheets.push(ss)
-        return ss
+        v = ss
     }
+    if(styleEl == undefined) {
+        styleEl = v
+    }
+    return v
 }
 
 
@@ -187,12 +193,34 @@ function addStylesheetRulesObject(rules, _sheet) {
         let rule = rules[selector]
         let entries = Object.entries(rule)
         let newRule = [selector, entries]
-        console.log(newRule)
+        // console.log(newRule)
         pushResponse(res, styleSheet, newRule)
     }
 
 
     return res
+}
+
+const selectorExists = function(selector, _sheet){
+    let sheet = getEnsureStyleSheet(_sheet)
+
+    for(let rule of sheet.cssRules) {
+        if(selector == rule.selectorText) {
+            return true
+        }
+    }
+    return false
+}
+
+const getRuleBySelector = function(selector, _sheet){
+    let sheet = getEnsureStyleSheet(_sheet)
+
+    for(let rule of sheet.cssRules) {
+        if(selector == rule.selectorText) {
+            return selector
+        }
+    }
+    return undefined
 }
 
 
@@ -284,13 +312,14 @@ const isLiteralObject = function(a) {
 
 function insertRuleSelectorPropStr(styleSheet, selector, propStr) {
     // Insert CSS Rule
+
     let ruleStr = `${selector} {${propStr}}`
-    console.log(ruleStr)
+    // console.log(ruleStr)
     let _ruleIndex = styleSheet.insertRule(
                     ruleStr,
                     styleSheet.cssRules.length
                 );
-    console.log(_ruleIndex)
+    // console.log(_ruleIndex)
     return _ruleIndex
 }
 
@@ -417,6 +446,7 @@ class ClassGraph {
      */
     objectSplit(str, sep='-') {
         /* Parse a potential new css class. */
+        console.log('split on', str, sep)
         let keys = str.split(sep)
         console.log('split', str, keys)
         let nodeWord = this.nodeWord()
@@ -456,11 +486,75 @@ class ClassGraph {
         let values = keys.slice(c1)
         console.log(props, values)
         return {
-            props, values,
+            props, values, str,
             node: currentNode
         }
     }
 
+    insertRule(splitObj) {
+        let a = splitObj.props.join('-')
+        // let clean = this.escapeStr(splitObj.str)
+        // let propStr = `.${clean}`
+        let propStr = this.asSelectorString(splitObj)
+        let valueKey = a
+        let valueVal = splitObj.values.join(' ')
+        let d = {[valueKey]: valueVal}
+
+        let exists = selectorExists(propStr)
+        console.log('inserting', propStr, d)
+        console.log('exists', exists)
+
+        if(exists) {
+            console.warn('Selector already exists', propStr)
+            return getRuleBySelector(propStr)
+        }
+
+        let res = addStylesheetRules({
+            [propStr]: d
+        });
+
+        for(let rule of res) {
+            rule.render()
+        }
+
+        return res
+    }
+
+
+    asSelectorString(entity) {
+        let clean;
+        // array
+        if(Array.isArray(entity)) {
+            // prop bits
+            let a = entity.join('-')
+            clean = this.escapeStr(a)
+        }
+
+        // string,
+        if(typeof(entity) == String) {
+            // is str
+            clean = this.escapeStr(entity)
+        }
+
+        // object
+        if(entity.props) {
+            // is splitObj
+            let a = entity.props.join('-')
+            clean = this.escapeStr(a)
+        }
+
+        if(entity.str) {
+            // splitobject before props.
+            clean = this.escapeStr(entity.str)
+        }
+
+        let propStr = `.${clean}`
+        return propStr
+
+    }
+    escapeStr(str) {
+        return str.replace(/[<>*%()=@?]/g, "\\$&")
+    }
 
 }
 
