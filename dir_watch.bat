@@ -1,1 +1,0 @@
-robocopy "C:\Users\jay\Documents\projects\pipes\charlie-b\js" "C:\Users\jay\Documents\projects\pipes\delta\static\js\lib" /E /ZB /XJ /XF "~*.*" "*~.*" "desktop.ini" "Thumbs.db" "*.torrent" ".lock" ".Sync*" /xd "Rubbish" ".Sync*" ".Box Sync" "_private" "Outlook Files" /FFT /MT /R:2 /W:5 /V /MON:1 /TEE /MOT:1

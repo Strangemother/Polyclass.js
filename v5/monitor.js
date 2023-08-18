@@ -1,0 +1,55 @@
+
+const monitorClasses = function(node) {
+    console.log('monitorClasses', node)
+    // create an observer instance
+    let mutationHandler = function(mutations) {
+        console.log('mutationHandler', mutations)
+
+        let eachMutation = function(mutation) {
+            if(mutation.attributeName == 'class') {
+                classMutationDetection(mutation)
+            }
+        }
+
+        mutations.forEach(eachMutation);
+    }
+
+    var observer = new MutationObserver(mutationHandler);
+
+    // configuration of the observer:
+    var config = {
+            attributes: true
+            , subtree: true
+            // , childList:true
+            , attributeFilter: ['class']
+            // , characterData: true
+            , attributeOldValue: true
+            // , characterDataOldValue: true
+        };
+
+    // pass in the target node, as well as the observer options
+    return observer.observe(node, config);
+}
+
+
+const classMutationDetection = function(mutation) {
+    let classes = mutation.target.classList.value;
+    let old = mutation.oldValue
+    console.log(`old: "${mutation.oldValue}", target:`, mutation.target, `classes: "${classes}"`)
+    let new_spl = classes.split(' ')
+    let old_spl = old?.split(' ')
+    let newItems = old_spl? difference(new_spl, old_spl): new_spl
+    console.log('new', newItems)
+    // let removedItems = difference(old_spl, new_spl)
+    // console.log('removedItems', removedItems)
+    cg.captureNew(newItems, old_spl)
+}
+
+
+const difference = function(setA, setB) {
+  const _difference = new Set(setA);
+  for (const elem of setB) {
+    _difference.delete(elem);
+  }
+  return _difference;
+}

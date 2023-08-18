@@ -1,68 +1,17 @@
 
 
-v = addStylesheetRules([
-    ['body',
-        ['background', '#333']
-        , ['color', '#991111']
-    ]
-]);
+const autoMain = function(){
+    console.log('Running autoMain')
+    styleSheetAdds()
+    insertSplitTests()
 
+    insertRuleTests()
+    insertReceiverTests()
 
-v = addStylesheetRules([
-    ['body',
-        [
-            ['background', '#333']
-            , ['color', '#991111']
-        ]
-    ]
-]);
+    cg.processOnLoad(document.body)
+    cg.monitor(document.body)
+}
 
-v = addStylesheetRules([
-    ['body',
-        [
-            ['background', '#333']
-            , ['color', '#991111']
-        ]
-        , [
-            ['background', '#555']
-            , ['color', '#991221']
-        ]
-    ]
-]);
-
-
-v = addStylesheetRules({
-    body: {
-        background: '#111'
-        , color: '#11AA11'
-    }
-});
-
-
-v = addStylesheetRules({
-    body: [
-        {background: '#111'}
-        , {color: '#11AA11'}
-    ]
-});
-
-
-let propInfo = { background: '#111' }
-
-
-b = addStylesheetRules({
-    body: [
-        {color: '#11AA11'}
-        , propInfo
-    ]
-});
-
-
-propInfo.background = '#000'
-propInfo.color = 'red'
-b[0].replace()
-z=b[0]
-monitorClasses(document.body)
 
 const assert = function(a, b) {
     console.assert(a, b)
@@ -88,9 +37,7 @@ const assertLists = function(a, b) {
     }
 }
 
-cg = generateClassGraph()
-
-
+//cg = generateClassGraph()
 const testExample = function(str, props, values) {
     let b = cg.objectSplit(str)
     assertLists(b.props,  props)
@@ -100,45 +47,134 @@ const testExample = function(str, props, values) {
     return b
 }
 
-a = testExample('margin-auto-1em'
-                , ['margin']
-                , ['auto', '1em']
+// ----------------------------------------------------------------------------
+
+
+const styleSheetAdds = function(){
+
+
+    v = addStylesheetRules([
+        ['body',
+            ['background', '#333']
+            , ['color', '#991111']
+        ]
+    ]);
+
+
+    v = addStylesheetRules([
+        ['body',
+            [
+                ['background', '#333']
+                , ['color', '#991111']
+            ]
+        ]
+    ]);
+
+    v = addStylesheetRules([
+        ['body',
+            [
+                ['background', '#333']
+                , ['color', '#991111']
+            ]
+            , [
+                ['background', '#555']
+                , ['color', '#991221']
+            ]
+        ]
+    ]);
+
+
+    v = addStylesheetRules({
+        body: {
+            background: '#111'
+            , color: '#11AA11'
+        }
+    });
+
+
+    v = addStylesheetRules({
+        body: [
+            {background: '#111'}
+            , {color: '#11AA11'}
+        ]
+    });
+
+
+    let propInfo = { background: '#111' }
+
+
+    b = addStylesheetRules({
+        body: [
+            {color: '#11AA11'}
+            , propInfo
+        ]
+    });
+
+
+    propInfo.background = '#000'
+    propInfo.color = 'red'
+    b[0].replace()
+}
+
+const insertReceiverTests = function(){
+
+    cg.insertReceiver(['font', 'pack'], function(...tokens) { console.log('install', tokens) })
+    let res = cg.objectSplit('font-pack-roboto')
+    console.log('insertReceiver', res)
+}
+
+
+const insertSplitTests = function(){
+
+    let a = testExample('margin-auto-1em'
+                    , ['margin']
+                    , ['auto', '1em']
                 )
 
-b = testExample('margin-block-end-5%'
+    let b = testExample('margin-block-end-5%'
                 , ['margin', 'block', 'end']
                 , ['5%']
-            )
+                )
 
-c = testExample('border-bottom-dotted-1px'
+    let c = testExample('border-bottom-dotted-1px'
                     , ['border', 'bottom']
                     , ['dotted', '1px']
                 )
 
-d = testExample('gap-1em'
+    let d = testExample('gap-1em'
                     , ['gap']
                     , ['1em']
                 )
 
-e = testExample('color-green'
+    let e = testExample('color-green'
                     , ['color']
                     , ['green']
                 )
+    return [a,b,c,d,e]
+}
 
-cg.insertRule(b)
-cg.insertRule(c)
 
-ss = '.gap-1em'
-ok = assert(!selectorExists(ss), `selector (incorrectly) exists '${ss}'`)
-cg.insertRule(d)
-ok = assert(selectorExists(ss), `selector does not exist '${ss}'`)
-cg.insertRule(d)
+const insertRuleTests = function(){
+    let [a,b,c,d,e] = insertSplitTests()
 
-let ir = cg.insertRule(e)
-// cg.insertRule(a)
-// cg.insertRule(b)
-console.log(a, b,c )
-console.log(ir)
+    cg.insertRule(b)
+    cg.insertRule(c)
 
-ss = cg.asSelectorString(b)
-assert(selectorExists(ss), `Selector does not exist: "${ss}"`)
+    ss = '.gap-1em'
+    ok = assert(!selectorExists(ss), `selector (incorrectly) exists '${ss}'`)
+    cg.insertRule(d)
+    ok = assert(selectorExists(ss), `selector does not exist '${ss}'`)
+    cg.insertRule(d)
+
+    let ir = cg.insertRule(e)
+    // cg.insertRule(a)
+    // cg.insertRule(b)
+
+    ss = cg.asSelectorString(b)
+    assert(selectorExists(ss), `Selector does not exist: "${ss}"`)
+
+    // insert a single line
+    cg.insertLine('demo-box', { 'font-size': '1.5em'})
+}
+
+;autoMain();
