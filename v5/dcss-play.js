@@ -1,4 +1,6 @@
 
+(()=>{
+
 
 const autoMain = function(){
     console.log('Running autoMain')
@@ -10,6 +12,9 @@ const autoMain = function(){
     cg.processOnLoad(document.body)
     cg.monitor(document.body)
 }
+
+
+// -----------------------------------------------------------------------------
 
 
 const assert = function(a, b) {
@@ -41,17 +46,17 @@ const testExample = function(str, props, values) {
     let b = cg.objectSplit(str)
     assertLists(b.props,  props)
     assertLists(b.values, values)
-
-
     return b
 }
+
 
 // ----------------------------------------------------------------------------
 
 
 const styleSheetAdds = function(){
+    let dcss = cg.dcss
 
-
+    let addStylesheetRules = dcss.addStylesheetRules.bind(dcss)
     v = addStylesheetRules([
         ['body',
             ['background', '#333']
@@ -151,7 +156,8 @@ const insertRuleTests = function(){
 
     cg.insertRule(b)
     cg.insertRule(c)
-
+    let dcss = cg.dcss
+    let selectorExists = dcss.selectorExists.bind(dcss)
     ss = '.gap-1em'
     ok = assert(!selectorExists(ss), `selector (incorrectly) exists '${ss}'`)
     cg.insertRule(d)
@@ -171,3 +177,6 @@ const insertRuleTests = function(){
 
 
 ;autoMain();
+
+
+})()

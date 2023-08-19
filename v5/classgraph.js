@@ -1,7 +1,43 @@
 
+const kebabCase = function(str, sep='-') {
+    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
+    return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
+}
+
+
+const generateClassGraph = function(config={}){
+    let cg = new ClassGraph(config)
+    cg.generate()
+    return cg
+}
+
+
 class ClassGraph {
 
+    sep = '-'
     escapeRegex = /[<>*%#()=.@+?\/]/g
+    dcss = new DynamicCSSStyleSheet(this)
+
+    constructor(conf) {
+        this.conf = conf || {}
+
+        if(this.conf.addons !== false) {
+            this.installAddons(this.getPreAddons())
+        }
+
+        this.sep = conf.sep || this.sep
+    }
+
+    getPreAddons(){
+        return this.constructor.addons
+    }
+
+    installAddons(addons){
+        for(let key in addons) {
+            let addon = addons[key]
+            addon(this)
+        }
+    }
 
     generate(node){
         /*
@@ -10,6 +46,7 @@ class ClassGraph {
             If the _next_ node is a tree node, continue - if it's a value node, release
 
          */
+
         node = node || document.body
         let items = Object.entries(node.style)
         for(let [name, value] of items) {
@@ -74,10 +111,10 @@ class ClassGraph {
         If the leafs' next step is not a node, parse the values.
         reject leaf-only definitions.
      */
-    objectSplit(str, sep='-', safe=true) {
+    objectSplit(str, sep=this.sep, safe=true) {
         /* Parse a potential new css class. */
         // console.log('split on', str, sep)
-        let keys = str.split(sep)
+        let keys = typeof(str) == 'string'? str.split(sep): str
         // console.log('split', str, keys)
         let nodeWord = this.nodeWord()
         let node = this.getRoot()
@@ -139,14 +176,14 @@ class ClassGraph {
         if(props) {
             Object.assign(d, props)
         }
-        let exists = selectorExists(propStr)
+        let exists = this.dcss.selectorExists(propStr)
 
         if(exists) {
             console.warn('Selector already exists', propStr)
-            return getRuleBySelector(propStr)
+            return this.dcss.getRuleBySelector(propStr)
         }
         // console.log('Inserting rule', propStr)
-        let renderArray = addStylesheetRules({
+        let renderArray = this.dcss.addStylesheetRules({
             [propStr]: d
         });
 
@@ -204,6 +241,23 @@ class ClassGraph {
 
     escapeStr(str) {
         return str.replace(this.escapeRegex, "\\$&")
+    }
+
+    isProperty(parts, sep=this.sep) {
+        /* Given a CSS Attribute, return a bool to denote if it exists
+        within the graph.
+        Useful for _testing_ keys for validity
+
+            > isAttribute('margin-bottom')
+            true
+        */
+        let res = this.objectSplit(parts)
+        return res.values.length == 0
+    }
+
+    isDeclaration(parts, sep=this.sep) {
+        let res = this.objectSplit(parts)
+        return res.values.length > 0 &&  res.props.length > 0
     }
 
     getCSSText() {
@@ -273,10 +327,6 @@ class ClassGraph {
         return allClasses
     }
 
-    monitor(parent=document.body) {
-        monitorClasses(parent)
-    }
-
     addClass(entity, ...tokens) {
         let nodes = this.asNodes(entity)
         for(let node of nodes) {
@@ -304,14 +354,4 @@ class ClassGraph {
 }
 
 
-const kebabCase = function(str, sep='-') {
-    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
-    return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
-}
-
-
-const generateClassGraph = function(){
-    let cg = new ClassGraph()
-    cg.generate()
-    return cg
-}
+;ClassGraph.addons = {};

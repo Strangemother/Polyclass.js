@@ -1,3 +1,19 @@
+(()=>{
+
+let cg;
+
+const insertReceiver = function(){
+
+
+    ClassGraph.addons.monitorClasses = function(_cg){
+        cg = _cg;
+    }
+
+    ClassGraph.prototype.monitor = function(parent=document.body) {
+        monitorClasses(parent)
+    }
+}
+
 
 const monitorClasses = function(node) {
     console.log('monitorClasses', node)
@@ -32,7 +48,10 @@ const monitorClasses = function(node) {
 const classMutationDetection = function(mutation) {
     let classes = mutation.target.classList.value;
     let old = mutation.oldValue
-    console.log(`old: "${mutation.oldValue}", target:`, mutation.target, `classes: "${classes}"`)
+    console.log(`old: "${mutation.oldValue}", target:`
+                , mutation.target
+                , `classes: "${classes}"`
+            )
     let new_spl = classes.split(' ')
     let old_spl = old?.split(' ')
     let newItems = old_spl? difference(new_spl, old_spl): new_spl
@@ -50,3 +69,7 @@ const difference = function(setA, setB) {
     }
     return _difference;
 }
+
+;insertReceiver();
+
+})()
