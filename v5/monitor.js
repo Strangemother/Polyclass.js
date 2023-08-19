@@ -1,23 +1,8 @@
 
 const monitorClasses = function(node) {
     console.log('monitorClasses', node)
-    // create an observer instance
-    let mutationHandler = function(mutations) {
-        console.log('mutationHandler', mutations)
-
-        let eachMutation = function(mutation) {
-            if(mutation.attributeName == 'class') {
-                classMutationDetection(mutation)
-            }
-        }
-
-        mutations.forEach(eachMutation);
-    }
-
-    var observer = new MutationObserver(mutationHandler);
-
     // configuration of the observer:
-    var config = {
+    let config = {
             attributes: true
             , subtree: true
             // , childList:true
@@ -27,6 +12,18 @@ const monitorClasses = function(node) {
             // , characterDataOldValue: true
         };
 
+    let eachMutation = function(mutation) {
+        if(mutation.attributeName == 'class') {
+            classMutationDetection(mutation)
+        }
+    }
+
+    let mutationHandler = function(mutations) {
+        console.log('mutationHandler', mutations)
+        mutations.forEach(eachMutation);
+    }
+
+    let observer = new MutationObserver(mutationHandler);
     // pass in the target node, as well as the observer options
     return observer.observe(node, config);
 }
@@ -42,14 +39,14 @@ const classMutationDetection = function(mutation) {
     console.log('new', newItems)
     // let removedItems = difference(old_spl, new_spl)
     // console.log('removedItems', removedItems)
-    cg.captureNew(newItems, old_spl)
+    cg.captureNew(newItems)
 }
 
 
 const difference = function(setA, setB) {
-  const _difference = new Set(setA);
-  for (const elem of setB) {
-    _difference.delete(elem);
-  }
-  return _difference;
+    const _difference = new Set(setA);
+    for (const elem of setB) {
+        _difference.delete(elem);
+    }
+    return _difference;
 }

@@ -1,7 +1,9 @@
 
 var styleEl
+const insertMethod = 'adopt'
 
-function addStylesheetRules(rules, _sheet) {
+
+const addStylesheetRules = function(rules, _sheet) {
     /*
     let v = addStylesheetRules([
         ['#ball',
@@ -16,10 +18,8 @@ function addStylesheetRules(rules, _sheet) {
     return addStylesheetRulesObject(rules, _sheet)
 }
 
-const insertMethod = 'adopt'
 
-
-function getEnsureStyleSheet(_sheet) {
+const getEnsureStyleSheet = function(_sheet) {
     let styleNode = _sheet || styleEl;
 
     if(styleNode != undefined) {
@@ -56,7 +56,8 @@ class RenderArray extends Array {
     }
 }
 
-function addStylesheetRulesArray(rules, _sheet) {
+
+const addStylesheetRulesArray = function(rules, _sheet) {
     let styleNode = getEnsureStyleSheet(_sheet)
 
     let res = new RenderArray()
@@ -78,22 +79,28 @@ const pushResponse = function (res, styleSheet, rule) {
 }
 
 
-function addStylesheetRulesObject(rules, _sheet) {
+const getSheet = function(_sheet) {
+    return getEnsureStyleSheet(_sheet)
+}
+
+
+const addStylesheetRulesObject = function(rules, _sheet) {
     let styleNode = getEnsureStyleSheet(_sheet)
 
     let res = new RenderArray()
     let styleSheet = styleNode//.sheet;
+
     for(let selector in rules) {
         let rule = rules[selector]
         let entries = Object.entries(rule)
         let newRule = [selector, entries]
-        // console.log(newRule)
+        console.log(newRule,newRule)
         pushResponse(res, styleSheet, newRule)
     }
 
-
     return res
 }
+
 
 const selectorExists = function(selector, _sheet){
     let sheet = getEnsureStyleSheet(_sheet)
@@ -105,6 +112,7 @@ const selectorExists = function(selector, _sheet){
     }
     return false
 }
+
 
 const getRuleBySelector = function(selector, _sheet){
     let sheet = getEnsureStyleSheet(_sheet)
@@ -118,7 +126,7 @@ const getRuleBySelector = function(selector, _sheet){
 }
 
 
-function pushArrayRule(styleSheet, conf) {
+const pushArrayRule = function(styleSheet, conf) {
     // If the second argument of a rule is an array of arrays,
     // correct our variables.
 
@@ -162,7 +170,7 @@ function pushArrayRule(styleSheet, conf) {
 }
 
 
-function buildPropStr(rule, j=1) {
+const buildPropStr = function(rule, j=1) {
 
     // console.log('Reading rule', rule)
     let propStr = '';
@@ -190,21 +198,21 @@ function buildPropStr(rule, j=1) {
     }
 
     return propStr;
-
 }
+
 
 const stringEntry = function(name, value, isImportant=false) {
     let importantStr = isImportant ? ' !important' : '';
     return `${name}: ${value}${importantStr};\n`
 }
 
+
 const isLiteralObject = function(a) {
     return (!!a) && (a.constructor === Object);
 };
 
 
-
-function insertRuleSelectorPropStr(styleSheet, selector, propStr) {
+const insertRuleSelectorPropStr = function(styleSheet, selector, propStr) {
     // Insert CSS Rule
 
     let ruleStr = `${selector} {${propStr}}`

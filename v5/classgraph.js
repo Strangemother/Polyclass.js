@@ -1,6 +1,8 @@
 
 class ClassGraph {
 
+    escapeRegex = /[<>*%#()=.@+?\/]/g
+
     generate(node){
         /*
             The graph generatoe produces a depth of allows
@@ -198,20 +200,31 @@ class ClassGraph {
 
         let propStr = `.${clean}`
         return propStr
-
     }
 
     escapeStr(str) {
-        return str.replace(/[<>*%#()=.@?\/]/g, "\\$&")
+        return str.replace(this.escapeRegex, "\\$&")
+    }
 
+    getCSSText() {
+        let strRes = ''
+        let lineEnd = '\n'
+        let sheet = getSheet()
+        for(let rule of sheet.rules) {
+            strRes += `${rule.cssText};${lineEnd}`
+        }
+
+        return strRes
     }
 
     captureNew(items, oldItems) {
         console.log('Capture new', items, oldItems)
         for(let str of items) {
-
+            if(str.length == 0) {
+                continue
+            }
             let b = cg.objectSplit(str)
-            let n = b.node.handler
+            let n = b.node?.handler
             // debugger
             let func = n? n.bind(b): cg.insertRule.bind(cg)
             let res = func(b)
@@ -220,8 +233,13 @@ class ClassGraph {
     }
 
     processOnLoad(node, watch=document) {
-        watch.addEventListener('DOMContentLoaded', function(){
+        if(this.domContentLoaded == true) {
+            return this.process(node)
+        }
+
+        (watch || node).addEventListener('DOMContentLoaded', function(){
             this.process(node)
+            this.domContentLoaded = true
         }.bind(this))
     }
 
@@ -262,7 +280,10 @@ class ClassGraph {
     addClass(entity, ...tokens) {
         let nodes = this.asNodes(entity)
         for(let node of nodes) {
-            node.classList.add(...tokens)
+            for(let token of tokens) {
+                for(let t of token.split(' '))
+                node.classList.add(t)
+            }
         }
     }
 
@@ -282,6 +303,7 @@ class ClassGraph {
     }
 }
 
+
 const kebabCase = function(str, sep='-') {
     let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
     return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
@@ -293,6 +315,3 @@ const generateClassGraph = function(){
     cg.generate()
     return cg
 }
-
-
-const cg = generateClassGraph()
