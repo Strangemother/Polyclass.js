@@ -1,0 +1,31 @@
+{
+  "name": "dcss",
+  "version": "1.0.0",
+  "description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
+  "main": "src/index.js",
+  "module": "src/browser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Strangemother/classy-declarative-css.js.git"
+  },
+  "keywords": [
+    "automatic-css",
+    "css-class",
+    "pre-generated-classes",
+    "css-combiner"
+  ],
+  "author": "Jay Jagpal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Strangemother/classy-declarative-css.js/issues"
+  },
+  "homepage": "https://github.com/Strangemother/classy-declarative-css.js#readme",
+  "dependencies": {
+    "rollup": "^3.28.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}

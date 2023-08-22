@@ -182,14 +182,34 @@ class ClassGraph {
             console.warn('Selector already exists', propStr)
             return this.dcss.getRuleBySelector(propStr)
         }
-        // console.log('Inserting rule', propStr)
-        let renderArray = this.dcss.addStylesheetRules({
-            [propStr]: d
-        });
+        console.log('Inserting rule', propStr)
 
-        renderArray.renderAll()
+        let handlerFunc = splitObj.node?.handler?.bind(splitObj)
 
-        return renderArray
+        let handlerRes = {
+            insert:true
+        }
+
+        if(handlerFunc) {
+            // executing the handler
+            if(typeof(handlerFunc) == 'function') {
+                let potentialRes = handlerFunc(splitObj)
+                if(potentialRes !== undefined) {
+                    handlerRes = potentialRes
+                }
+            }
+        }
+
+        if(handlerRes.insert !== false) {
+
+            let renderArray = this.dcss.addStylesheetRules({
+                [propStr]: d
+            });
+
+            renderArray.renderAll()
+
+            return renderArray
+        }
     }
 
     insertReceiver(keys, handler) {
@@ -277,11 +297,11 @@ class ClassGraph {
             if(str.length == 0) {
                 continue
             }
-            let b = cg.objectSplit(str)
-            let n = b.node?.handler
+            let splitObj = cg.objectSplit(str)
+            let n = splitObj.node?.handler
             // debugger
-            let func = n? n.bind(b): cg.insertRule.bind(cg)
-            let res = func(b)
+            let func = n? n.bind(splitObj): cg.insertRule.bind(cg)
+            let res = func(splitObj)
             console.log(str, res)
         }
     }
@@ -307,7 +327,7 @@ class ClassGraph {
     safeInsertLine(name) {
         let spl2 = this.objectSplit(name)
         if(spl2.valid) {
-            console.log('Inserting', spl2)
+            // console.log('Inserting', spl2)
             this.insertRule(spl2)
         }
         // console.log(spl2)
