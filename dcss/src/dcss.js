@@ -10,13 +10,31 @@ class RenderArray extends Array {
 
 class DynamicCSSStyleSheet {
 
+    /**
+     * Represents the style element.
+     * @type {undefined}
+     */
     styleEl = undefined
+
+    /**
+     * Represents the method of inserting the stylesheet.
+     * @type {string}
+     */
     insertMethod = 'adopt'
 
+    /**
+     * Initializes the class and installs the addons.
+     * @param {Object} cg - Class graph.
+     */
     constructor(cg) {
         this.installAddons(cg, this.constructor.addons)
     }
 
+    /**
+     * Installs the addons for the class.
+     * @param {Object} cg - Class graph.
+     * @param {Object} addons - Addons to be installed.
+     */
     installAddons(cg, addons){
         for(let key in addons) {
             let addon = addons[key]
@@ -24,11 +42,18 @@ class DynamicCSSStyleSheet {
         }
     }
 
+    /**
+     * Adds stylesheet rules either from an array or an object.
+     * @param {Array|Object} rules - Rules to be added.
+     * @param {Object} _sheet - The stylesheet.
+     */
     addStylesheetRules(rules, _sheet) {
         /*
         let v = addStylesheetRules([
             ['#ball',
-                ['offset-path', 'path("M126.09375 10 V86.28 A9.951 9.950 0 0 0 136.04375 96.23 H708.3468750")']
+                ['offset-path', 'path("M126.09375 10
+                                        V86.28 A9.951 9.950 0 0 0 136.04375 96.23
+                                        H708.3468750")']
             ]
         ]);
         */
@@ -39,6 +64,11 @@ class DynamicCSSStyleSheet {
         return this.addStylesheetRulesObject(rules, _sheet)
     }
 
+    /**
+     * Ensures the stylesheet is available and returns it.
+     * @param {Object} _sheet - The stylesheet.
+     * @returns {Object} - The ensured stylesheet.
+     */
     getEnsureStyleSheet(_sheet) {
         let styleNode = _sheet || this.styleEl;
         let v
@@ -67,6 +97,12 @@ class DynamicCSSStyleSheet {
         return v
     }
 
+    /**
+     * Adds stylesheet rules from an array.
+     * @param {Array} rules - Array of rules.
+     * @param {Object} _sheet - The stylesheet.
+     * @returns {RenderArray} - An array of rendered rules.
+     */
     addStylesheetRulesArray(rules, _sheet) {
         let styleNode = this.getEnsureStyleSheet(_sheet)
 
@@ -80,6 +116,13 @@ class DynamicCSSStyleSheet {
         return res
     }
 
+    /**
+     * Pushes the response for the rule.
+     * @param {RenderArray} res - Result array.
+     * @param {Object} styleSheet - The stylesheet.
+     * @param {Array} rule - The rule to be pushed.
+     * @returns {Object} - The pushed rule.
+     */
     pushResponse(res, styleSheet, rule) {
         // console.log(rule)
         let _rule = this.pushArrayRule(styleSheet, rule)
@@ -87,10 +130,21 @@ class DynamicCSSStyleSheet {
         return _rule
     }
 
+    /**
+     * Returns the ensured stylesheet.
+     * @param {Object} _sheet - The stylesheet.
+     * @returns {Object} - The ensured stylesheet.
+     */
     getSheet(_sheet) {
         return this.getEnsureStyleSheet(_sheet)
     }
 
+    /**
+     * Adds stylesheet rules from an object.
+     * @param {Object} rules - Object of rules.
+     * @param {Object} _sheet - The stylesheet.
+     * @returns {RenderArray} - An array of rendered rules.
+     */
     addStylesheetRulesObject(rules, _sheet) {
         let styleNode = this.getEnsureStyleSheet(_sheet)
 
@@ -108,6 +162,12 @@ class DynamicCSSStyleSheet {
         return res
     }
 
+    /**
+     * Checks if a selector exists in the stylesheet.
+     * @param {string} selector - Selector to check.
+     * @param {Object} _sheet - The stylesheet.
+     * @returns {boolean} - True if selector exists, otherwise false.
+     */
     selectorExists(selector, _sheet){
         let sheet = this.getEnsureStyleSheet(_sheet)
 
@@ -119,6 +179,12 @@ class DynamicCSSStyleSheet {
         return false
     }
 
+    /**
+     * Retrieves a rule by its selector.
+     * @param {string} selector - Selector to retrieve.
+     * @param {Object} _sheet - The stylesheet.
+     * @returns {string|undefined} - The rule if found, otherwise undefined.
+     */
     getRuleBySelector(selector, _sheet){
         let sheet = this.getEnsureStyleSheet(_sheet)
 
@@ -130,6 +196,12 @@ class DynamicCSSStyleSheet {
         return undefined
     }
 
+    /**
+     * Pushes an array rule to the stylesheet.
+     * @param {Object} styleSheet - The stylesheet.
+     * @param {Array} conf - Configuration for the rule.
+     * @returns {Object} - The pushed rule.
+     */
     pushArrayRule(styleSheet, conf) {
         // If the second argument of a rule is an array of arrays,
         // correct our variables.
@@ -173,6 +245,12 @@ class DynamicCSSStyleSheet {
         }
     }
 
+    /**
+     * Builds a property string from a rule.
+     * @param {Array} rule - The rule.
+     * @param {number} j - Index (default is 1).
+     * @returns {string} - The property string.
+     */
     buildPropStr(rule, j=1) {
 
         // console.log('Reading rule', rule)
@@ -203,15 +281,34 @@ class DynamicCSSStyleSheet {
         return propStr;
     }
 
+    /**
+     * Returns a string entry for a property.
+     * @param {string} name - Property name.
+     * @param {string} value - Property value.
+     * @param {boolean} isImportant - Flag to indicate if the property is important (default is false).
+     * @returns {string} - The string entry.
+     */
     stringEntry(name, value, isImportant=false) {
         let importantStr = isImportant ? ' !important' : '';
         return `${name}: ${value}${importantStr};\n`
     }
 
+    /**
+     * Checks if a value is a literal object.
+     * @param {*} a - Value to check.
+     * @returns {boolean} - True if value is a literal object, otherwise false.
+     */
     isLiteralObject(a) {
         return (!!a) && (a.constructor === Object);
     }
 
+    /**
+     * Inserts a rule into the stylesheet using a selector and property string.
+     * @param {Object} styleSheet - The stylesheet.
+     * @param {string} selector - Selector for the rule.
+     * @param {string} propStr - Property string for the rule.
+     * @returns {number} - The index of the inserted rule.
+     */
     insertRuleSelectorPropStr(styleSheet, selector, propStr) {
         // Insert CSS Rule
 
@@ -227,4 +324,8 @@ class DynamicCSSStyleSheet {
 }
 
 
+/**
+ * Represents the addons for the class.
+ * @type {Object}
+ */
 DynamicCSSStyleSheet.addons = {}
