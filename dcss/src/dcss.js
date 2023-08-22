@@ -7,6 +7,7 @@ class RenderArray extends Array {
     }
 }
 
+
 class DynamicCSSStyleSheet {
 
     styleEl = undefined
@@ -224,5 +225,6 @@ class DynamicCSSStyleSheet {
         return _ruleIndex
     }
 }
+
 
 DynamicCSSStyleSheet.addons = {}
