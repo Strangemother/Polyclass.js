@@ -1,20 +1,71 @@
 # [NAME]
 
-Ever struggled with managing dynamic CSS attributes efficiently? [NAME] is here to help.
+[NAME] is a psuedo pre-built CSS Class library, built dynamically from structured class names
+
+> All the boilerplate is builtin with [NAME]
 
 This open-source, lightweight library is tailored for dynamic CSS management, generating a graph of keys for all CSS properties. With the capability to represent over a million unique class combinations, [NAME] offers eliminating the need for inline styles. Whether you're working with pre-rendered content or making live DOM changes, [NAME] ensures your designs remain fluid and dynamic.
+
++ Readable
++ Instantly plug-and-play
++ No Dependencies, and works along-side all the major libraries.
+
+## Example
+
+```html
+<div class="my-container some-other-primary-area
+    font-pack-roboto-100-400-i400
+    background-#333">
+      <div class="demo-box
+        gap-1em
+        display-flex
+        flex-direction-column
+        ">
+          <div class="text
+            background-color-#111
+            border-solid-3px-green
+            border-radius-.4em
+            padding-.8em-1.4em
+            color-#EEE
+            font-roboto-400
+            margin-1em">
+              Text content.
+          </div>
+      </div>
+</div>
+```
+
+Constructed classes:
+
+    background-color-#111
+    background-#333
+    border-solid-3px-green
+    border-radius-.4em
+    color-#EEE
+    display-flex
+    flex-direction-column
+    gap-1em
+    margin-1em
+    padding-.8em-1.4em
+
+    font-pack-roboto-100-400-i400
+    font-roboto-400
+
+
+Without using any existing CSS sheets, [NAME] will generate all the expected CSS as a contructed stylesheet.
 
 
 ## Features
 
 + Comprehensive Graph: A detailed graph of CSS attributes, ensuring you have access to every possible style combination.
 + Dynamic Class Combinations: Generate over a million unique class combinations with both short and long flavors for each CSS declaration.
-+ Real-time Adaptability: Seamless compatibility with both pre-rendered content and live DOM changes.
++ Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
 
 
 ## Getting Started
 
-To get started with classy-declarative-css.js, follow these steps:
+To get started with [NAME], follow these steps (It's really just include the JS and start using...)
+
 
 1. Include the Main Script:
 
@@ -31,9 +82,9 @@ To get started with classy-declarative-css.js, follow these steps:
 
 3. Write Your Declarative CSS:
 
-In your HTML, you can now start using the declarative CSS syntax provided by the library. For example:
+  In your HTML, you can now start using the declarative CSS syntax provided by the library. For example:
 
-    <div class="my-label
+      <div class="my-label
                 padding-1em
                 margin-.4em-1em
                 background-#333
@@ -43,23 +94,15 @@ In your HTML, you can now start using the declarative CSS syntax provided by the
 
 ## Current Class Count
 
-> Probably wrong; it's GPT Generated for now.
+Current class count is still increasing; Not including the `font-pack` addon.
 
-+ CSS Properties: There are around 500 distinct CSS properties. However, many of these properties can be broken down into sub-properties. For instance, margin can be broken down into margin-top, margin-right, margin-bottom, and margin-left.
-+ Measurement Types: Common measurement types in CSS include px, %, em, rem, vh, vw, vmin, vmax, cm, mm, in, pt, and pc. That's 13 different measurement types.
-+ Colors: There are 16,777,216 possible RGB colors. However, in most practical scenarios, a subset of these colors is used. If we consider named colors, hex values, rgba, hsla, etc., we can conservatively estimate about 1,000 commonly used colors.
-    + All web-safe colors
-    + All hex values
-+ Short vs. Long Flavor: Each property can be represented in its short form (like margin) or its long form (like margin-top, margin-right, etc.). This effectively doubles the number of properties.
+There are roughly 139 top level attributes (`margin`, `border` etc..)
 
-Given this:
-
-+ Total properties (considering short and long flavors): 500 x 2 = 1,000
-+ Total combinations for each property: 1,000 (colors for color properties) + 13 (measurement types for others) = 1,013
-
-So, the total number of possible classes would be: 1,000 properties x 1,013 combinations = 1,013,000
-
-This is a rough estimate, and the actual number might be higher or lower based on specific constraints and the exact number of properties and values considered.
++ Every sub attribute is a key (about 209 in total)
++ Every size type,
+  + absolute (about 7; `cm`, `px`, `Q` etc..)
+  + relative (about 20, `em`, `vw` `svh` etc)
++ Every color (16M hex short and long formats, all the websafe colours)
 
 
 ## Info

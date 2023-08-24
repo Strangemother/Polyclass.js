@@ -160,9 +160,69 @@ class ClassGraph {
         }
     }
 
+    objectSplitTranslateValue(str, sep=this.sep, safe=true) {
+        let splitObj = this.objectSplit(str, sep, safe)
+        return this.translateValue(splitObj)
+    }
+
     insertLine(selectorStatement, props) {
         let spl = this.objectSplit(selectorStatement)
         return this.insertRule(spl, props)
+    }
+
+    translateValue(splitObj) {
+        /*
+        return the cleaned values for the css declaration
+
+            hex     6   3   2   1
+            rgba    4
+            rgb     3   3/1
+            hsl     3   3/1
+            hwb     3   3/1
+            lab     3   3/1
+            lch     3   3/1
+            oklab   3   3/1
+            oklch   3   3/1
+
+            // Named colors
+            rebeccapurple
+            aliceblue
+
+            // RGB Hexadecimal
+            #f09
+            #ff0099
+
+            // RGB (Red, Green, Blue)
+            rgb(255 0 153)
+            rgb(255 0 153 / 80%)
+
+            // HSL (Hue, Saturation, Lightness)
+            hsl(150 30% 60%)
+            hsl(150 30% 60% / 0.8)
+
+            // HWB (Hue, Whiteness, Blackness)
+            hwb(12 50% 0%)
+            hwb(194 0% 0% / 0.5)
+
+            // LAB (Lightness, A-axis, B-axis)
+            lab(50% 40 59.5)
+            lab(50% 40 59.5 / 0.5)
+
+            // LCH (Lightness, Chroma, Hue)
+            lch(52.2% 72.2 50)
+            lch(52.2% 72.2 50 / 0.5)
+
+            // Oklab (Lightness, A-axis, B-axis)
+            oklab(59% 0.1 0.1)
+            oklab(59% 0.1 0.1 / 0.5)
+
+            // Oklch (Lightness, Chroma, Hue)
+            oklch(60% 0.15 50)
+            oklch(60% 0.15 50 / 0.5)
+        */
+        let valueVal = splitObj.values.join(' ')
+        console.log('translateValue', valueVal)
+        return valueVal
     }
 
     insertRule(splitObj, props=undefined) {
@@ -170,7 +230,7 @@ class ClassGraph {
         // let clean = this.escapeStr(splitObj.str)
         // let propStr = `.${clean}`
         let propStr = this.asSelectorString(splitObj)
-        let valueVal = splitObj.values.join(' ')
+        let valueVal = this.translateValue(splitObj)
         let d = {[valueKey]: valueVal}
 
         if(props) {
@@ -182,7 +242,7 @@ class ClassGraph {
             console.warn('Selector already exists', propStr)
             return this.dcss.getRuleBySelector(propStr)
         }
-        console.log('Inserting rule', propStr)
+        // console.log('Inserting rule', propStr)
 
         let handlerFunc = splitObj.node?.handler?.bind(splitObj)
 
@@ -283,7 +343,8 @@ class ClassGraph {
     getCSSText() {
         let strRes = ''
         let lineEnd = '\n'
-        let sheet = getSheet()
+        let sheet = this.dcss.getSheet()
+        // debugger
         for(let rule of sheet.rules) {
             strRes += `${rule.cssText};${lineEnd}`
         }

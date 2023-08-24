@@ -13,97 +13,15 @@ const fontPackReceiver = (function(){
     }
 
 
-    let fontPackReceiver =  function(obj) {
-        /* links required:
-
-            <link rel="preconnect" href="https://fonts.googleapis.com">
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-            <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
-
-            <link href="https://fonts.googleapis.com/css2?
-                family=Roboto+Condensed:ital,wght@0,400;0,700;1,700
-                &family=Roboto:wght@300&display=swap" rel="stylesheet">
-            <link rel="preconnect" href="https://fonts.googleapis.com">
-
-                family=Barriecito
-                family=Roboto:wght@300
-                family=Roboto+Condensed:ital,wght@0,300;
-                                                    1,300
-                family=Roboto+Condensed:ital,wght@0,300;
-                                                    0,400;
-                                                    1,300;
-                                                    1,400
-                family=Roboto+Condensed:ital,wght@0,300;
-                                                    0,400;
-                                                    0,700;
-                                                    1,300;
-                                                    1,400;
-                                                    1,700
-
-                family=Montserrat:ital,wght@0,100;
-                                            0,200;
-                                            0,300;
-                                            0,400;
-                                            0,500;
-                                            0,600;
-                                            0,700;
-                                            0,800;
-                                            0,900;
-                                            1,100;
-                                            1,200;
-                                            1,300;
-                                            1,400;
-                                            1,500;
-                                            1,600;
-                                            1,700;
-                                            1,800;
-                                            1,900
-                family=Roboto+Condensed:ital,wght@0,300;
-                                                  0,400;
-                                                  0,700;
-                                                  1,300;
-                                                  1,400;
-                                                  1,700
-                family=Roboto+Condensed:ital,wght@0,300;
-                                                  0,400;
-                                                  0,700;
-                                                  1,300;
-                                                  1,400;
-                                                  1,700
-                family=Roboto:wght@300
-
-                family=Montserrat:wght@100;
-                                       200;
-                                       300;
-                                       400;
-                                       500;
-                                       600;
-                                       700;
-                                       800;
-                                       900
-
-            # font exo-2 regulat italic
-                family=Exo+2:ital@1
-
-            # font exo-2 all italic
-                family=Exo+2:ital,wght@1,300;
-                                       1,400;
-                                       1,500;
-                                       1,600;
-                                       1,700;
-                                       1,800;
-                                       1,900
-
-        CSS Required:
-
-            font-family: 'Roboto', sans-serif;
-         */
+    const fontPackReceiver =  function(obj) {
 
         // Tokenize as a family string.
         //
         values = obj.values
 
-        let familyStrings = createFamilyString(values)
+        let fonts = createFontObjects(values)
+        let familyStrings = createFamilyString(values, fonts)
+
         // let families = tokenize(values)
 
         // install as header <link> items
@@ -112,108 +30,101 @@ const fontPackReceiver = (function(){
 
 
         // Install additional css additions
-        // // For value create a font-family;
-        let classes = { }
-
-        for(let name of values) {
-
-            let replaceFunc =  ($, ofs) => (ofs ? ' ' : "") //+ $.toLowerCase()
-            let cleanName = toTitleCase(name.replace(/[+]/g, replaceFunc))
-            let attr = 'font-family'
-            let className = cg.asSelectorString([attr, name])
-
-            // The name is the origin 'font-pack', plus the given font name `font-name-Roboto`
-            let packName = cg.asSelectorString(obj.props.concat(name))
-            classes[packName] = [
-                    {[attr]: `'${cleanName}', sans-serif`}
-                ]
-            classes[className] = classes[packName]
-
-
-            console.log('Classes', classes)
-            let installed = cg.dcss.addStylesheetRules(classes);
-            installed.renderAll()
-            classes = {}
-        }
-        console.log(obj)
-        // let installed = addStylesheetRulesObject(classes);
-
+        return installFontObjects(fonts)
     }
 
-    let toTitleCase = function(str) {
+    const installFontObjects = function(fonts) {
+        // // For value create a font-family;
+        for(let pack of Object.values(fonts)) {
+            let name = pack.first
+            let replaceFunc = ($, ofs) => (ofs ? ' ' : "") //+ $.toLowerCase()
+            let cleanName = toTitleCase(name.replace(/[+]/g, replaceFunc))
+            console.log('Installing Font', cleanName)//, pack)
+            pack.cleanName = cleanName
+            pack.definition = makeDefinitions(pack)
+            let installed = cg.dcss.addStylesheetRules(pack.definition);
+            installed.renderAll()
+        }
+    }
+
+
+    const toTitleCase = function(str) {
         return str.replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });
     }
 
+    const createFamilyString = function(values, fonts) {
+        fonts = fonts || createFontObjects(values)
+        let fs = function(e) {
+            return `family=${e.str}`
+        }
 
-    const createFamilyString = function(values) {
+        return Object.values(fonts).flatMap((e)=>fs(e)).join('&')
+    }
+
+    const makeDefinitions = function(pack) {
         /*
-            In the first verion the function returns a string for the head node
-            href.
-            However this can only split names. In V2 a function accepts many tokens
-            to install weight types. Each node produces a unique font for the weight.
+            .roboto-i400 {
+                font-family: Roboto;
+                font-weight: 300;
+                font-style: italic;
+            }
 
-            -------------------------------------------------------------------
-
-            str:
-                font-pack-roboto-300-400-500
-
-            URL:
-                family=Roboto:wght@300,400,500
-
-            class
-                .font-pack-robot-300 {
-                    font-family: Roboto
-                    font-weight: 300
-                }
-
-            -------------------------------------------------------------------
-
-            str:
-                font-pack-roboto-400-i300
-
-            url:
-                family=Roboto+Condensed:ital,wght@0,400;1,300
-
-            classes:
-                .font-pack-roboto-i300 {
-                        font-family: Roboto, sans-serif;
-                        font-weight: 300;
-                        font-style: italic;
-                }
-
-                .font-pack-roboto-400 {
-                        font-family: Roboto, sans-serif;
-                        font-weight: 400;
-                }
-
-            -------------------------------------------------------------------
-
-            str:
-                font-pack-exo+2-i
-
-            url:
-                family=Exo+2:ital@1
-
-            -------------------------------------------------------------------
-
-            str:
-                font-pack-exo+2-i300-i400-i500-i600-i700-i800-i900 // ugly.
-
-            url:
-                family=Exo+2:ital,wght@1,300;1,400;1,500;1,600;1,700;1,800;1,900
-
+        pack:
+            cleanName:"Roboto"
+            first:"roboto"
+            formatStringParts:(2) ['ital', 'wght']
+            str:"Roboto:ital,wght@0,100;0,400;0,900;1,300;1,400;1,700;1,900"
+            titleToken:"Roboto"
+            tokens:
+                100:{int: 100, regu: 1}
+                300:{int: 300, ital: 1}
+                400:{int: 400, regu: 1, ital: 1}
+                700:{int: 700, ital: 1}
+                900:{int: 900, regu: 1, ital: 1}
          */
+        let res = {}
+        for(let token of Object.values(pack.tokens)) {
+            // console.log('making on token' , token)
+            let def = {
+                'font-weight': token.int
+                , 'font-family': `'${pack.cleanName}', sans-serif`
+            }
+            let selectorBits = ['font', pack.first]
 
+            for(let key of token.keys) {
+                let newDef = Object.assign({}, def)
+                if(key.isItal) {
+                    newDef['font-style'] = 'italic'
+                }
+
+                let selectorRange = selectorBits.concat([key.token])
+                let packName = cg.asSelectorString(selectorRange)
+                // console.log(packName, newDef)
+                res[packName] = newDef
+            }
+
+        }
+        return res
+    }
+
+    const createFontObjects = function(values) {
         // family=Roboto:wght@300
-        let familyStrings = '' //"family=Roboto:wght@300"
+        // let familyStrings = '' //"family=Roboto:wght@300"
+        let index = 0
+        let fonts = {}
 
-        for(let i in values) {
+        let currentFont;
+        let regex = /([a-zA-Z-]{0,}?)(\d+)/;
+        let REGULAR = 'r' // a no definition (standard) font
+        let skipEmpty = true
+        let manyFont = true
+
+        for(let t in values) {
 
             // A token will be a name or a format type.
             // iterate forward. Test n+1; if n+1 is not a weight, break
             // else continue digesting the weights until a not weight is met.
             // This produces a object dict of { value, font, weights }
-            // weights will be stringy until converted to _real_ formats.
             /*
                 for token in tokens:
                     if token is not value-like:
@@ -224,31 +135,167 @@ const fontPackReceiver = (function(){
                         current_font.weights += token
 
              */
-            let token = values[i]
+            let token = values[t]
 
-            let amp = familyStrings.length == 0? '':'&';
-            let titleToken = toTitleCase(token);
-            familyStrings += `${amp}family=${titleToken}`
+            // if token is weight, stack into the previous (current) font.
+            if(index == 0) {
+                // the first token should be a font.
+                fonts[index] = { first: token, tokens:{} }
+                currentFont = index
+                index++;
+                continue
+            }
+
+            let [prefix, int] = [null, null]
+            try{
+                // if match int, {v|r|i}int, stack, else continue.
+                let _;
+                [_, prefix, int] = token.match(regex);
+                // console.log(prefix || REGULAR, int)
+                if(prefix.length == 0) {
+                    prefix = REGULAR
+                }
+            } catch {
+                if(manyFont) {
+                    // regenerate the current font and continue forward.
+                    // console.log('Building font space', token)
+                    fonts[index] = { first: token, tokens:{} }
+                    currentFont = index
+                    index++;
+                    continue
+                } else {
+
+                    // bad token
+                    if(token.length == 0
+                        && skipEmpty == true) {
+                        //skip the empties
+                        index++;
+                        continue
+                    }
+                    console.warn(`Bad token: "${token}"`)
+                }
+            }
+
+            let prefixMap = {
+                // Here we flag italic or regular.
+                // Google fonts accept a formatter "ital,wght" and a value "0,100"
+                // italic flag 1: "1,100"
+                null: function(){ /* do nothing */ return { regu: 1, wasNull: 1} }
+                , 'i': function(){ /* flag italic */  return { ital: 1 } }
+                , 'r': function(){ /* flag regular */ return { regu: 1 } }
+            }
+
+            let weightDef = {
+                int: Number(int)
+
+            }
+
+            if(weightDef.int == 0) {
+                // The given weight is likely wrong.
+                console.warn('Skipping zero weighted item')
+                index++;
+                continue
+            }
+
+            for(let bit in prefix) {
+                let v = prefix[bit]
+                let actuator = prefixMap[v]
+                Object.assign(weightDef, actuator())
+            }
+
+            // console.log('weightDef', weightDef);
+
+            let existing = fonts[currentFont]?.tokens[int] || {};
+
+            Object.assign(existing, weightDef)
+            // console.log('Adding to existing keys', token)
+            if(existing.keys == undefined) {
+                existing.keys = new Set
+            }
+            existing.keys.add({ isItal: weightDef.ital, token})
+            fonts[currentFont].tokens[int] = existing;
+            index++;
         }
 
-        return familyStrings
+        return stringifyTokenized(fonts);
     }
 
+    const stringifyTokenized = function(fonts){
+        // now make family strings on each type
+        for(let i in fonts) {
+            let pack = fonts[i]
+
+            if(pack.first.length == 0) {
+                //skip blank entries
+                continue
+            }
+
+            extendPack(pack)
+        }
+
+
+        return fonts
+    }
+
+    const extendPack = function(pack) {
+        let titleToken = toTitleCase(pack.first);
+
+        let allTokens = Object.assign({}, ...Object.values(pack.tokens))
+        let hasItal = allTokens.ital != undefined
+
+        let formatStringParts = []
+        if(hasItal) { formatStringParts.push('ital') }
+        if(hasItal || allTokens.regu) { formatStringParts.push('wght') }
+
+        let weightValues = new Set
+
+        for(let key in pack.tokens) {
+            let token = pack.tokens[key]
+            // console.log(token)
+            let ital = token.ital? 1: 0
+            let int = token.int
+            let a = hasItal? [ital]: []
+            a.push(int)
+            let weightStr = a.join(',')
+            weightValues.add(weightStr)
+
+            if(token.regu != undefined) {
+                let a0 = hasItal? [0]: []
+                a0.push(int)
+                let regWeightStr = a0.join(',')
+                weightValues.add(regWeightStr)
+
+            }
+        }
+
+        let weights = Array.from(weightValues).sort()//.join(';')
+        let totalWeightStr = weights.join(';')
+        let formatString = formatStringParts.join(',')
+        let str = `${titleToken}:${formatString}@${totalWeightStr}`
+
+        Object.assign(pack, {
+            weights
+            , formatStringParts
+            , titleToken
+            , str
+        })
+    }
 
     const generateGoogleLinks = function(familyStrings){
 
-            let a = getOrCreateLink('link', 'preconnect', {
-                href: "https://fonts.googleapis.com"
-            })
+        let a = getOrCreateLink('link', 'preconnect', {
+            href: "https://fonts.googleapis.com"
+        })
 
-            let b = getOrCreateLink('link', 'preconnect', {
-                href: "https://fonts.gstatic.com"
-                , crossorigin: ''
-            })
+        let b = getOrCreateLink('link', 'preconnect', {
+            href: "https://fonts.gstatic.com"
+            , crossorigin: ''
+        })
 
-            let c = getOrCreateLink('link', "stylesheet", {
-                href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
-            })
+        let c = getOrCreateLink('link', "stylesheet", {
+            href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
+        })
+
         return [a,b,c]
     }
 
