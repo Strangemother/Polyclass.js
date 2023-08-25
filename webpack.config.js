@@ -17,7 +17,7 @@ module.exports = {
     ]
     , all: {
         dependsOn: 'bundle'
-        import: './src/browser.js'
+        , import: './src/browser.js'
     }
     , fontPackAddon: './src/addons/font-pack.js'
     , monitorAddon: './src/addons/monitor.js'
