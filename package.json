@@ -9,7 +9,7 @@
     "build": "webpack"
   },
   "files": [
-      "dist/",
+      "dist/"
   ],
   "repository": {
     "type": "git",
