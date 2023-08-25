@@ -25,7 +25,7 @@ module.exports = {
         , './src/module.js'
         , './src/browser.js'
     ]
-    , 'bundle/all' [
+    , 'bundle/all': [
         './src/classgraph.js'
         , './src/dcss.js'
         , './src/module.js'
