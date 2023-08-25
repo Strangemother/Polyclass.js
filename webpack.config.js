@@ -4,6 +4,7 @@ const path = require('path');
 
 module.exports = {
   mode: 'development'
+  , devtool: false
   , entry: {
     browser: './src/browser.js'    // Browser entry point
     , module: './src/index.js'     // Node.js entry point (optional)
