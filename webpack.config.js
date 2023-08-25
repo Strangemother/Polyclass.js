@@ -9,7 +9,9 @@ module.exports = {
     , dcss: './src/dcss.js'
     , classgraph: './src/classgraph.js'
     , bundle: [
-        'browser', 'dcss', 'classgraph'
+        './src/browser.js',
+        './src/dcss.js',
+        './src/classgraph.js'
     ]
   },
   // output: {
