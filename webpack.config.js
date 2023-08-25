@@ -16,7 +16,7 @@ module.exports = {
         , './src/module.js'
     ]
     , all: {
-        dependsOn: 'bundle'
+        dependOn: 'bundle'
         , import: './src/browser.js'
     }
     , fontPackAddon: './src/addons/font-pack.js'
