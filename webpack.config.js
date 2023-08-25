@@ -6,21 +6,33 @@ module.exports = {
   mode: 'production'
   , devtool: false
   , entry: {
-    browser: './src/browser.js'    // Browser entry point
-    , module: './src/module.js'     // Node.js entry point (optional)
-    , dcss: './src/dcss.js'
+    browser: './src/browser.js'
     , classgraph: './src/classgraph.js'
-    , bundle: [
+    , dcss: './src/dcss.js'
+    , module: './src/module.js'
+
+    , 'addon/font-pack': './src/addons/font-pack.js'
+    , 'addon/monitor': './src/addons/monitor.js'
+
+    , 'bundle/esm': [
         './src/classgraph.js'
         , './src/dcss.js'
         , './src/module.js'
     ]
-    , all: {
-        dependOn: 'bundle'
-        , import: './src/browser.js'
-    }
-    , 'addon/fontpack': './src/addons/font-pack.js'
-    , 'addon/monitor': './src/addons/monitor.js'
+    , 'bundle/browser': [
+        './src/classgraph.js'
+        , './src/dcss.js'
+        , './src/module.js'
+        , './src/browser.js'
+    ]
+    , 'bundle/all' [
+        './src/classgraph.js'
+        , './src/dcss.js'
+        , './src/module.js'
+        , './src/addons/font-pack.js'
+        , './src/addons/monitor.js'
+        , './src/browser.js'
+    ]
   },
   // output: {
   //   path: path.resolve(__dirname, 'dist'),
