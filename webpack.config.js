@@ -3,7 +3,8 @@
 const path = require('path');
 
 module.exports = {
-  entry: {
+  mode: 'development'
+  , entry: {
     browser: './src/browser.js'    // Browser entry point
     , module: './src/index.js'     // Node.js entry point (optional)
     , dcss: './src/dcss.js'
