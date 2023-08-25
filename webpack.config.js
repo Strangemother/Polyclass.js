@@ -18,6 +18,5 @@ module.exports = {
     sourceMapFilename: '[name].[hash:8].map',
     chunkFilename: '[id].[hash:8].js',
     libraryTarget: 'umd'         // Universal Module Definition
-  };
-
+  }
 };
