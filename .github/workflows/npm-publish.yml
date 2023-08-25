@@ -53,4 +53,8 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - run: npm ci
+      - name: Bump version and create commit
+        run: |
+          npm version patch  # or 'minor' or 'major'
+      - run: git push --follow-tags
       - run: npm publish
