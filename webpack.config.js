@@ -12,8 +12,8 @@ module.exports = {
     , classgraph: './src/classgraph.js'
     , bundle: [
         './src/classgraph.js'
-        './src/dcss.js',
-        './src/module.js'
+        , './src/dcss.js'
+        , './src/module.js'
     ]
     , all: {
         dependsOn: 'bundle'
