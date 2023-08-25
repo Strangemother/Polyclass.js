@@ -55,8 +55,8 @@ jobs:
       - run: npm ci
       - name: Bump version and create commit
         run: |
-          npm version patch  # or 'minor' or 'major'
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@users.noreply.github.com"
           git push --follow-tags
+          npm version patch  # or 'minor' or 'major'
       - run: npm publish
