@@ -19,8 +19,8 @@ module.exports = {
         dependOn: 'bundle'
         , import: './src/browser.js'
     }
-    , fontPackAddon: './src/addons/font-pack.js'
-    , monitorAddon: './src/addons/monitor.js'
+    , 'addon/fontpack': './src/addons/font-pack.js'
+    , 'addon/monitor': './src/addons/monitor.js'
   },
   // output: {
   //   path: path.resolve(__dirname, 'dist'),
