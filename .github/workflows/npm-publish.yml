@@ -33,6 +33,10 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: ls
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/ # or path/to/artifact
 
   publish-npm:
     needs: build
