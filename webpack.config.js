@@ -3,18 +3,24 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'development'
+  mode: 'production'
   , devtool: false
   , entry: {
     browser: './src/browser.js'    // Browser entry point
-    , module: './src/index.js'     // Node.js entry point (optional)
+    , module: './src/module.js'     // Node.js entry point (optional)
     , dcss: './src/dcss.js'
     , classgraph: './src/classgraph.js'
     , bundle: [
-        './src/browser.js',
-        './src/dcss.js',
         './src/classgraph.js'
+        './src/dcss.js',
+        './src/module.js'
     ]
+    , all: {
+        dependsOn: 'bundle'
+        import: './src/browser.js'
+    }
+    , fontPackAddon: './src/addons/font-pack.js'
+    , monitorAddon: './src/addons/monitor.js'
   },
   // output: {
   //   path: path.resolve(__dirname, 'dist'),
