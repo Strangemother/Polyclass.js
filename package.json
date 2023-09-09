@@ -1,6 +1,6 @@
 {
   "name": "classy-declarative-css",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
   "main": "dist/cdc.umd.js",
   "module": "dist/cdc.modern.js",
