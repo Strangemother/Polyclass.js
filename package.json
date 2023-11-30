@@ -1,48 +1,49 @@
 {
-"name": "cdc",
-"type": "module",
-"source": "src/foo.js",
-"exports": {
-  "require": "./dist/foo.cjs",
-  "default": "./dist/foo.modern.js"
-},
-"main": "./dist/foo.cjs",
-"module": "./dist/foo.module.js",
-"unpkg": "./dist/foo.umd.js",
-"scripts": {
-  "build": "microbundle",
-  "dev": "microbundle watch"
-},
-"version": "0.0.9",
-"description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
-"main": "src/index.js",
-"module": "src/polyclass-browser.js",
-"main": "dist/cdc.umd.js",
-"module": "dist/cdc.modern.js",
-"scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "microbundle"
-},
-"files": [
-    "src/",
-    "dist/"
-],
-"repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/Strangemother/polyclass.js.git"
-},
-"keywords": [
-    "automatic-css",
-    "css-class",
-    "pre-generated-classes",
-    "css-combiner"
-],
-"author": "Jay Jagpal",
-"license": "MIT",
-"bugs": {
-    "url": "https://github.com/Strangemother/polyclass.js/issues"
-},
-"homepage": "https://github.com/Strangemother/polyclass.js#readme",
-"devDependencies": {
-    "microbundle": "^0.15.1"
+    "name": "cdc",
+    "type": "module",
+    "source": "src/foo.js",
+    "exports": {
+        "require": "./dist/foo.cjs",
+        "default": "./dist/foo.modern.js"
+    },
+    "main": "./dist/foo.cjs",
+    "module": "./dist/foo.module.js",
+    "unpkg": "./dist/foo.umd.js",
+    "scripts": {
+        "build": "microbundle",
+        "dev": "microbundle watch"
+    },
+    "version": "0.0.9",
+    "description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
+    "main": "src/index.js",
+    "module": "src/polyclass-browser.js",
+    "main": "dist/cdc.umd.js",
+    "module": "dist/cdc.modern.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "microbundle"
+    },
+    "files": [
+        "src/",
+        "dist/"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/Strangemother/polyclass.js.git"
+    },
+    "keywords": [
+        "automatic-css",
+        "css-class",
+        "pre-generated-classes",
+        "css-combiner"
+    ],
+    "author": "Jay Jagpal",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Strangemother/polyclass.js/issues"
+    },
+    "homepage": "https://github.com/Strangemother/polyclass.js#readme",
+    "devDependencies": {
+        "microbundle": "^0.15.1"
+    }
 }
