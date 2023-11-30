@@ -1,5 +1,5 @@
 {
-    "name": "cdc",
+    "name": "polyclass.js",
     "type": "module",
     "source": "src/foo.js",
     "exports": {
@@ -17,8 +17,8 @@
     "description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
     "main": "src/index.js",
     "module": "src/polyclass-browser.js",
-    "main": "dist/cdc.umd.js",
-    "module": "dist/cdc.modern.js",
+    "main": "dist/polyclass.umd.js",
+    "module": "dist/polyclass.modern.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "microbundle"
