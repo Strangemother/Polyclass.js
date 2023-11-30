@@ -6,7 +6,7 @@ module.exports = {
   mode: 'production'
   , devtool: false
   , entry: {
-    browser: './src/browser.js'
+    browser: './src/polyclass-browser.js'
     , classgraph: './src/classgraph.js'
     , dcss: './src/dcss.js'
     , module: './src/module.js'
