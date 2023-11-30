@@ -1,17 +1,17 @@
 {
 "name": "cdc",
 "type": "module",
-"source": "src/foo.js",             // your source code
+"source": "src/foo.js",
 "exports": {
-  "require": "./dist/foo.cjs",      // used for require() in Node 12+
-  "default": "./dist/foo.modern.js" // where to generate the modern bundle (see below)
+  "require": "./dist/foo.cjs",
+  "default": "./dist/foo.modern.js"
 },
-"main": "./dist/foo.cjs",           // where to generate the CommonJS bundle
-"module": "./dist/foo.module.js",   // where to generate the ESM bundle
-"unpkg": "./dist/foo.umd.js",       // where to generate the UMD bundle (also aliased as "umd:main")
+"main": "./dist/foo.cjs",
+"module": "./dist/foo.module.js",
+"unpkg": "./dist/foo.umd.js",
 "scripts": {
-  "build": "microbundle",           // compiles "source" to "main"/"module"/"unpkg"
-  "dev": "microbundle watch"        // re-build when source files change
+  "build": "microbundle",
+  "dev": "microbundle watch"
 },
 "version": "0.0.9",
 "description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
