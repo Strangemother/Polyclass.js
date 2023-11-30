@@ -6,6 +6,9 @@ name: Node.js Package
 on:
   release:
     types: [created]
+  push:
+    branches: "feature/*"
+
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
@@ -28,6 +31,12 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
+      - run: npm run build
+      - run: ls
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/ # or path/to/artifact
 
   publish-npm:
     needs: build
@@ -38,7 +47,16 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - uses: actions/download-artifact@v3
+      - name: Display structure of downloaded files
+        run: ls -R
+      - run: npm ci
+      - name: Bump version and create commit
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@users.noreply.github.com"
+          npm version patch  # or 'minor' or 'major'
+          git push --follow-tags
+      - run: npm publish
