@@ -405,8 +405,21 @@ class ClassGraph {
             oklch(60% 0.15 50)
             oklch(60% 0.15 50 / 0.5)
         */
-        let valueVal = splitObj.values.join(' ')
-        console.log('translateValue', valueVal)
+        let vals = splitObj.values
+        let valueVal = vals?.join(' ')
+        // console.log('translateValue', valueVal)
+
+
+        /* Discover any "special" keys to digest the value processing,
+        such as "vars-*" */
+        for (var i = 0; i < (vals || []).length; i++) {
+            let k = vals[i]
+            let digest = this.translateMap[k]
+            if(digest){
+                return digest.bind(this)(splitObj, i)
+            }
+        }
+
         return valueVal
     }
 
