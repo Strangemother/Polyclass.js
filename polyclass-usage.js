@@ -7,21 +7,6 @@ console.log('Running index')
 const autoMain = function(){
 }
 
-
-const xcg = generateClassGraph({
-    addons: true // default true
-    , vendorLocked: false
-    // , prefixes: ['pc','x']
-    , aliases: {
-        background: ['bg', 'back']
-        , border: ['bd']
-        , var: ['v']
-        , padding: ['pd']
-        , radius: ['r']
-    }
-})
-
-
 const pc = Polyclass({
     addons: true // default true
     , vendorLocked: false
@@ -69,7 +54,7 @@ propInfo.color = 'red'
 b[0].replace()
 
 
-// pc.insertReceiver('demo-box', { 'font-size': '1.5em'})
+// pc.insertReceiver(  'demo-box', { 'font-size': '1.5em'})
 pc.insertClassProps('demo-box', { 'font-size': '1.5em'})
 
 // pc.vars({
