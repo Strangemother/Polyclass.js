@@ -136,6 +136,9 @@ class ClassGraph {
             graphNode = newNode
         }
         graphNode.leaf = true
+        if(func!=undefined) {
+            graphNode.handler = func
+        }
         return graphNode
     }
 
