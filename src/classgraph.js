@@ -305,24 +305,51 @@ class ClassGraph {
             }
 
             node = currentNode
-
         }
 
         // grab the next keys
         let props = keys.slice(0, c1)
         let values = keys.slice(c1)
-        return {
+        let r = {
             props, values, str,
             node: currentNode,
             valid: currentNode && (values.length > 0) || false
         }
+
+        // this.translateValue(r)
+        return r
     }
 
+    /* Split and translate the values through any complex rules.
+
+        Usually the `translateValue` occurs during the insert phase (late stage)
+        Therefore isn't seen in the split object.
+     */
     objectSplitTranslateValue(str, sep=this.sep, safe=true) {
         let splitObj = this.objectSplit(str, sep, safe)
         return this.translateValue(splitObj)
     }
 
+    /* Insert a string as a "statement" in one line,
+
+        res = cg.insertLine('alpha-red', {color: 'red'})
+        res.renderAll()
+
+    Creates:
+
+        .alpha-red {
+            color: red
+        }
+
+    render must be called on each returned rule. `renderAll`
+    is a special function on the returned array, calling `render` on
+    each sub item.
+
+    The function converts the statement into a splitobject,
+    and applies it to the stylesheet through `insertRule`
+
+    returns the result from insertRule, an Array of Rules.
+    */
     insertLine(selectorStatement, props) {
         let spl = this.objectSplit(selectorStatement)
         return this.insertRule(spl, props)
