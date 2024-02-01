@@ -421,35 +421,47 @@ class ClassGraph {
         }
 
         return valueVal
+
     }
 
-    insertRule(splitObj, props=undefined) {
-        let valueKey = splitObj.props.join('-')
-        // let clean = this.escapeStr(splitObj.str)
-        // let propStr = `.${clean}`
-        let propStr = this.asSelectorString(splitObj)
-        let valueVal = this.translateValue(splitObj)
-        let d = {[valueKey]: valueVal}
+    /*Given a special splitobject using `objectSplit()`, convert to a css
+      style and insert into the dynamic stylesheet.
 
-        if(props) {
-            Object.assign(d, props)
-        }
+      1. geneate a selector string
+      2. Check existing; return early if it exists
+      3. Convert the splitobject values to a propery dictionary
+      4. Assign any user overrides + use split node hander if exists
+      5. Insert into the stylesheet + renderAll
+     */
+    insertRule(splitObj, props=undefined, withParentSelector=true) {
+        let valueKey = splitObj?.props?.join('-')
+        // The class selector e.g. ".margin-top-\special"
+        let propStr = this.asSelectorString(splitObj, withParentSelector)
+
         let exists = this.dcss.selectorExists(propStr)
-
         if(exists) {
-            console.warn('Selector already exists', propStr)
+            // Prop created. Return the original.
             return this.dcss.getRuleBySelector(propStr)
         }
-        // console.log('Inserting rule', propStr)
 
-        let handlerFunc = splitObj.node?.handler?.bind(splitObj)
+        let valueVal = this.translateValue(splitObj)
+
+        // The style object applied to the prop string:
+        // .propSt { declarations }
+        let declarations = {[valueKey]: valueVal}
+
+        if(props) {
+            // Apply any user enforced object overrides.
+            Object.assign(declarations, props)
+        }
+
 
         let handlerRes = {
             insert:true
         }
-
+        let handlerFunc = splitObj.node?.handler?.bind(splitObj)
         if(handlerFunc) {
-            // executing the handler
+            // executing the handler and replace the handlerRes if required.
             if(typeof(handlerFunc) == 'function') {
                 let potentialRes = handlerFunc(splitObj)
                 if(potentialRes !== undefined) {
@@ -458,27 +470,26 @@ class ClassGraph {
             }
         }
 
-        if(handlerRes.insert !== false) {
 
+        if(handlerRes.insert !== false) {
             let renderArray = this.dcss.addStylesheetRules({
-                [propStr]: d
+                [propStr]: declarations
             });
 
             renderArray.renderAll()
-
             return renderArray
         }
     }
 
-    insertReceiver(keys, handler) {
-        /*Insert a function into the graph, to accept the tokens
-            insertRecevier('font-pack', handlerFunc(...tokens){
-                console.log('Install', tokens)
-            })
+    /*Insert a function into the graph, to accept the tokens
+        insertRecevier('font-pack', handlerFunc(...tokens){
+            console.log('Install', tokens)
+        })
 
-            > 'font-pack-roboto'
-            'Install roboto'
-        */
+        > 'font-pack-roboto'
+        'Install roboto'
+    */
+    insertReceiver(keys, handler) {
 
         let leaf = this.addTree(keys)
         leaf.handler = handler
@@ -486,7 +497,23 @@ class ClassGraph {
         return leaf
     }
 
-    asSelectorString(entity) {
+    /* Convert the given `entity` to a CSS Selector string. The entity may be:
+    + array: of strings
+    + string
+    + object: with `props`: array of strings
+    + object: with `str` as string
+
+        this.asString('margin-top-.5em', withParentSelector=false)
+        ".margin-top-\\.5em"
+
+        this.asString('margin-top-.5em', withParentSelector=true)
+        ".acme-labs .margin-top-\\.5em"
+
+    If a parent selector exists, this is applied as a prefix to the selector
+    Return a string, CSS selector escaped
+    */
+
+    asSelectorString(entity, withParentSelector=true) {
         let clean;
         // array
         if(Array.isArray(entity)) {
@@ -514,7 +541,28 @@ class ClassGraph {
         }
 
         let propStr = `.${clean}`
+
+        if(withParentSelector) {
+            return this.prependParent(propStr, entity)
+        }
+
         return propStr
+    }
+
+    /*
+        Given a finished selector and the original entity generating the
+        selector, return a string to replace the given cleanString.
+
+            prependParent('.foo', {})
+            '.acme-labs .foo'
+     */
+    prependParent(cleanString, originalEntity) {
+        if(this.parentSelector != undefined) {
+            let v = this.parentSelector
+            return `${v}${cleanString}`
+        }
+
+        return cleanString
     }
 
     escapeStr(str) {
@@ -550,8 +598,17 @@ class ClassGraph {
         return strRes
     }
 
+    /*
+    Called by the monitor upon a `class` mutation, with the
+    list of _new_ classes applied to the entity
+
+        cg.captureNew(['margin-solid-1px'])
+
+    Any detected rule of which does not exist, is created and
+    applied to the class graph.
+     */
     captureNew(items, oldItems) {
-        console.log('Capture new', items, oldItems)
+        // console.log('Capture new', items, oldItems)
         for(let str of items) {
             if(str.length == 0) {
                 continue
@@ -561,11 +618,19 @@ class ClassGraph {
             // debugger
             let func = n? n.bind(splitObj): cg.insertRule.bind(cg)
             let res = func(splitObj)
-            console.log(str, res)
+            // console.log(str, res)
         }
     }
 
     processOnLoad(node, watch=document) {
+        /* Process the given node using `process(node)`,
+        when the `DOMContentLoaded` event emits from the `watch` object.
+
+        By default `watch` is the document.
+
+            cg.processOnLoad(body)
+
+         */
         if(this.domContentLoaded == true) {
             return this.process(node)
         }
