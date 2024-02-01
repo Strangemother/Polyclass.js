@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 
+html {
+    --var-happy-octopus: #11ff44;
+}
+
 
 body {
     font-family: "Roboto";
