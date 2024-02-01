@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DCSS</title>
+    <style type="text/css">
+
+        html {
+            --happy-octopus: #095a1a;
+        }
+
+    </style>
 </head>
 <body class="font-roboto-400">
 
@@ -11,9 +18,16 @@
     <script src="./src/classgraph.js"></script>
     <script src="./src/addons/monitor.js"></script>
     <script src="./src/addons/font-pack.js"></script>
+    <script src="./src/addons/var-translate.js"></script>
+    <script src="./src/addons/vars-box.js"></script>
+    <script src="./src/polyclass.js"></script>
 
+    <script src="./polyclass-usage.js"></script>
+    <!--
+    <script src="./dcss-usage.js"></script>
     <script src="./src/browser.js"></script>
     <script src="./quick-tests.js"></script>
+    -->
 
     <div id="demo_space" class='foo another there-is-only-one-sausage'>
         <!-- The demo workspace -->
@@ -22,6 +36,7 @@
                     primary-area
                     font-pack-roboto-100-400-900-i300-i400-i700-i900-roboto+mono-300-i300-400-i400-i700
                     background-#333">
+
             <div class="demo-box gap-1 flex down">
                 <div class="text
                     background-color-#111
@@ -30,10 +45,59 @@
                     padding-.8em-1.4em
                     color-#EEE
                     margin-1em">CSS.</div>
+            </div>
 
+            <div class="demo-box gap-1 flex down">
+                <div class="background-color-var-happy-octopus color-white">
+                    <p>Green like an octopus!</p>
+                </div>
+                <div class="background-color-white color-var-happy-octopus">
+                    <p>Flipped like an ape!</p>
+                </div>
+            </div>
+
+            <div class="color-var-cheese">
+                <p>color: var(--cheese)</p>
             </div>
         </div>
 
+        <div class="next-area">
+            <h2>Aliasing</h2>
+            <p>This area has alias named attributes.</p>
+
+            <div class="demo-box gap-1 flex down">
+
+
+                <div class="text
+                    background-color-#111
+                    border-solid-3px-green
+                    border-radius-.4em
+                    padding-.8em-1.4em
+                    color-#EEE
+                    margin-1em">These should be identical. (generic)</div>
+
+                <div class="text
+                    bg-cl-#111
+                    bd-solid-3px-green
+                    bd-r-.4em
+                    pd-.8em-1.4em
+                    cl-#EEE
+                    mg-1em">These should be identical. (aliases)</div>
+
+                <div class="text
+                    pc-x-bg-cl-#111
+                    pc-x-bd-solid-3px-green
+                    pc-x-bd-r-.4em
+                    pc-x-pd-.8em-1.4em
+                    pc-x-cl-#EEE
+                    pc-x-mg-1em">These should be identical. (vendor switch pc-x-*)</div>
+
+                <div class="c-v-cheese">
+                    color var cheese
+                </div>
+            </div>
+
+        </div>
     </div>
 </body>
 </html>
