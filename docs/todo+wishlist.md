@@ -370,3 +370,9 @@ In this case it would be better for key `tom-d-harry` to fail, and `tom-d` to re
     tom-d-harry[-1em]   works A
     tom-d-harry[]       fail-over
     tom-d[-harry]       works B
+
+
+## type tests
+
+    isColor     check #000 red
+    isSize      check 1em 4ch
