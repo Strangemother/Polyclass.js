@@ -1,3 +1,11 @@
+/* Class Graph
+The primary functionality to read and adapt class strings.
+
+Functionally it's just a string splitter, using the built-in CSS attributes
+to generate a graph of possible values.
+
+    const cg = generateClassGraph()
+ */
 
 const kebabCase = function(str, sep='-') {
     let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
