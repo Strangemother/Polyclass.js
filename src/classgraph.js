@@ -157,25 +157,133 @@ class ClassGraph {
         return this.graph
     }
 
-    /*
-        When testing a key, we walk the grapg until a leaf.
+
+    processAliases(aliases) {
+        for(let key in aliases) {
+            this.addAliases(key, aliases[key])
+        }
+    }
+
+    getPrefixes(){
+        let c = this.conf
+        if(c.prefixes){
+            return c.prefixes
+        }
+
+        if(c.prefix){
+            return [c.prefix]
+        }
+        return []
+    }
+
+    isVendorPrefixMatch(keys, prefixes) {
+        prefixes = prefixes == undefined? this.getPrefixes(): prefixes;
+
+        for (var i = 0; i < prefixes.length; i++) {
+            let prefix = prefixes[i]
+            if(keys[i] == prefix) {
+                //pass
+            } else {
+                //fail
+                return false
+            }
+
+        }
+        return true
+    }
+
+    /*Given a list of keys, convert any _literal_ aliases to their true
+    key.
+    Return a new list. The new list length may differ from the given list.
+    */
+    aliasConvert(rawKeys) {
+
+        let prefixes = this.conf.prefixes
+
+
+        let r = []
+        for(let rk of rawKeys) {
+            // If alias, replace
+            r.push(this.aliasMap[rk] || rk)
+        }
+
+        return r
+    }
+
+    addAliases(key, aliases) {
+        for(let a of aliases) {
+            this.addAlias(key, a)
+        }
+    }
+
+    /*Insert a key value alias "bg" == "background" */
+    addAlias(key, alias) {
+        this.aliasMap[alias] = key
+    }
+
+    /* Split a string into its constituents; the CSS key and value
+
+            cg.objectSplit('margin-top-10em')
+
+            {
+                "props": [
+                    "margin",
+                    "top"
+                ],
+                "values": [
+                    "10em"
+                ],
+                "str": "margin-top-10em",
+                "node": {
+                    "key": "top",
+                    "position": [
+                        "margin",
+                        "top"
+                    ],
+                    "leaf": true
+                },
+                "valid": true
+            }
+
+        When testing a key, we walk the graph until a leaf.
         If the next step is a node, continue.
         If the leafs' next step is not a node, parse the values.
         reject leaf-only definitions.
      */
     objectSplit(str, sep=this.sep, safe=true) {
         /* Parse a potential new css class. */
-        // console.log('split on', str, sep)
-        let keys = typeof(str) == 'string'? str.split(sep): str
-        // console.log('split', str, keys)
-        let nodeWord = this.nodeWord()
-        let node = this.getRoot()
-        let currentNode;
-        // c1 rather than c (count).
-        // As all references require the count+1
-        // - but "c" is usually a 0 index counter
-        let c1 = 0;
-        let l = keys.length
+
+        let rawKeys = typeof(str) == 'string'? str.split(sep): str
+            , nodeWord = this.nodeWord()
+            , node = this.getRoot()
+            , currentNode
+            // c1 rather than c (count).
+            // As all references require the count+1
+            // - but "c" is usually a 0 index counter
+            , c1 = 0
+            , keys = this.aliasConvert(rawKeys)
+            , l = keys.length
+            ;
+
+        if(this.isVendorPrefixMatch(keys)) {
+            // console.log('Vendor Match!')
+            //
+            // Slice away the vendor.
+            keys = keys.slice(this.getPrefixes().length)
+        } else {
+            // console.log('does not match vendor', keys)
+            if(this.vendorLocked) {
+                // nully obj.
+                return {
+                    props:undefined,
+                    values:undefined,
+                    str,
+                    node: currentNode,
+                    valid: false
+                }
+            }
+        }
+
         for(let k of keys) {
             // loop until a leaf, where the _next_ key is not a value node.
             currentNode = node[nodeWord][k]
@@ -183,9 +291,7 @@ class ClassGraph {
             let isLastNode = (l == c1)
 
             if(currentNode == undefined) {
-                if(safe) {
-                    break
-                }
+                if(safe) { break };
                 continue
             }
 
