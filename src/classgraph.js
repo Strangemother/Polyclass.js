@@ -29,11 +29,28 @@ class ClassGraph {
     constructor(conf) {
         this.conf = conf || {}
 
+        /*
+            A simple key -> function dictionary to capture special (simple)
+            keys during the translate value phase.
+            for example detect `var` in "color-var-foo"
+         */
+        this.translateMap = {
+            // 'var': this.variableDigest,
+        }
+
         if(this.conf.addons !== false) {
             this.installAddons(this.getPreAddons())
         }
 
-        this.sep = conf.sep || this.sep
+        this.vendorLocked = conf?.vendorLocked == undefined? false: conf.vendorLocked
+        this.sep = conf?.sep || this.sep
+        this.aliasMap = {}
+        this.parentSelector = conf?.parentSelector
+        this.processAliases(this.conf?.aliases)
+    }
+
+    insertTranslator(key, func) {
+        this.translateMap[key] = func
     }
 
     getPreAddons(){
@@ -49,10 +66,9 @@ class ClassGraph {
 
     generate(node){
         /*
-            The graph generatoe produces a depth of allows
+            The graph generator produces a depth of allowed
             css defintitions. Upon discovery a node may 'release' or continue.
             If the _next_ node is a tree node, continue - if it's a value node, release
-
          */
 
         node = node || document.body
@@ -70,7 +86,32 @@ class ClassGraph {
         this.addTree(keys)
     }
 
-    addTree(keys) {
+    /* Insert a leaf into a tree, marking it as a valid position.
+
+        cg.addTree(['derek', 'eric', 'fred'])
+
+    return the leaf:
+
+        {
+            "key": "harry",
+            "position": [
+                "tom",
+                "dick",
+                "harry"
+            ],
+            "leaf": true
+        }
+
+    This essentially marks this as a valid leaf in the graph.
+    When a new object is requested by its key, this is used
+    as a test for the property split:
+
+        "tom-dick-harry-10rem"
+
+        ["tom-dick-harry", "10rem"]
+
+     */
+    addTree(keys, func) {
 
         let graphNode = this.getRoot();
         let nodesWord = this.nodeWord()
