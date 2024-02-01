@@ -1,4 +1,16 @@
-
+/**
+ * A DynamicCSSStyleSheet allows the developer to manipulate the
+ * CSS Style objects within the sheet, rather than switching classes
+ * or using JS.
+ *
+ * When installed the stylesheet acts behaves like a standard stylesheet
+ * We can add, update, and remove active style definitions, immediately
+ * affecting the view.
+ *
+ * This is very useful for complex or dynamic CSS definitions, such as
+ * a `path()` or font packages. We can couple view changes with style attributes
+ * without a middle-man
+ */
 class RenderArray extends Array {
     renderAll() {
         for(let node of this) {
@@ -155,7 +167,7 @@ class DynamicCSSStyleSheet {
             let rule = rules[selector]
             let entries = Object.entries(rule)
             let newRule = [selector, entries]
-            // console.log(newRule,newRule)
+            // console.log(newRule)
             this.pushResponse(res, styleSheet, newRule)
         }
 
