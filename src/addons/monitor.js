@@ -1,3 +1,14 @@
+/**
+ * # Monitor
+ *
+ * Monitor the HTML tree for dynamically inserted classes.
+ * This ensures any class applied to a node _after_ first render
+ * is discovered. It works through a mutation observer for the
+ * attribute "class". This is useful for dynamic processing of HTML pages
+ *
+ * If the view is a SPA or all the possible classes are _used_ on
+ * the view, this isn't required.
+ */
 (()=>{
 
 let cg;
@@ -10,12 +21,18 @@ const insertReceiver = function(){
     }
 
     ClassGraph.prototype.monitor = function(parent=document.body) {
-        monitorClasses(parent)
+        return monitorClasses(parent)
     }
 }
 
 
 const monitorClasses = function(node) {
+    /*
+
+    Note: If Chrome mutation observer fails to detect a change
+    (But this function is called.), restart the tab, window or browser.
+     */
+
     console.log('monitorClasses', node)
     // configuration of the observer:
     let config = {
@@ -29,29 +46,32 @@ const monitorClasses = function(node) {
         };
 
     let eachMutation = function(mutation) {
+        // console.log('eachMutation', mutation)
         if(mutation.attributeName == 'class') {
             classMutationDetection(mutation)
         }
     }
 
     let mutationHandler = function(mutations) {
-        console.log('mutationHandler', mutations)
+        // console.log('mutationHandler', mutations)
         mutations.forEach(eachMutation);
     }
 
     let observer = new MutationObserver(mutationHandler);
     // pass in the target node, as well as the observer options
-    return observer.observe(node, config);
+    observer.observe(node, config);
+
+    return observer
 }
 
 
 const classMutationDetection = function(mutation) {
     let classes = mutation.target.classList.value;
     let old = mutation.oldValue
-    console.log(`old: "${mutation.oldValue}", target:`
-                , mutation.target
-                , `classes: "${classes}"`
-            )
+    // console.log(`old: "${mutation.oldValue}", target:`
+    //             , mutation.target
+    //             , `classes: "${classes}"`
+    //         )
     let new_spl = classes.split(' ')
     let old_spl = old?.split(' ')
     let newItems = old_spl? difference(new_spl, old_spl): new_spl

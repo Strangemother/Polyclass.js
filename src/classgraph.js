@@ -1,3 +1,11 @@
+/* Class Graph
+The primary functionality to read and adapt class strings.
+
+Functionally it's just a string splitter, using the built-in CSS attributes
+to generate a graph of possible values.
+
+    const cg = generateClassGraph()
+ */
 
 const kebabCase = function(str, sep='-') {
     let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
@@ -21,11 +29,28 @@ class ClassGraph {
     constructor(conf) {
         this.conf = conf || {}
 
+        /*
+            A simple key -> function dictionary to capture special (simple)
+            keys during the translate value phase.
+            for example detect `var` in "color-var-foo"
+         */
+        this.translateMap = {
+            // 'var': this.variableDigest,
+        }
+
         if(this.conf.addons !== false) {
             this.installAddons(this.getPreAddons())
         }
 
-        this.sep = conf.sep || this.sep
+        this.vendorLocked = conf?.vendorLocked == undefined? false: conf.vendorLocked
+        this.sep = conf?.sep || this.sep
+        this.aliasMap = {}
+        this.parentSelector = conf?.parentSelector
+        this.processAliases(this.conf?.aliases)
+    }
+
+    insertTranslator(key, func) {
+        this.translateMap[key] = func
     }
 
     getPreAddons(){
@@ -41,10 +66,9 @@ class ClassGraph {
 
     generate(node){
         /*
-            The graph generatoe produces a depth of allows
+            The graph generator produces a depth of allowed
             css defintitions. Upon discovery a node may 'release' or continue.
             If the _next_ node is a tree node, continue - if it's a value node, release
-
          */
 
         node = node || document.body
@@ -62,7 +86,32 @@ class ClassGraph {
         this.addTree(keys)
     }
 
-    addTree(keys) {
+    /* Insert a leaf into a tree, marking it as a valid position.
+
+        cg.addTree(['derek', 'eric', 'fred'])
+
+    return the leaf:
+
+        {
+            "key": "harry",
+            "position": [
+                "tom",
+                "dick",
+                "harry"
+            ],
+            "leaf": true
+        }
+
+    This essentially marks this as a valid leaf in the graph.
+    When a new object is requested by its key, this is used
+    as a test for the property split:
+
+        "tom-dick-harry-10rem"
+
+        ["tom-dick-harry", "10rem"]
+
+     */
+    addTree(keys, func) {
 
         let graphNode = this.getRoot();
         let nodesWord = this.nodeWord()
@@ -87,6 +136,9 @@ class ClassGraph {
             graphNode = newNode
         }
         graphNode.leaf = true
+        if(func!=undefined) {
+            graphNode.handler = func
+        }
         return graphNode
     }
 
@@ -105,25 +157,133 @@ class ClassGraph {
         return this.graph
     }
 
-    /*
-        When testing a key, we walk the grapg until a leaf.
+
+    processAliases(aliases) {
+        for(let key in aliases) {
+            this.addAliases(key, aliases[key])
+        }
+    }
+
+    getPrefixes(){
+        let c = this.conf
+        if(c.prefixes){
+            return c.prefixes
+        }
+
+        if(c.prefix){
+            return [c.prefix]
+        }
+        return []
+    }
+
+    isVendorPrefixMatch(keys, prefixes) {
+        prefixes = prefixes == undefined? this.getPrefixes(): prefixes;
+
+        for (var i = 0; i < prefixes.length; i++) {
+            let prefix = prefixes[i]
+            if(keys[i] == prefix) {
+                //pass
+            } else {
+                //fail
+                return false
+            }
+
+        }
+        return true
+    }
+
+    /*Given a list of keys, convert any _literal_ aliases to their true
+    key.
+    Return a new list. The new list length may differ from the given list.
+    */
+    aliasConvert(rawKeys) {
+
+        let prefixes = this.conf.prefixes
+
+
+        let r = []
+        for(let rk of rawKeys) {
+            // If alias, replace
+            r.push(this.aliasMap[rk] || rk)
+        }
+
+        return r
+    }
+
+    addAliases(key, aliases) {
+        for(let a of aliases) {
+            this.addAlias(key, a)
+        }
+    }
+
+    /*Insert a key value alias "bg" == "background" */
+    addAlias(key, alias) {
+        this.aliasMap[alias] = key
+    }
+
+    /* Split a string into its constituents; the CSS key and value
+
+            cg.objectSplit('margin-top-10em')
+
+            {
+                "props": [
+                    "margin",
+                    "top"
+                ],
+                "values": [
+                    "10em"
+                ],
+                "str": "margin-top-10em",
+                "node": {
+                    "key": "top",
+                    "position": [
+                        "margin",
+                        "top"
+                    ],
+                    "leaf": true
+                },
+                "valid": true
+            }
+
+        When testing a key, we walk the graph until a leaf.
         If the next step is a node, continue.
         If the leafs' next step is not a node, parse the values.
         reject leaf-only definitions.
      */
     objectSplit(str, sep=this.sep, safe=true) {
         /* Parse a potential new css class. */
-        // console.log('split on', str, sep)
-        let keys = typeof(str) == 'string'? str.split(sep): str
-        // console.log('split', str, keys)
-        let nodeWord = this.nodeWord()
-        let node = this.getRoot()
-        let currentNode;
-        // c1 rather than c (count).
-        // As all references require the count+1
-        // - but "c" is usually a 0 index counter
-        let c1 = 0;
-        let l = keys.length
+
+        let rawKeys = typeof(str) == 'string'? str.split(sep): str
+            , nodeWord = this.nodeWord()
+            , node = this.getRoot()
+            , currentNode
+            // c1 rather than c (count).
+            // As all references require the count+1
+            // - but "c" is usually a 0 index counter
+            , c1 = 0
+            , keys = this.aliasConvert(rawKeys)
+            , l = keys.length
+            ;
+
+        if(this.isVendorPrefixMatch(keys)) {
+            // console.log('Vendor Match!')
+            //
+            // Slice away the vendor.
+            keys = keys.slice(this.getPrefixes().length)
+        } else {
+            // console.log('does not match vendor', keys)
+            if(this.vendorLocked) {
+                // nully obj.
+                return {
+                    props:undefined,
+                    values:undefined,
+                    str,
+                    node: currentNode,
+                    valid: false
+                }
+            }
+        }
+
         for(let k of keys) {
             // loop until a leaf, where the _next_ key is not a value node.
             currentNode = node[nodeWord][k]
@@ -131,9 +291,7 @@ class ClassGraph {
             let isLastNode = (l == c1)
 
             if(currentNode == undefined) {
-                if(safe) {
-                    break
-                }
+                if(safe) { break };
                 continue
             }
 
@@ -147,24 +305,51 @@ class ClassGraph {
             }
 
             node = currentNode
-
         }
 
         // grab the next keys
         let props = keys.slice(0, c1)
         let values = keys.slice(c1)
-        return {
+        let r = {
             props, values, str,
             node: currentNode,
             valid: currentNode && (values.length > 0) || false
         }
+
+        // this.translateValue(r)
+        return r
     }
 
+    /* Split and translate the values through any complex rules.
+
+        Usually the `translateValue` occurs during the insert phase (late stage)
+        Therefore isn't seen in the split object.
+     */
     objectSplitTranslateValue(str, sep=this.sep, safe=true) {
         let splitObj = this.objectSplit(str, sep, safe)
         return this.translateValue(splitObj)
     }
 
+    /* Insert a string as a "statement" in one line,
+
+        res = cg.insertLine('alpha-red', {color: 'red'})
+        res.renderAll()
+
+    Creates:
+
+        .alpha-red {
+            color: red
+        }
+
+    render must be called on each returned rule. `renderAll`
+    is a special function on the returned array, calling `render` on
+    each sub item.
+
+    The function converts the statement into a splitobject,
+    and applies it to the stylesheet through `insertRule`
+
+    returns the result from insertRule, an Array of Rules.
+    */
     insertLine(selectorStatement, props) {
         let spl = this.objectSplit(selectorStatement)
         return this.insertRule(spl, props)
@@ -220,38 +405,63 @@ class ClassGraph {
             oklch(60% 0.15 50)
             oklch(60% 0.15 50 / 0.5)
         */
-        let valueVal = splitObj.values.join(' ')
-        console.log('translateValue', valueVal)
+        let vals = splitObj.values
+        let valueVal = vals?.join(' ')
+        // console.log('translateValue', valueVal)
+
+
+        /* Discover any "special" keys to digest the value processing,
+        such as "vars-*" */
+        for (var i = 0; i < (vals || []).length; i++) {
+            let k = vals[i]
+            let digest = this.translateMap[k]
+            if(digest){
+                return digest.bind(this)(splitObj, i)
+            }
+        }
+
         return valueVal
+
     }
 
-    insertRule(splitObj, props=undefined) {
-        let valueKey = splitObj.props.join('-')
-        // let clean = this.escapeStr(splitObj.str)
-        // let propStr = `.${clean}`
-        let propStr = this.asSelectorString(splitObj)
-        let valueVal = this.translateValue(splitObj)
-        let d = {[valueKey]: valueVal}
+    /*Given a special splitobject using `objectSplit()`, convert to a css
+      style and insert into the dynamic stylesheet.
 
-        if(props) {
-            Object.assign(d, props)
-        }
+      1. geneate a selector string
+      2. Check existing; return early if it exists
+      3. Convert the splitobject values to a propery dictionary
+      4. Assign any user overrides + use split node hander if exists
+      5. Insert into the stylesheet + renderAll
+     */
+    insertRule(splitObj, props=undefined, withParentSelector=true) {
+        let valueKey = splitObj?.props?.join('-')
+        // The class selector e.g. ".margin-top-\special"
+        let propStr = this.asSelectorString(splitObj, withParentSelector)
+
         let exists = this.dcss.selectorExists(propStr)
-
         if(exists) {
-            console.warn('Selector already exists', propStr)
+            // Prop created. Return the original.
             return this.dcss.getRuleBySelector(propStr)
         }
-        // console.log('Inserting rule', propStr)
 
-        let handlerFunc = splitObj.node?.handler?.bind(splitObj)
+        let valueVal = this.translateValue(splitObj)
+
+        // The style object applied to the prop string:
+        // .propSt { declarations }
+        let declarations = {[valueKey]: valueVal}
+
+        if(props) {
+            // Apply any user enforced object overrides.
+            Object.assign(declarations, props)
+        }
+
 
         let handlerRes = {
             insert:true
         }
-
+        let handlerFunc = splitObj.node?.handler?.bind(splitObj)
         if(handlerFunc) {
-            // executing the handler
+            // executing the handler and replace the handlerRes if required.
             if(typeof(handlerFunc) == 'function') {
                 let potentialRes = handlerFunc(splitObj)
                 if(potentialRes !== undefined) {
@@ -260,27 +470,26 @@ class ClassGraph {
             }
         }
 
-        if(handlerRes.insert !== false) {
 
+        if(handlerRes.insert !== false) {
             let renderArray = this.dcss.addStylesheetRules({
-                [propStr]: d
+                [propStr]: declarations
             });
 
             renderArray.renderAll()
-
             return renderArray
         }
     }
 
-    insertReceiver(keys, handler) {
-        /*Insert a function into the graph, to accept the tokens
-            insertRecevier('font-pack', handlerFunc(...tokens){
-                console.log('Install', tokens)
-            })
+    /*Insert a function into the graph, to accept the tokens
+        insertRecevier('font-pack', handlerFunc(...tokens){
+            console.log('Install', tokens)
+        })
 
-            > 'font-pack-roboto'
-            'Install roboto'
-        */
+        > 'font-pack-roboto'
+        'Install roboto'
+    */
+    insertReceiver(keys, handler) {
 
         let leaf = this.addTree(keys)
         leaf.handler = handler
@@ -288,7 +497,23 @@ class ClassGraph {
         return leaf
     }
 
-    asSelectorString(entity) {
+    /* Convert the given `entity` to a CSS Selector string. The entity may be:
+    + array: of strings
+    + string
+    + object: with `props`: array of strings
+    + object: with `str` as string
+
+        this.asString('margin-top-.5em', withParentSelector=false)
+        ".margin-top-\\.5em"
+
+        this.asString('margin-top-.5em', withParentSelector=true)
+        ".acme-labs .margin-top-\\.5em"
+
+    If a parent selector exists, this is applied as a prefix to the selector
+    Return a string, CSS selector escaped
+    */
+
+    asSelectorString(entity, withParentSelector=true) {
         let clean;
         // array
         if(Array.isArray(entity)) {
@@ -316,7 +541,28 @@ class ClassGraph {
         }
 
         let propStr = `.${clean}`
+
+        if(withParentSelector) {
+            return this.prependParent(propStr, entity)
+        }
+
         return propStr
+    }
+
+    /*
+        Given a finished selector and the original entity generating the
+        selector, return a string to replace the given cleanString.
+
+            prependParent('.foo', {})
+            '.acme-labs .foo'
+     */
+    prependParent(cleanString, originalEntity) {
+        if(this.parentSelector != undefined) {
+            let v = this.parentSelector
+            return `${v}${cleanString}`
+        }
+
+        return cleanString
     }
 
     escapeStr(str) {
@@ -352,8 +598,17 @@ class ClassGraph {
         return strRes
     }
 
+    /*
+    Called by the monitor upon a `class` mutation, with the
+    list of _new_ classes applied to the entity
+
+        cg.captureNew(['margin-solid-1px'])
+
+    Any detected rule of which does not exist, is created and
+    applied to the class graph.
+     */
     captureNew(items, oldItems) {
-        console.log('Capture new', items, oldItems)
+        // console.log('Capture new', items, oldItems)
         for(let str of items) {
             if(str.length == 0) {
                 continue
@@ -363,11 +618,19 @@ class ClassGraph {
             // debugger
             let func = n? n.bind(splitObj): cg.insertRule.bind(cg)
             let res = func(splitObj)
-            console.log(str, res)
+            // console.log(str, res)
         }
     }
 
     processOnLoad(node, watch=document) {
+        /* Process the given node using `process(node)`,
+        when the `DOMContentLoaded` event emits from the `watch` object.
+
+        By default `watch` is the document.
+
+            cg.processOnLoad(body)
+
+         */
         if(this.domContentLoaded == true) {
             return this.process(node)
         }

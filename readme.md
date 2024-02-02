@@ -10,19 +10,77 @@ This open-source, lightweight library is tailored for dynamic CSS management, ge
 + Instantly plug-and-play
 + No Dependencies, and works along-side all the major libraries.
 
+## Usage
+
+Include Polyclass as a script:
+
+```html
+<script src="polyclass.js"></script>
+```
+
+Run `Polyclass` somewhere in your code. It can run in the `<head>` or `<footer>` of a page:
+
+```js
+const pc = Polyclass({
+  processOnLoad: document.body
+})
+```
+
+If the page is already loaded, run the `process()` method:
+
+```js
+const pc = Polyclass()
+pc.process(document.body)
+```
+
+And you're ready to go! Populate the html classes to see it in action:
+
+```html
+<div id="demo_space" class='foo padding-1em-2em margin-1em color-#333'>
+    <p>Styled content.</p>
+</div>
+```
+
+The styles are automatically generated:
+
+| class | description |
+| --- | --- |
+| `padding-1em-2em` | Padding, top and bottom `1em`, left and right `2em` |
+| `margin-1em` | Margin, all sides `1em` |
+| `color-#333`| Text color, nearly black `#333` |
+
+
+Here's the CSS Polyclass created:
+
+```css
+.padding-1em-2em {
+    padding: 1em 2em;
+}
+
+.margin-1em {
+    margin: 1em;
+}
+
+.color-#333 {
+    color: #333;
+}
+```
+
 
 ## Why?
 
-+ Reduce Boilerplate
-  When designing a website, ideas change and designs alter. This can lead to junk CSS, or massive boiler-sheets of _pre defined classes_.
 
-  Polyclass reduces this, allowing you to bypass defining all your basic stles, and opt for a delarative CSS naming convention
++ **Reduce Boilerplate**
+  Ideas change. Designs alter. Polyclass can help kill the junk CSS and massive boiler-sheets of _pre defined classes_.
 
-+ Faster page load times
++ **Become your own vendor!**
+  Don't settle for a _forever_ locked-in eco-system, supporting enourmous stylesheets. Build out your own boilerplate, add a vendor switch and job done!
+
++ **Generate _Dynamic Classes_**
+  Build dyanamic names to write base and generate layouts without limits, such as a column-stucture: `acme-grid-columms-4`,  `acme-grid-columms-3`, `acme-grid-columms-12`
++ **Faster page load times**
   CSS mean bytes down the pipe. Polyclass builds CSS on the fly.
-
-+ Dynamic CSS tooling
-
++ **Dynamic CSS tooling**
   With _ALL CSS_ Properties ready to go, you can offer this tool in your buildouts; for dynamic styling of your components - without base sheets and limits.
 
   + CMS theming addons
