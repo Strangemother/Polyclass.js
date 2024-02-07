@@ -7,16 +7,31 @@
 ;(()=>{
 
 
-const polyclassHead = function(){
-    console.log('new', arguments)
-    return polyclassProxy.newInstance.apply(polyclassProxy, arguments)
+
+const polyUnits = {}
+window.polyUnits = polyUnits
+/* Upon document load, process and *[polyclass] entity. Similar to process() */
+const autoActivator = function(watch=document){
+    console.log('Monitor', watch)
+    watch.addEventListener('DOMContentLoaded', function(){
+        const targets = document.querySelectorAll('*[polyclass]');
+        console.log('Discovered', targets.length)
+        for(let target of targets){
+            let polyclassId = Math.random().toString(32).slice(2)
+            let pc = new Polyclass({target})
+            target.dataset.polyclassId = polyclassId
+            polyUnits[polyclassId] = pc;
+        }
+    }.bind(this))
 };
 
+autoActivator();
 
 class PolyObject {
 
     // constructor() {
     constructor([config]=[]) {
+        this.units = polyUnits
         console.log('me:', config)
         let cg = new ClassGraph(config)
         cg.generate()
@@ -24,6 +39,11 @@ class PolyObject {
         if(config?.processOnLoad) {
             this.processOnLoad(config.processOnLoad)
         }
+
+        if(config?.target) {
+            this.process(config.target)
+        }
+
 
         this.innerProxyHandler = {
             reference: this
@@ -62,10 +82,12 @@ class PolyObject {
         this.proxy = new Proxy(this.innerHead, this.innerProxyHandler)
     }
 
-
-
     processOnLoad(){
         return this._graph.processOnLoad.apply(this._graph, arguments)
+    }
+
+    process(){
+        return this._graph.process.apply(this._graph, arguments)
     }
 
     /* insert a class selector into the graph
@@ -135,13 +157,22 @@ class PolyObject {
     }
 }
 
+
+const polyclassHead = function(){
+    console.log('new', arguments)
+    return polyclassProxy.newInstance.apply(polyclassProxy, arguments)
+};
+
+
 const polyclassProxy = {
     /* The handler for the main polyclass instance.
 
     Written as a class for nicer definitions.
     */
-
-    get(target, property, receiver) {
+    safeSpace: {
+        units: polyUnits
+    }
+    , get(target, property, receiver) {
         /* polyclass.attribute or polyclass.method() was called.
 
         handle the property target on the classgraph (the read object)
@@ -150,11 +181,14 @@ const polyclassProxy = {
 
         if(property in realTarget) {
 
-            if(realTarget[property].bind) {
+            if(realTarget[property] && realTarget[property].bind) {
                 return realTarget[property].bind(realTarget)
             }
             return realTarget[property]
         };
+        // console.warn(`No property ${property} on receiver`, realTarget)
+
+        return this.safeSpace[property]
     }
 
     , newInstance() {
@@ -182,6 +216,7 @@ const polyclassProxy = {
         return this.getInstance.apply(this, argsList)
     }
 }
+
 
 window.Polyclass = new Proxy(polyclassHead, polyclassProxy)
 

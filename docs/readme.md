@@ -1,5 +1,8 @@
 # Polyclass.js
 
+
+![Polyclass Logo](./logo/1-300.png)
+
 Polyclass is a _just in time_ pre-built CSS Class library, built dynamically from a graph of structured CSS property names to produce a "Declarive CSS Stylsheet".
 
 > All the boilerplate css is builtin with Polyclass.js
@@ -9,6 +12,17 @@ This open-source, lightweight library is tailored for dynamic CSS management, ge
 + Readable
 + Instantly plug-and-play
 + No Dependencies, and works along-side all the major libraries.
+
+
++ [running-polyclass](./running-polyclass.md)
++ [css-var](./css-var.md): Utilise variables for declarative properties and values `color-var-primary-text`
++ [anatomy](./anatomy.md): Understand a CSS Property
++ [font-pack](./font-pack.md): Install and use fonts dynamically with `font-pack-*`
++ [inserting-rules](./inserting-rules.md): Inject CSS declarations and custom class detection functions.
++ [vars-object](./vars-object.md): Use Javascript objects as CSS `--var` definitions.
++ [vendor-prefix](./vendor-prefix.md): Scope Polyclass usage to a prefix such as `acme-company-background-black`
++ [aliases](./aliases.md): Reduce typing by aliasing long words `background` => `bg` == `bg-color-*`
++ [addons](./addons.md): Read more on the addon platform for customising Polyclass internals
 
 ## Usage
 
@@ -65,6 +79,24 @@ Here's the CSS Polyclass created:
     color: #333;
 }
 ```
+
+## Who is this for?
+
+
+### Designers
+
+Iterate on your styles until you're happy. With a **massive** base of rules there is less to _build_ as you invent.
+
+
+### Developers
+
+Don't spend time caring for your _base styles_. Use a declarative naming convension for your class names for easy to document, easy to integrate core styles, and less bytes to download.
+
+
+
+### Vendors
+
+Build your layout engine or style library. Enable the _vendor_ prefix and invent your own dynamic classes.
 
 
 ## Why?
@@ -155,6 +187,14 @@ TLDR;
 1. Include the library
 2. Write class names
 
+```html
+<div class='margin-1em'></div>
+<div class='margin-4vw-1.5ch'></div>
+<div class='margin-1.453em-53px'></div>
+<div class='padding-var-very-wide'></div>
+```
+
+
 ---
 
 1. Include the Main Script:
@@ -163,12 +203,21 @@ TLDR;
 
       <script src="path_to_your_directory/polyclass.min.js"></script>
 
-2. Include Add-ons (Optional):
+2. Define through JS or HTML attibute:
 
-  If you wish to use additional features, you can include the respective add-on scripts. For instance, to use the font-pack and monitor add-ons, include them as follows:
+  Using the HTML attribute:
 
-      <script src="path_to_your_directory/addons/font-pack.js"></script>
-      <script src="path_to_your_directory/addons/monitor.js"></script>
+  ```html
+  <body polyclass></body>
+  ```
+
+  Using the Javascript instance:
+
+  ```js
+  const pc = Polyclass({
+      , processOnLoad: document.body
+  })
+  ```
 
 3. Write Your Declarative CSS:
 
@@ -245,6 +294,7 @@ This works with essentially any class attribute:
 This project is licensed under the terms of the MIT License.
 
 The MIT License offers you the freedom to use, modify, and distribute this code. While it’s not a formal requirement, taking a moment to acknowledge the original contributors reflects a deep-seated respect that is fundamental to the open-source community.
+
 
 ## Contributing
 
