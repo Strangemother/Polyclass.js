@@ -6,7 +6,7 @@
 
 ---
 
-4+ quadrillion available properties *\*(and counting)* :):
+4+ quadrillion available properties *\*(and counting)* 😅
 
 </div>
 
@@ -21,7 +21,7 @@ This open-source, lightweight library is tailored for dynamic CSS management, ge
 + Instantly plug-and-play
 + No Dependencies, and works along-side all the major libraries.
 
-## In a Hurry?
+## 🚀 In a Hurry?
 
 Include:
 
