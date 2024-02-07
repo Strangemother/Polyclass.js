@@ -20,6 +20,7 @@ This open-source, lightweight library is tailored for dynamic CSS management, ge
 + Readable
 + Instantly plug-and-play
 + No Dependencies, and works along-side all the major libraries.
++ Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
 
 ## 🚀 In a Hurry?
 
@@ -241,125 +242,9 @@ Once defined, the constructed classes are invented on-the-fly:
 
 As expected each class exactly represents the `key:value` of any _declarable_ CSS Property.
 
-
-Without using any existing CSS sheets, Polyclass will generate all the expected CSS as a contructed stylesheet.
-
-
-## Features
-
-+ Comprehensive Graph: A detailed graph of CSS attributes, ensuring you have access to every possible style combination.
-+ Dynamic Class Combinations: Generate over a million unique class combinations with both short and long flavors for each CSS declaration.
-+ Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
-
-
-## Getting Started
-
-To get started with Polyclass, follow these steps:
-
-TLDR;
-
-1. Include the library
-2. Write class names
-
-```jinja
-<div class='margin-1em'></div>
-<div class='margin-4vw-1.5ch'></div>
-<div class='margin-1.453em-53px'></div>
-<div class='padding-var-very-wide'></div>
-```
-
 ---
 
-1. Include the Main Script:
-
-  Add the `polyclass.js` script to your HTML file.
-
-      <script src="path_to_your_directory/polyclass.min.js"></script>
-
-2. Define through JS or HTML attibute:
-
-  Using the HTML attribute:
-
-  ```jinja
-  <body polyclass></body>
-  ```
-
-  Using the Javascript instance:
-
-  ```js
-  const pc = Polyclass({
-      , processOnLoad: document.body
-  })
-  ```
-
-3. Write Your Declarative CSS:
-
-  In your HTML, you can now start using the declarative CSS syntax provided by the library. For example:
-
-      <div class="my-label
-                padding-1em
-                margin-.4em-1em
-                background-#333
-                color-white"
-            >Hello World!</div>
-
-
-## Current Class Count
-
-Current class count is still increasing; Not including the `font-pack` addon.
-
-There are roughly 139 top level attributes (`margin`, `border` etc..)
-
-+ Every sub attribute is a key (about 209 in total)
-+ Every size type,
-  + absolute (about 7; `cm`, `px`, `Q` etc..)
-  + relative (about 20, `em`, `vw` `svh` etc)
-+ Every color (16M hex short and long formats, all the websafe colours)
-
-
-## Info
-
-For more advanced usage, you can explore the various modules and functionalities provided by the library:
-
-+ Font Pack Add-on: Enhance your typography with the `font-pack.js` add-on. This allows you to easily integrate various font styles and weights into your project.
-+ Monitor Add-on: With the `monitor.js` add-on, you can keep track of changes and updates to your declarative CSS in real-time.
-+ Class Graph: The `classgraph.js` module provides a way to visualize and understand the relationships between different CSS classes in your project.
-+ Core DCSS: The core functionality of the library can be found in `dcss.js`. This is where the magic happens, allowing you to write declarative CSS with ease.
-
-
-## Usage
-
-Once Polyclass is installed, it's ready to go. By default no configuration is required.
-
-As a recap to installing:
-
-  <script src="path_to_your_directory/polyclass.min.js"></script>
-
-Then write some CSS classes to style:
-
-```jinja
-<div class="margin-1rem">
-This has a margin of 1 real EM.
-</div>
-```
-
-The CSS class `margin-1rem` will instantly generate into the dynamic stylesheet:
-
-```css
-.margin-1em {
-  margin: 1rem
-}
-```
-
-This works with essentially any class attribute:
-
-```jinja
-<body class='background-#111'>
-  <div class="border-top-solid-1px border-radius-.4em color-green">
-    This has a border with round edges.
-  </div>
-</body>
-```
+Without using any existing CSS sheets, Polyclass will generate all the expected CSS as a constructed stylesheet.
 
 
 ## License
