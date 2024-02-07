@@ -10,6 +10,13 @@ Whilst documenting Polyclass, I initially attempting to gather the total possibl
 
 As such we count all the properties of which are clear and easy. This is still a fair amount including numbers, sizes, counts, and property unique values (e.g. `flex-direction: column`), but doesn't include special CSS properties, such as function calls or grid templates.
 
+---
+
+Running Total:
+
+    margin      2,696,728,989,522,418
+    padding     2,696,728,989,522,418
+    color               4,294,967,444
 
 ## Count a Margin
 
@@ -92,6 +99,82 @@ Wait that's `2,696,728,989,493,554` _sane_ combinations?
 
 ---
 
-I must have this completely incorrect. That must be wrong. This is for `margin:` and doesn't include `margin-*` `top`, `bottom`, `left`, and `right`.
+Okay I checked with a better maths person. It's correct :|
 
-If we account for the 4 additional sub-properties, with `7206` possible length types each, that's 28,864
+If we account for the 4 additional sub-properties, with `7206` available length types each, that's `28,864` total `margin-*` possible values.
+
+---
+
+In total for `margin` and `margin-*` we have:
+
+    2,696,728,989,493,554 +
+                   28,864 =
+    2,696,728,989,522,418
+
+
+## Padding
+
+Fortunately `padding` is identical in syntax as `margin`. Therefore we can reuse the number `2,696,728,989,522,418` possible combinations.
+
+## Color
+
++ https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#formal_syntax
+
+The text color, or simple `color` in CSS accepts a range of _types_ however there is a _sane_ set of polyclass values, and other values we probably wouldn't want apply as class names.
+
+For now let's cover the base types:
+
++ https://developer.mozilla.org/en-US/docs/Web/CSS/color
+
+```
+color: currentcolor;
+/* Global values */
+color: inherit;
+color: initial;
+color: revert;
+color: revert-layer;
+color: unset;
+
+/* <named-color> values */
+color: red;
+color: orange;
+color: tan;
+color: rebeccapurple;
+
+/* <hex-color> values */
+color: #090;
+color: #009900;
+color: #090a;
+color: #009900aa;
+
+```
+
+### Hex
+
+Hex is a quick count. Generally we count 6 char hex `#663399`. I mostly use 3 char, but 8 char is the max possible.
+
+    16 ** 3
+    4,096
+    16 ** 4
+    65,536
+    16 ** 6
+    16,777,216
+    16 ** 8
+    4,294,967,296
+
+We won't cheat and pick the the one type 8 char totalling `4,294,967,296` (4 billion) hex numbers.
+
+---
+
+Polyclass _does_ allow more expressive colours:
+
+    color-#333
+    color-red
+    color-rgb(10,10,10)
+
+
+However we'll ignore the functional, and only count hex types and `named` colors. There are 148 named colors (some colours are duplicate, however we _can_ name them in polyclass default set, therefore we count it.)
+
+    4,294,967,296 +
+              148 =
+    4,294,967,444

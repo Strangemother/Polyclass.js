@@ -1,19 +1,71 @@
-# Polyclass.js
+<div align="center">
 
+# Polyclass.js
 
 ![Polyclass Logo](./logo/1-300.png)
 
-Polyclass is a _just in time_ pre-built CSS Class library, built dynamically from a graph of structured CSS property names to produce a "Declarive CSS Stylsheet".
+---
 
-> All the boilerplate css is builtin with Polyclass.js
+Polyclass is a _just-in-time_ CSS class library, built dynamically from your class-names using "Declarative CSS".
 
-This open-source, lightweight library is tailored for dynamic CSS management, generating a graph of keys for all CSS properties. With the capability to boilerplate millions of unique class combinations through decarative naming, Polyclass offers eliminating the need for inline styles. Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is delcared as needed.
+</div>
+
+
+> All the boilerplate CSS is builtin with Polyclass.js
+
+
+This open-source, lightweight library is tailored for dynamic CSS management, generating a graph of keys for all CSS properties. With the capability to boilerplate millions of unique class combinations through declarative naming, Polyclass offers eliminating the need for in-line styles. Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.
 
 + Readable
 + Instantly plug-and-play
 + No Dependencies, and works along-side all the major libraries.
 
-Bits and Bolts:
+## Ina Hurry?
+
+Include:
+
+```jinja
+<script src="polyclass.js"></script>
+```
+
+Polyclass automatic:
+
+```jinja
+<body polyclass> <!-- Activate -->
+  <h1
+    class='color-#999'> <!-- Write classes -->
+    Grey Title!</h1>
+</body>
+```
+
+**Polyclass anything!**
+
+```jinja
+<div class="my-container some-other-primary-area
+    font-pack-roboto-100-400-i400
+    background-#333">
+
+      <div class="demo-box
+        gap-1em
+        display-flex
+        flex-direction-column">
+
+          <div class="text
+            background-color-#111
+            border-solid-3px-green
+            border-radius-.4em
+            padding-.8em-1.4em
+            color-#EEE
+            font-roboto-400
+            margin-1em">
+
+              Text content.
+          </div>
+      </div>
+</div>
+```
+
+## Bits and Bolts:
 
 + [Run](./running-polyclass.md)
 + [`font-pack-*` addon](./font-pack.md): Install and use fonts dynamically with `font-pack-*`
