@@ -28,6 +28,52 @@ Items I want in the lib - some in progress
 + parent selector
 + Baking
 + Forward Feed Keys
++ a `clean()` function
++ Dynamic Css Import
++ _though_ key function
+
+## polyclass active switch
+
+Enable polyclass in the view without JS, using an auto-switch in the
+body or HTML. Additional config may be applied through  data-attributes.
+
+```html
+<html>
+    <head>
+        <script type="text/javascript" src='polyclass.js'></script>
+    </head>
+
+    <body polyclass class='background-#111 color-invert-background'>
+    </body>
+</html>
+```
+
+Alterntive configs:
+
+```html
+<body polyclass="pc" pc-vendorlocked=false />
+<body polyclass
+    data-polyclass-alias-color="c"
+    data-polyclass-alias-background="bg,back" />
+```
+
+
+## RuleProxy
+
+A proxy object to edit a single rule in the view. This can change aspects
+of a key, value as a class. This change will bubble to dcss
+
+    rule = pc.addRule('.foo.bar', {color: 'red', margin: '4em 1em 2em 3em'})
+
+    rule[margin][0].setValue('5em')
+
+
+## Replacement editing
+
+Attempt to _replace_ a similar class with a new one, this can be bubbled to the dcss, allowing clearner editing. This is useful if the view cycles
+through many styles, leaving a tail of unused styles.
+
+    pc(node).change('margin-1.4em-1em', 'margin-1.5em-1em')
 
 ## better fonting
 
@@ -311,6 +357,10 @@ const cg = generateClassGraph({
 cg.addVendorAlias(cs.conf.prefixes, 'ccc')
 ```
 
+# a `clean()` function
+
+The `clean()` can inspect a HTML entity and its children for its applied classes and remove any unused classes within the dcss. This is useful when supplying a base sheet.
+
 
 ## Definition Merge
 
@@ -376,3 +426,25 @@ In this case it would be better for key `tom-d-harry` to fail, and `tom-d` to re
 
     isColor     check #000 red
     isSize      check 1em 4ch
+
+
+# Dynamic Css Import
+
+Provide the ability to key target CSS Files using polyclasses
+
+    <div class='collect-theme-alpha'></div>
+    <!-- fetch(static/css/theme-alpha.css) -->
+
+# _though_ key function
+
+Apply a function to capture the usage of a key using transition through a node:
+
+    cg.addThrough(['margin'], function(splitObj){
+        console.log('margin-* was called.', arguments)
+    })
+
+    <div class='margin-10em'></div>
+    <div class='margin-top-10em'></div>
+
+    // margin-* was called
+    // margin-* was called

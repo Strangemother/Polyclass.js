@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCSS</title>
+    <style type="text/css">
+
+        html {
+            background: #111;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="font-pack-roboto-100-400">
+
+        <script src="./src/dcss.js"></script>
+        <script src="./src/classgraph.js"></script>
+        <script src="./src/addons/monitor.js"></script>
+        <script src="./src/addons/font-pack.js"></script>
+        <script src="./src/addons/var-translate.js"></script>
+        <script src="./src/addons/vars-box.js"></script>
+        <script src="./src/polyclass.js"></script>
+
+        <!--
+        <script src="./polyclass-usage.js"></script>
+        <script src="./dcss-usage.js"></script>
+        <script src="./src/browser.js"></script>
+        <script src="./quick-tests.js"></script>
+        -->
+
+        <div polyclass>
+            <div class="font-pack-roboto-400 font-roboto-400 background-#333 color-#DDD">
+                <h1>Polyclass auto.</h1>
+
+                <div id="demo_space" class="">
+                    <!-- The demo workspace -->
+                    <div class="container
+                                primary-area
+                                background-#444">
+                            polyclass
+                    </div>
+                </div>
+                <div>
+                    <p>Hello</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="background-#333">
+            <h1>Polyclass Unprocesses</h1>
+
+            <div class="font-roboto-400">
+                <!-- The demo workspace -->
+                <div class="container
+                            primary-area
+                            color-green
+                            background-#333">
+                        <p>The content here is not a target and therefore doesn't receive polyclass processing.</p>
+                        <p><strong>However</strong> shared class names will render global CSS properties, such as the background here.</p>
+                        <p>New classes such as <code>color-green</code>, is not rendered.</p>
+                </div>
+            </div>
+
+            <div>
+                <p>Hello</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
