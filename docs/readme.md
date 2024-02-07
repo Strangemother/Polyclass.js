@@ -13,26 +13,35 @@ This open-source, lightweight library is tailored for dynamic CSS management, ge
 + Instantly plug-and-play
 + No Dependencies, and works along-side all the major libraries.
 
+Bits and Bolts:
 
-+ [running-polyclass](./running-polyclass.md)
-+ [css-var](./css-var.md): Utilise variables for declarative properties and values `color-var-primary-text`
-+ [anatomy](./anatomy.md): Understand a CSS Property
-+ [font-pack](./font-pack.md): Install and use fonts dynamically with `font-pack-*`
-+ [inserting-rules](./inserting-rules.md): Inject CSS declarations and custom class detection functions.
-+ [vars-object](./vars-object.md): Use Javascript objects as CSS `--var` definitions.
-+ [vendor-prefix](./vendor-prefix.md): Scope Polyclass usage to a prefix such as `acme-company-background-black`
-+ [aliases](./aliases.md): Reduce typing by aliasing long words `background` => `bg` == `bg-color-*`
-+ [addons](./addons.md): Read more on the addon platform for customising Polyclass internals
++ [Run](./running-polyclass.md)
++ [`font-pack-*` addon](./font-pack.md): Install and use fonts dynamically with `font-pack-*`
++ [CSS `var()`](./css-var.md): Utilise variables for declarative properties and values `color-var-primary-text`
++ [Polyclass `vars()` object](./vars-object.md): Use Javascript objects as CSS `--var` definitions.
++ [`vendor-*` prefix](./vendor-prefix.md): Scope Polyclass usage to a prefix such as `acme-company-background-black`
++ [Aliases](./aliases.md): Reduce typing by aliasing long words `background` => `bg` == `bg-color-*`
++ [Inserting Rules](./inserting-rules.md): Inject CSS declarations and custom class detection functions.
++ [Polyclass and CSS Anatomy](./anatomy.md): Understand a CSS Property
++ [Addons](./addons.md): Read more on the addon platform for customising Polyclass internals
 
 ## Usage
 
 Include Polyclass as a script:
 
-```html
+```jinja
 <script src="polyclass.js"></script>
 ```
 
-Run `Polyclass` somewhere in your code. It can run in the `<head>` or `<footer>` of a page:
+Use the Polyclass automatic detection:
+
+```jinja
+<body polyclass>
+  <h1 class='color-#999'>Grey Title!</h1>
+</body>
+```
+
+Or run `Polyclass` somewhere in your code. It can run in the `<head>` or `<footer>` of a page:
 
 ```js
 const pc = Polyclass({
@@ -49,9 +58,13 @@ pc.process(document.body)
 
 And you're ready to go! Populate the html classes to see it in action:
 
-```html
-<div id="demo_space" class='foo padding-1em-2em margin-1em color-#333'>
-    <p>Styled content.</p>
+```jinja
+<div id="demo_space"
+    class='foo
+           padding-1em-2em
+           margin-1em
+           color-#333'>
+    <p>Styled content from <strong>only</strong> CSS classes.</p>
 </div>
 ```
 
@@ -110,8 +123,10 @@ Build your layout engine or style library. Enable the _vendor_ prefix and invent
 
 + **Generate _Dynamic Classes_**
   Build dyanamic names to write base and generate layouts without limits, such as a column-stucture: `acme-grid-columms-4`,  `acme-grid-columms-3`, `acme-grid-columms-12`
+
 + **Faster page load times**
   CSS mean bytes down the pipe. Polyclass builds CSS on the fly.
+
 + **Dynamic CSS tooling**
   With _ALL CSS_ Properties ready to go, you can offer this tool in your buildouts; for dynamic styling of your components - without base sheets and limits.
 
@@ -126,7 +141,7 @@ If there is a CSS Property, it can be defined in Polyclass.
 
 Here's some HTML, with some `Polyclass` CSS `class` attributes:
 
-```html
+```jinja
 <div class="my-container some-other-primary-area
     font-pack-roboto-100-400-i400
     background-#333">
@@ -187,13 +202,12 @@ TLDR;
 1. Include the library
 2. Write class names
 
-```html
+```jinja
 <div class='margin-1em'></div>
 <div class='margin-4vw-1.5ch'></div>
 <div class='margin-1.453em-53px'></div>
 <div class='padding-var-very-wide'></div>
 ```
-
 
 ---
 
@@ -207,7 +221,7 @@ TLDR;
 
   Using the HTML attribute:
 
-  ```html
+  ```jinja
   <body polyclass></body>
   ```
 
@@ -264,7 +278,7 @@ As a recap to installing:
 
 Then write some CSS classes to style:
 
-```html
+```jinja
 <div class="margin-1rem">
 This has a margin of 1 real EM.
 </div>
@@ -280,7 +294,7 @@ The CSS class `margin-1rem` will instantly generate into the dynamic stylesheet:
 
 This works with essentially any class attribute:
 
-```html
+```jinja
 <body class='background-#111'>
   <div class="border-top-solid-1px border-radius-.4em color-green">
     This has a border with round edges.
