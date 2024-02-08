@@ -50,14 +50,14 @@ jobs:
           registry-url: https://registry.npmjs.org/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
       - name: Display structure of downloaded files
         run: ls -R
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@users.noreply.github.com"
-      - run: git add . && git commit
+      - run: git add . && git commit -m "Append dangling files"
       - run: npm install --package-lock-only
       - run: npm ci
       - name: Bump version and create commit
