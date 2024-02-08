@@ -34,8 +34,8 @@ Polyclass is a _just-in-time_ CSS class library, built dynamically from your cla
 It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet
 
 + All (\~200) CSS Properties are ready, even: `order-block-start-style-dotted`!
-+ Supports all (\~35) CSS length types, such as: `margin-top-3.33cqmax`
-+ Use true CSS property names, or invent your own; such as `box-push-outside-10pt`
++ Supports **any** CSS length you prefer, from `px` to `cqmax`
++ Use true CSS property names like `margin` or invent your own `box-push-outside`
 
 Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.
 
