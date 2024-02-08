@@ -16,7 +16,7 @@ The CSS base library with over 4 quadrillion available properties *\*([and count
               background-color-#111
               padding-2em">  <!-- Write classes -->
       <h1 class='color-#EEE'>
-          Instant CSS styles, using all CSS properties!
+          Instant CSS margin, padding, background and text color - with zero effort.
       </h1>
   </div>
 </body>
@@ -100,6 +100,18 @@ Include Polyclass as a script:
 
 ```jinja
 <script src="polyclass.js"></script>
+```
+
+Grab from NPM
+
+```bash
+npm install polyclass
+```
+
+Grab from unpkg:
+
+```
+TBD
 ```
 
 ### Load
@@ -186,7 +198,6 @@ Don't spend time caring for your _base styles_. Use a declarative naming convens
 ### Vendors
 
 Build your layout engine or style library. Enable the _vendor_ prefix and invent your own dynamic classes.
-
 
 ## Why?
 
