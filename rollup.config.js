@@ -12,7 +12,6 @@ export default {
     "./src/addons/var-translate.js",
     "./src/addons/vars-box.js",
     "./src/polyclass.js",
-    'addons/**/*.js'
   ],
   output: {
     file: 'dist/polyclass-browser.js', // Output file
