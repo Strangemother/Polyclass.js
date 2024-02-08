@@ -6,7 +6,17 @@
 
 ---
 
-4+ quadrillion available properties *\*(and counting)* 😅
+```jinja
+<body polyclass> <!-- Activate -->
+  <div class="margin-1em-20vw
+              background-color-#111
+              padding-2em">  <!-- Write classes -->
+      <h1 class='color-#EEE'>
+          Instant CSS styles, using all CSS properties!
+      </h1>
+  </div>
+</body>
+```
 
 </div>
 
@@ -78,6 +88,7 @@ Polyclass automatic:
 + [Inserting Rules](./inserting-rules.md): Inject CSS declarations and custom class detection functions.
 + [Polyclass and CSS Anatomy](./anatomy.md): Understand a CSS Property
 + [Addons](./addons.md): Read more on the addon platform for customising Polyclass internals
+
 
 ## Usage
 
@@ -161,7 +172,6 @@ Here's the CSS Polyclass created:
 ```
 
 ## Who is this for?
-
 
 ### Designers
 
