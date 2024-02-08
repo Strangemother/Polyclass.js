@@ -15,7 +15,7 @@ export default {
   ],
   output: {
     file: 'dist/polyclass-browser.js', // Output file
-    format: 'iife', // Output format
+    // format: 'iife', // Output format
     name: 'polyclass', // Global variable name when included directly in the browser
     sourcemap: true // Optional: generates a source map
     // inlineDynamicImports: true
