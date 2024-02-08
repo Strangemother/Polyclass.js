@@ -60,7 +60,7 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@users.noreply.github.com"
       - run: npm install --package-lock-only
-      - run: git add . && git commit -m "Append dangling files"
+      # - run: git add . && git commit -m "Append dangling files" # only for broken packages
       - run: npm ci
       - name: Bump version and create commit
         run: |

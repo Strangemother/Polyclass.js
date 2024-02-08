@@ -2,9 +2,11 @@
 
 # Polyclass.js
 
-![Polyclass Logo](./logo/1-300.png)
+![Polyclass Logo](./docs/logo/1-300.png)
 
 ---
+
+</div>
 
 ```jinja
 <body polyclass> <!-- Activate -->
@@ -17,8 +19,6 @@
   </div>
 </body>
 ```
-
-</div>
 
 Polyclass is a _just-in-time_ CSS class library, built dynamically from your class-names using "Declarative CSS".
 
