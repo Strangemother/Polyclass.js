@@ -53,7 +53,7 @@ jobs:
       - uses: actions/download-artifact@v3
       - name: Display structure of downloaded files
         run: ls -R
-      - run: npm install --package-lock-only
+      # - run: npm install --package-lock-only
       - run: npm ci
       - name: Bump version and create commit
         run: |
