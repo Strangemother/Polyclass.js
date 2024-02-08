@@ -14,10 +14,10 @@
         "build": "rollup -c"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^latest_version",
-        "@rollup/plugin-node-resolve": "^latest_version",
-        "rollup": "^latest_version",
-        "rollup-plugin-terser": "^latest_version"
+        "@rollup/plugin-commonjs": "^25.0.7",
+        "@rollup/plugin-node-resolve": "^15.2.3",
+        "rollup": "^4.9.6",
+        "@rollup/plugin-terser": "^0.4.4"
     },
     "description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
     "files": [
