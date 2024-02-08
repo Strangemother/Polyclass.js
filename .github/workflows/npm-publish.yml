@@ -53,13 +53,15 @@ jobs:
       - uses: actions/download-artifact@v3
       - name: Display structure of downloaded files
         run: ls -R
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@users.noreply.github.com"
       - run: git add . && git commit
       - run: npm install --package-lock-only
       - run: npm ci
       - name: Bump version and create commit
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@users.noreply.github.com"
           npm version patch  # or 'minor' or 'major'
           git push --follow-tags
       - run: npm publish
