@@ -10,13 +10,15 @@ Whilst documenting Polyclass, I initially attempting to gather the total possibl
 
 As such we count all the properties of which are clear and easy. This is still a fair amount including numbers, sizes, counts, and property unique values (e.g. `flex-direction: column`), but doesn't include special CSS properties, such as function calls or grid templates.
 
----
 
-Running Total:
+## Running Total
+
 
     margin      2,696,728,989,522,418
     padding     2,696,728,989,522,418
-    color               4,294,967,444
+    color               4,294,967,444+
+
+`137` properties to go.
 
 ## Count a Margin
 

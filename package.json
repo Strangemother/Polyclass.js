@@ -9,11 +9,16 @@
     "main": "dist/polyclass.umd.js",
     "module": "dist/polyclass.modern.js",
     "unpkg": "./dist/foo.umd.js",
+    "version": "0.0.12",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "microbundle"
+        "build": "rollup -c"
     },
-    "version": "0.0.11",
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^latest_version",
+        "@rollup/plugin-node-resolve": "^latest_version",
+        "rollup": "^latest_version",
+        "rollup-plugin-terser": "^latest_version"
+    },
     "description": "JavaScript library designed to provide dynamic and real-time manipulation of CSS stylesheets. Whether you're looking to animate elements, adjust styles on-the-fly, or create responsive designs without the overhead of traditional CSS",
     "files": [
         "src/",
@@ -35,7 +40,4 @@
         "url": "https://github.com/Strangemother/polyclass.js/issues"
     },
     "homepage": "https://github.com/Strangemother/polyclass.js#readme",
-    "devDependencies": {
-        "microbundle": "^0.15.1"
-    }
 }
