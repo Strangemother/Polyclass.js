@@ -2,6 +2,8 @@
 
 # Polyclass.js
 
+The CSS base library with over 4 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
+
 ![Polyclass Logo](./docs/logo/1-300.png)
 
 ---
