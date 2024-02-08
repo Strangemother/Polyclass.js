@@ -24,12 +24,21 @@ The CSS base library with over 4 quadrillion available properties *\*([and count
 
 Polyclass is a _just-in-time_ CSS class library, built dynamically from your class-names using "Declarative CSS".
 
-> All the boilerplate CSS is builtin with Polyclass.js
++ Eliminate in-line styles
++ Declare CSS on-the-fly
++ Work with any CSS measurement size and type
++ Build custom event handled class-names
 
+> Polyclass is the only CSS stylesheet generator using declartive class names, for ever-evergreen styles.
 
-This open-source, lightweight library is tailored for dynamic CSS management, generating a graph of keys for all CSS properties. With the capability to boilerplate millions of unique class combinations through declarative naming, Polyclass offers eliminating the need for in-line styles. Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.
+It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet
 
-+ Readable
++ All (\~200) CSS Properties are ready, even: `order-block-start-style-dotted`!
++ Supports all (\~35) CSS length types, such as: `margin-top-3.33cqmax`
++ Use true CSS property names, or invent your own; such as `box-push-outside-10pt`
+
+Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.
+
 + Instantly plug-and-play
 + No Dependencies, and works along-side all the major libraries.
 + Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
