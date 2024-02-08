@@ -1,6 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve'; // Helps Rollup find external modules
 import commonjs from '@rollup/plugin-commonjs'; // Converts CommonJS modules to ES6
-import { terser } from '@rollup/plugin-terser'; // Minifies the bundle
+import terser from '@rollup/plugin-terser'; // Minifies the bundle
 
 
 export default {
