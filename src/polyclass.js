@@ -4,28 +4,9 @@
  * This file serves as a convenience tool for the class graph
  * and dynamic graph.
  */
+
+
 ;(()=>{
-
-
-
-const polyUnits = {}
-window.polyUnits = polyUnits
-/* Upon document load, process and *[polyclass] entity. Similar to process() */
-const autoActivator = function(watch=document){
-    console.log('Monitor', watch)
-    watch.addEventListener('DOMContentLoaded', function(){
-        const targets = document.querySelectorAll('*[polyclass]');
-        console.log('Discovered', targets.length)
-        for(let target of targets){
-            let polyclassId = Math.random().toString(32).slice(2)
-            let pc = new Polyclass({target})
-            target.dataset.polyclassId = polyclassId
-            polyUnits[polyclassId] = pc;
-        }
-    }.bind(this))
-};
-
-autoActivator();
 
 class PolyObject {
 
@@ -94,7 +75,6 @@ class PolyObject {
 
         pc.addTree(['tom','d','harry'], function(splitObj){})
     */
-
     add(keys, callback) {
         return this._graph.addTree.apply(this._graph, arguments)
     }
@@ -158,11 +138,17 @@ class PolyObject {
 }
 
 
+/*
+    This function is the Polyclass proxy target for `Polyclass()`.
+    This function executes the `newInstance` function on the primary
+    proxt, If called with `new Polyclass`
+*/
 const polyclassHead = function(){
     console.log('new', arguments)
     return polyclassProxy.newInstance.apply(polyclassProxy, arguments)
 };
 
+const polyUnits = new Map()
 
 const polyclassProxy = {
     /* The handler for the main polyclass instance.
@@ -172,10 +158,11 @@ const polyclassProxy = {
     safeSpace: {
         units: polyUnits
     }
+
     , get(target, property, receiver) {
         /* polyclass.attribute or polyclass.method() was called.
 
-        handle the property target on the classgraph (the read object)
+        handle the property target on the PolyObject instance (the read object)
          */
         let realTarget = this.getInstance();
 
@@ -194,7 +181,8 @@ const polyclassProxy = {
     , newInstance() {
         console.log('new instance', Array.from(arguments))
         let r = new PolyObject(Array.from(arguments))
-        return r.proxy
+        return r
+        // return r.proxy
     }
 
     , getInstance(){
@@ -219,5 +207,31 @@ const polyclassProxy = {
 
 
 window.Polyclass = new Proxy(polyclassHead, polyclassProxy)
+window.polyUnits = polyUnits
+
+/* Upon document load, process and *[polyclass] entity. Similar to process() */
+const autoActivator = function(watch=document){
+
+    // console.log('Monitor', watch)
+
+    watch.addEventListener('DOMContentLoaded', function(){
+        onDomLoaded()
+    }.bind(this))
+};
+
+
+const onDomLoaded = function() {
+    const targets = document.querySelectorAll('*[polyclass]');
+    console.log('Discovered', targets.length)
+    for(let target of targets){
+        let polyclassId = Math.random().toString(32).slice(2)
+        let pc = new Polyclass({target})
+        target.dataset.polyclassId = polyclassId
+        // polyUnits[polyclassId] = pc;
+        polyUnits.set(polyclassId, pc)
+    }
+}
+
+autoActivator();
 
 })();
