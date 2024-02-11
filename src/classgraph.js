@@ -20,6 +20,22 @@ const generateClassGraph = function(config={}){
 }
 
 
+const colorPrebits = function() {
+    /*
+        hex     1
+        rgba    4
+        rgb     3   3/1
+        hsl     3   3/1
+        hwb     3   3/1
+        lab     3   3/1
+        lch     3   3/1
+        oklab   3   3/1
+        oklch   3   3/1
+        color   4   4/1
+     */
+}
+
+
 class ClassGraph {
 
     sep = '-'
@@ -64,12 +80,12 @@ class ClassGraph {
         }
     }
 
+    /*
+        The graph generator produces a depth of allowed
+        css defintitions. Upon discovery a node may 'release' or continue.
+        If the _next_ node is a tree node, continue - if it's a value node, release
+     */
     generate(node){
-        /*
-            The graph generator produces a depth of allowed
-            css defintitions. Upon discovery a node may 'release' or continue.
-            If the _next_ node is a tree node, continue - if it's a value node, release
-         */
 
         node = node || document.body
         let items = Object.entries(node.style)
@@ -86,29 +102,30 @@ class ClassGraph {
         this.addTree(keys)
     }
 
-    /* Insert a leaf into a tree, marking it as a valid position.
+    /*
+        Insert a leaf into a tree, marking it as a valid position.
 
-        cg.addTree(['derek', 'eric', 'fred'])
+            cg.addTree(['derek', 'eric', 'fred'])
 
-    return the leaf:
+        return the leaf:
 
-        {
-            "key": "harry",
-            "position": [
-                "tom",
-                "dick",
-                "harry"
-            ],
-            "leaf": true
-        }
+            {
+                "key": "harry",
+                "position": [
+                    "tom",
+                    "dick",
+                    "harry"
+                ],
+                "leaf": true
+            }
 
-    This essentially marks this as a valid leaf in the graph.
-    When a new object is requested by its key, this is used
-    as a test for the property split:
+        This essentially marks this as a valid leaf in the graph.
+        When a new object is requested by its key, this is used
+        as a test for the property split:
 
-        "tom-dick-harry-10rem"
+            "tom-dick-harry-10rem"
 
-        ["tom-dick-harry", "10rem"]
+            ["tom-dick-harry", "10rem"]
 
      */
     addTree(keys, func) {
@@ -368,6 +385,31 @@ class ClassGraph {
             lch     3   3/1
             oklab   3   3/1
             oklch   3   3/1
+            color   4   3/1
+
+            // sRGB color space: hsl(), hwb(), rgb();
+            // CIELAB color space: lab(), lch();
+            // Oklab color space: oklab(), oklch();
+            // Other color spaces: color().
+                color(colorspace c1 c2 c3[ / A])
+
+                    colorspace
+                        srgb, srgb-linear, display-p3, a98-rgb,
+                        prophoto-rgb, rec2020, xyz,
+                        xyz-d50, and xyz-d65.
+
+                    c1, c2, c3
+                        <number> between 0 and 1,
+                        a <percentage> or the keyword none,
+                        which provide the component values in the
+                        color space.
+
+                    A Optional
+                        An <alpha-value> or the keyword none,
+                        where the number 1 corresponds to 100%
+                        (full opacity).
+
+
 
             // Named colors
             rebeccapurple
@@ -377,6 +419,8 @@ class ClassGraph {
             #f09
             #ff0099
 
+            color(display-p3 0 1 0)
+
             // RGB (Red, Green, Blue)
             rgb(255 0 153)
             rgb(255 0 153 / 80%)
@@ -384,6 +428,7 @@ class ClassGraph {
             // HSL (Hue, Saturation, Lightness)
             hsl(150 30% 60%)
             hsl(150 30% 60% / 0.8)
+            hsl(0.15turn 90% 50%)
 
             // HWB (Hue, Whiteness, Blackness)
             hwb(12 50% 0%)
