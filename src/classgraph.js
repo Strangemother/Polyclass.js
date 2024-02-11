@@ -744,27 +744,50 @@ class ClassGraph {
     }
 
     process(parent=document.body) {
-        let classes = this.getAllClasses(parent)
+        let classes = this.getAllClasses(parent, true)
+        // for(let name of classes) {
+        //     debugger
+        //     this.safeInsertLine(name)
+        // }
+        classes.forEach((vals, key)=> this.safeInsertMany(key, vals))
+    }
+
+    safeInsertMany(entity, classes) {
         for(let name of classes) {
-            this.safeInsertLine(name)
+            this.safeInsertLine(name, entity)
         }
     }
 
-    safeInsertLine(name) {
+    safeInsertLine(name, entity) {
         let spl2 = this.objectSplit(name)
         if(spl2.valid) {
             // console.log('Inserting', spl2)
+            spl2.origin = entity
             this.insertRule(spl2)
         }
         // console.log(spl2)
         // this.isBranch(spl2)
     }
 
-    getAllClasses(parent=document.body) {
+    getAllClasses(parent=document.body, deep=false) {
         // console.log('Process.')
+
+        if(deep) {
+
+            let allClasses = new Map()
+            parent.querySelectorAll('*').forEach(function(node) {
+                allClasses.set(node, new Set(node.classList)) // .forEach(x=>allClasses.add(x))
+            });
+
+            // then test in the tree.
+            // console.log(allClasses)
+            return allClasses
+        }
+
         let allClasses = new Set()
         parent.querySelectorAll('*').forEach(function(node) {
             // Do whatever you want with the node object.
+
             node.classList.forEach(x=>allClasses.add(x))
         });
 
