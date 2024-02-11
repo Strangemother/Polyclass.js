@@ -31,7 +31,8 @@ const varTranslateReceiver = (function(){
 
         ClassGraph.addons.varTranslateReceiver = function(_cg){
             cg = _cg;
-            cg.insertTranslator('var', variableDigest)
+            cg.insertTranslator('var', variableDigest2)
+            // cg.insertTranslator('var', variableDigest)
         }
     }
 
@@ -108,8 +109,27 @@ const varTranslateReceiver = (function(){
         let k1 = keys.slice(1)
         let word = `var(--${k1.join("-")})`
         // console.log(keys, word)
-
         return word
+        // [inStack, outStack, currentIndex] =
+        // digestFunc(splitObj, inStack, outStack, currentIndex)
+    }
+
+
+    const variableDigest2 =  function(splitObj, inStack, outStack, currentIndex) {
+        /*
+            Convert the value keys to a var representation.
+                `var-name-switch` -> [var, name, switch]
+            to
+                `var(--name-switch)`
+         */
+
+        let keys = inStack.slice(currentIndex)
+        let k1 = keys.slice(1)
+        let word = `var(--${k1.join("-")})`
+
+        outStack.push(word)
+        // return [inStack, outStack, currentIndex]
+        return [[], outStack, currentIndex + k1.length]
     }
 
 
