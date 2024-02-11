@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCSS</title>
+    <style type="text/css">
+
+        html {
+            background: #111;
+        }
+
+        :root {
+            --text-fg-color: green;
+            --eggs: #010101;
+            --generic-font-size: 1.5em;
+            --generic-padding: 1rem 2rem;
+        };
+
+    </style>
+</head>
+
+<body polyclass>
+    <div class="font-pack-alef-400 font-alef-400 ">
+
+        <script src="../src/dcss.js"></script>
+        <script src="../src/classgraph.js"></script>
+        <script src="../src/addons/monitor.js"></script>
+        <script src="../src/addons/font-pack.js"></script>
+        <script src="../src/addons/var-translate.js"></script>
+        <script src="../src/addons/vars-box.js"></script>
+        <script src="../src/polyclass.js"></script>
+
+        <!--
+        <script src="./polyclass-usage.js"></script>
+        <script src="./dcss-usage.js"></script>
+        <script src="./src/browser.js"></script>
+        <script src="./quick-tests.js"></script>
+        -->
+        <div class="background-color-var-eggs
+                    color-var-text-fg-color
+                    font-size-var-generic-font-size
+                    padding-var-generic-padding">
+            <p>
+                Background-color "eggs", text color "text-fg-color"
+            </p>
+        </div>
+        <div class="background-#333 color-#ddd">
+                <h1>Alef auto.</h1>
+
+                <div id="demo_space" class="">
+                    <!-- The demo workspace -->
+                    <div class="container
+                                primary-area
+                                background-#444">
+                            polyclass
+                    </div>
+                </div>
+
+                <div>
+                    <p>Hello</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
