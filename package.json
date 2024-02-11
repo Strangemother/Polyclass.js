@@ -9,7 +9,7 @@
     "main": "dist/polyclass.umd.js",
     "module": "dist/polyclass.modern.js",
     "unpkg": "./dist/foo.umd.js",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "scripts": {
         "build": "rollup -c"
     },
