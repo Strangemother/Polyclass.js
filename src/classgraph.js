@@ -454,20 +454,77 @@ class ClassGraph {
         let valueVal = vals?.join(' ')
         // console.log('translateValue', valueVal)
 
+        let outStack = this.forwardDigestKeys(splitObj, vals)
+
+        // console.log('Stacked', outStack.join(' '))
+        // console.log('value  ', valueVal)
+
+        return outStack.join(' ')
+    }
+
+    /* Walk forward through a list of values, until the walk is exausted.
+    The loop is goverened by each discovered function, A receiver function
+    must return `[inStack, outStack, currentIndex]`, for the next function
+    to receive.
+
+        const receiver =  function(splitObj, inStack, outStack, currentIndex) {
+            return [inStack, outStack, currentIndex]
+        }
+
+    Digest any keys from `inStack`,
+    Add any values to `outStack` to push results to the final results.
+    currentIndex defines where (within the vals) the forward processor is -
+    at the time of functional entry.
+
+    The function returns the index for the next iteration, when the
+    inStack.slice(currentIndex) to digest the _ongoing_ keys.
+
+    returning an index _past_ the length of the `inStack` will end the loop.
+     */
+    forwardDigestKeys(splitObj, vals) {
+        let iterating = true;
+        let inStack = (vals || []);
+        let maxIndex = 100;
+        let currentIndex = 0
+        let outStack = []
 
         /* Discover any "special" keys to digest the value processing,
         such as "vars-*" */
-        for (var i = 0; i < (vals || []).length; i++) {
-            let k = vals[i]
-            let digest = this.translateMap[k]
-            if(digest){
-                return digest.bind(this)(splitObj, i)
+        while (iterating) {
+            // Each function return a _result_ (appended or untouched),
+            // and the next keys. Next keys > 0 == iterating
+
+            let currentValKey = inStack[currentIndex]
+            let digestFunc = this.translateMap[currentValKey]
+            if(digestFunc){
+                // console.log('digesting', inStack);
+                [inStack, outStack, currentIndex] = digestFunc(splitObj,
+                                            inStack, outStack, currentIndex)
+                // console.log('Results.', inStack, outStack, currentIndex)
+            } else {
+                outStack.push(inStack[currentIndex])
+            }
+
+            currentIndex += 1
+            if(currentIndex >= inStack.length || currentIndex > maxIndex) {
+                // Instack exausted.
+                iterating = false;
             }
         }
+        // for (var i = 0; i < (vals || []).length; i++) {
+        //     let k = vals[i]
+        //     let digest = this.translateMap[k]
+        //     if(digest){
+        //         // return digest.bind(this)(splitObj, i)
+        //         console.log('Ignoring digest', digest.name)
+        //     }
+        // }
 
-        return valueVal
+        return outStack//.join(' ')
+        // return valueVal
 
     }
+
 
     /*Given a special splitobject using `objectSplit()`, convert to a css
       style and insert into the dynamic stylesheet.
