@@ -2,9 +2,10 @@
 
 # Polyclass.js
 
-The CSS base library with over 4 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 
 ![Polyclass Logo](./docs/logo/1-300.png)
+
+A procedural just-in-time declarative stylesheet for instant well-behaved CSS styling.
 
 ---
 
@@ -22,6 +23,8 @@ The CSS base library with over 4 quadrillion available properties *\*([and count
 </body>
 ```
 
+## Your Instant, Pluggable, Dynamic CSS Base Library
+
 Polyclass is a _just-in-time_ CSS class library, built dynamically from your class-names using "Declarative CSS".
 
 + Eliminate in-line styles
@@ -29,19 +32,25 @@ Polyclass is a _just-in-time_ CSS class library, built dynamically from your cla
 + Work with any CSS measurement size and type
 + Build custom event handled class-names
 
-> Polyclass is the only CSS stylesheet generator using declartive class names, for ever-evergreen styles.
+> Polyclass is the only CSS stylesheet generator using declarative class names, for ever-evergreen styles.
+
+## Lightweight, Quick, Vast.
 
 It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet
 
-+ All (\~200) CSS Properties are ready, even: `order-block-start-style-dotted`!
-+ Supports **any** CSS length you prefer, from `px` to `cqmax`
-+ Use true CSS property names like `margin` or invent your own `box-push-outside`
+
++ **No opinion!** factory, forced, or predefined CSS not included!
++ Supports **any** CSS length you need, from `px` to `cqmax`
++ **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
++ over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 
 Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.
 
 + Instantly plug-and-play
-+ No Dependencies, and works along-side all the major libraries.
++ No Dependencies: works along-side all the major libraries.
 + Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
+
+
 
 ## 🚀 In a Hurry?
 
@@ -76,13 +85,14 @@ Polyclass automatic:
           <div class="text
             background-color-#111
             border-solid-3px-green
-            border-radius-.4em
+            border-radius-0.4em
             padding-.8em-1.4em
             color-#EEE
             font-roboto-400
             margin-1em">
 
-              Text content.
+              Styled, Flexed, Fonted
+              <span class='color-red'>❤</span>
           </div>
       </div>
 </div>
@@ -194,6 +204,8 @@ Here's the CSS Polyclass created:
 }
 ```
 
+
+
 ## Who is this for?
 
 ### Designers
@@ -223,6 +235,72 @@ Build your layout engine or style library. Enable the _vendor_ prefix and invent
   + CMS theming addons
   + HTML edit only environments
   + extend to make your own dynamic sheet inclusions.
+
+
+### What is "Just-in-Time"?
+
+> Polyclass does not have a pre-compiled list of CSS Classes. Definitions are generated through a process of detected _used_ classes, and immediately creating a corresponding CSS declaration.
+
+Just-In-Time (JIT) compilation in Polyclass dynamically generates CSS classes as they're needed, optimizing efficiency by focusing only on the styles actively used in the document. This process ensures lean performance-oriented styling, eliminating pre-compiled CSS clutter and enhancing web application responsiveness.
+
+```jinja
+<div class='margin-5em-20vw'>
+    <p>This div immediately generates the class</p>
+</div>
+
+<div class='margin-5em-20vw'>
+    <p>This div reuses the previously generated class</p>
+</div>
+```
+
+### What is "Declarative" CSS?
+
+
+In its simplified form the term "declarative" means _what to do_, where the antonym "imperative" would be _how to do_:
+
+| Declarative | Imperative |
+| --- | --- |
+| What to do | How to do |
+| Expression | Statement |
+| Less Variable Mutation | More Variable Mutation |
+
+HTML is declarative, allowing the developer to perceive an object as the literal entity. For example we have a layout including a single header `h1`. The identity of the object is _"what is does"_. A `h1` will never be a `input`.
+
+```jinja
+<body>
+  <div>
+    <h1>This is a H1</h1>
+  </div>
+</body>
+```
+
+#### Declarative CSS with Polyclass
+
+By naming a class to mirror CSS properties and their values, such as `border-color-red`, users explicitly define _what to do_ without delving into how to achieve it. This approach removes the verbosity and complexity traditionally associated with CSS, streamlining style application and changes.
+
+| Declarative Class Name | CSS Output             |
+|------------------------|------------------------|
+| `margin-1em`           | `margin: 1em;`         |
+| `border-color-red`     | `border-color: red;`   |
+| `text-align-center`    | `text-align: center;`  |
+
+
+Declarative CSS with Polyclass means direct, readable, and maintainable code, where style modifications are as simple as swapping class names, ensuring a seamless and intuitive design experience.
+
+
+#### Developer Speed
+
+A declarative method for CSS styles ensure:
+
++ Developers **know** how a class affects the view
+  As the **class-name _is_ the declaration**, is extremely unlikely to find `color-red` representing another colour.
++ Immediate Learning
+  Existing developer knowledge is an advantage, with a base library using **real hex, `hsl` or even `Q` measurements** for values.
++ Instant Integration
+  Using a clean naming convention allows the developer to instantly update the view to reflect changes with no cleanup of old classes is required.
+
+Polyclass's JIT approach exemplifies how on-demand generation of styles can streamline development workflows, offering a flexible, efficient solution for real-time CSS management.
+
 
 ## Example
 
@@ -277,6 +355,7 @@ As expected each class exactly represents the `key:value` of any _declarable_ CS
 ---
 
 Without using any existing CSS sheets, Polyclass will generate all the expected CSS as a constructed stylesheet.
+
 
 
 ## License
