@@ -114,8 +114,16 @@ const fontPackReceiver = (function(){
 
 
     const toTitleCase = function(str) {
-        return str.replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });
+        /*convert a string (expected font string) to a title case version
+        This also title-cases +prefix string
+
+            foo bar     Foo Bar
+            foo+bar     Foo+Bar
+        */
+        return str.replace(/(^|[\s+])\S/g, function(t) { return t.toUpperCase() });
     }
+
+    window.toTitleCase = toTitleCase
 
     const createFamilyString = function(values, fonts) {
         fonts = fonts || createFontObjects(values)
@@ -164,11 +172,19 @@ const fontPackReceiver = (function(){
 
                 let selectorRange = selectorBits.concat([key.token])
                 let packName = cg.asSelectorString(selectorRange)
+                let packNameLower = cg.asSelectorString(selectorRange).toLowerCase()
                 // console.log(packName, newDef)
-                res[packName] = newDef
+                res[`${packName}, ${packNameLower}`] = newDef
             }
 
         }
+
+        // Produce a default, withouta size: "font-pack-alta-400-500-600"
+        // font-alta-400, ..., font-alta
+        let fontOnlyName = cg.asSelectorString(['font', pack.first])
+        res[fontOnlyName] = {
+                'font-family': `'${pack.cleanName}', sans-serif`
+            }
         return res
     }
 
