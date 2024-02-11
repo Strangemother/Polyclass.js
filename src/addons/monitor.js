@@ -23,6 +23,12 @@ const insertReceiver = function(){
     ClassGraph.prototype.monitor = function(parent=document.body) {
         return monitorClasses(parent)
     }
+
+    return {
+        init(polyObj) {
+            console.log('init polyObj')
+        }
+    }
 }
 
 

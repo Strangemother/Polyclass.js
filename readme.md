@@ -23,6 +23,27 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
 </body>
 ```
 
+## Table of Contents
+
++ [Quick Install](#usage)
++ [Example](#example)
++ Extras:
+  + [Fonts](./docs/font-pack.md): Install and use fonts dynamically with `font-pack-*`
+  + [Vendor Prefix](./docs/vendor-prefix.md): Scope Polyclass usage to a prefix such as `acme-company-background-black`
+  + [Aliases](./docs/aliases.md): Reduce typing by aliasing long words `background` => `bg` == `bg-color-*`
+  + [Inserting Rules](./docs/inserting-rules.md): Inject CSS declarations and custom class detection functions.
+  + Variables:
+    + [CSS `var()`](./docs/css-var.md): Utilise variables for declarative properties and values `color-var-primary-text`
+    + [Polyclass `vars()` object](./docs/vars-object.md): Use Javascript objects as CSS `--var` definitions.
++ Deeper:
+  + [Running Instances](./docs/running-polyclass.md)
+  + [Polyclass and CSS Anatomy](./docs/anatomy.md): Understand a CSS Property
+  + [Addons](./docs/addons.md): Read more on the addon platform for customising Polyclass internals
++ Knowledge
+  + [What is JIT](#what-is-just-in-time)
+  + [What is Declarative](#what-is-declarative-css)
+  + [5 Quadrillion?](./docs/class-count.md)
+
 ## Your Instant, Pluggable, Dynamic CSS Base Library
 
 Polyclass is a _just-in-time_ CSS class library, built dynamically from your class-names using "Declarative CSS".
@@ -32,12 +53,27 @@ Polyclass is a _just-in-time_ CSS class library, built dynamically from your cla
 + Work with any CSS measurement size and type
 + Build custom event handled class-names
 
-> Polyclass is the only CSS stylesheet generator using declarative class names, for ever-evergreen styles.
+```jinja
+<div class='display-flex
+            max-width-80vw
+            font-size-1.222ch
+            padding-0-10vw'>
+</div>
+```
+
 
 ## Lightweight, Quick, Vast.
 
 It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet
 
+```jinja
+<header
+    class='display-flex
+           position-sticky
+           top-1em'>
+    Flexy Sticky Header!
+</header>
+```
 
 + **No opinion!** factory, forced, or predefined CSS not included!
 + Supports **any** CSS length you need, from `px` to `cqmax`
@@ -49,7 +85,6 @@ Whether you're working with pre-rendered content or making live DOM changes, Pol
 + Instantly plug-and-play
 + No Dependencies: works along-side all the major libraries.
 + Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
-
 
 
 ## 🚀 In a Hurry?
@@ -98,20 +133,9 @@ Polyclass automatic:
 </div>
 ```
 
-## Bits and Bolts:
-
-+ [Run](./running-polyclass.md)
-+ [`font-pack-*` addon](./font-pack.md): Install and use fonts dynamically with `font-pack-*`
-+ [CSS `var()`](./css-var.md): Utilise variables for declarative properties and values `color-var-primary-text`
-+ [Polyclass `vars()` object](./vars-object.md): Use Javascript objects as CSS `--var` definitions.
-+ [`vendor-*` prefix](./vendor-prefix.md): Scope Polyclass usage to a prefix such as `acme-company-background-black`
-+ [Aliases](./aliases.md): Reduce typing by aliasing long words `background` => `bg` == `bg-color-*`
-+ [Inserting Rules](./inserting-rules.md): Inject CSS declarations and custom class detection functions.
-+ [Polyclass and CSS Anatomy](./anatomy.md): Understand a CSS Property
-+ [Addons](./addons.md): Read more on the addon platform for customising Polyclass internals
-
-
 ## Usage
+
+Polyclass is designed to be quick to initiate.
 
 ### Install
 
@@ -135,6 +159,9 @@ TBD
 
 ### Load
 
+To load Polyclass, use the automatic attribute, or a JavaScript instance.
+Multiple instances of Polyclass can exist in one view:
+
 #### HTML `polyclass` attribute
 
 Use the Polyclass automatic detection:
@@ -144,6 +171,8 @@ Use the Polyclass automatic detection:
   <h1 class='color-#999'>Grey Title!</h1>
 </body>
 ```
+
+Read more in [Running Polyclass:Auto](./docs/running-polyclass.md#auto-polyclass)
 
 #### JavaScipt `Polyclass` Instance
 
@@ -159,8 +188,11 @@ If the page is already loaded, run the `process()` method:
 
 ```js
 const pc = Polyclass()
-pc.process(document.body)
+pc.process(document.body) // detect after load
 ```
+
+Read more in [Running Polyclass:Instance](./docs/running-polyclass.md#polyclass-instance)
+
 
 #### Use
 
@@ -203,7 +235,6 @@ Here's the CSS Polyclass created:
     color: #333;
 }
 ```
-
 
 
 ## Who is this for?

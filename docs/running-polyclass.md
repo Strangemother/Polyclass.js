@@ -4,7 +4,7 @@ There are two general methods to running polyclass, they can work independently 
 
 The quickest method is the no-code HTML property:
 
-```html
+```jinja
 <script src='polyclass.js'></script>
 
 <body polyclass>
@@ -23,7 +23,7 @@ const pc = Polyclass()
 Polyclass can be automatically instantiated on a target HTML entity. This may be the `body` or any other HTML object.
 
 
-```html
+```jinja
 <script src='polyclass.js'></script>
 <body>
     <div polyclass>
@@ -38,7 +38,7 @@ Polyclass can be automatically instantiated on a target HTML entity. This may be
 You can multiple polyclass units:
 
 
-```html
+```jinja
 <script src='polyclass.js'></script>
 <body>
     <div polyclass>
@@ -57,7 +57,7 @@ You can multiple polyclass units:
 
 Polyclass builds _global_ css selectors, as such using a CSS class-name on an entity, will affect other nodes with the same class-name
 
-```html
+```jinja
 <script src='polyclass.js'></script>
 <body>
     <div polyclass>
