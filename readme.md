@@ -93,7 +93,7 @@ Whether you're working with pre-rendered content or making live DOM changes, Pol
 Include:
 
 ```jinja
-<script src="polyclass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/polyclass@0.0.22/dist/polyclass.full.js"></script>
 ```
 
 Polyclass automatic:

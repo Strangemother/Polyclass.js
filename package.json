@@ -6,7 +6,7 @@
         "require": "./dist/foo.cjs",
         "default": "./dist/foo.modern.js"
     },
-    "browser": "dist/polyclass-full.js",
+    "browser": "dist/polyclass.full.js",
     "version": "0.0.21",
     "scripts": {
         "build": "rollup -c"
