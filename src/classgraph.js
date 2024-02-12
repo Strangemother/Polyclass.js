@@ -709,13 +709,15 @@ class ClassGraph {
     Any detected rule of which does not exist, is created and
     applied to the class graph.
      */
-    captureNew(items, oldItems) {
+    captureNew(items, oldItems, origin) {
+        let cg = this;
         // console.log('Capture new', items, oldItems)
         for(let str of items) {
             if(str.length == 0) {
                 continue
             }
             let splitObj = cg.objectSplit(str)
+            splitObj.origin = origin
             let n = splitObj.node?.handler
             // debugger
             let func = n? n.bind(splitObj): cg.insertRule.bind(cg)
