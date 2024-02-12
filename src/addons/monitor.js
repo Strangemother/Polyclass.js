@@ -79,12 +79,12 @@ const classMutationDetection = function(mutation) {
     //             , `classes: "${classes}"`
     //         )
     let new_spl = classes.split(' ')
-    let old_spl = old?.split(' ')
+    let old_spl = old.split(' ').map((v)=>v.trim())
     let newItems = old_spl? difference(new_spl, old_spl): new_spl
     console.log('new', newItems)
     // let removedItems = difference(old_spl, new_spl)
     // console.log('removedItems', removedItems)
-    cg.captureNew(newItems)
+    cg.captureNew(newItems, undefined, mutation.target)
 }
 
 
