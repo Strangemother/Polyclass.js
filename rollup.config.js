@@ -2,77 +2,102 @@ import resolve from '@rollup/plugin-node-resolve'; // Helps Rollup find external
 import commonjs from '@rollup/plugin-commonjs'; // Converts CommonJS modules to ES6
 import terser from '@rollup/plugin-terser'; // Minifies the bundle
 
-import ClassGraph from "./src/classgraph.js"
+// import ClassGraph from "./src/classgraph.js"
 import concat from 'rollup-plugin-concat';
 
-const addons = [
-    "./src/addons/monitor.js"
+const ADDONS = [
+    "./src/addons/events.js"
     , "./src/addons/font-pack.js"
-    , "./src/addons/mouse-events.js"
-    , "./src/addons/var-translate.js"
+    , "./src/addons/monitor.js"
     , "./src/addons/vars-box.js"
+    , "./src/addons/var-translate.js"
 ]
 
-const core = [
+const CORE = [
     "./src/dcss.js"
     , "./src/classgraph.js"
 ]
 
-const polyclass = [
-    "./src/polyclass.js"
+const POLYCLASS = [
+    ...CORE
+    , "./src/polyclass.js"
 ]
 
-const groupedFiles =  [
-    {
-        files: core.concat(polyclass)
+const groupedFiles =  {
+    core: {
+        files: POLYCLASS
+        // files: CORE.concat(POLYCLASS)
         , outputFile: './build/polyclass-only.js'
     }
-    ,{
-        files: addons
+    ,addons: {
+        files: ADDONS
         , outputFile: './build/all-addons.js'
     }
-    ,{
-        files: core.concat(polyclass).concat(addons)
+    ,full: {
+        files: POLYCLASS.concat(ADDONS)
         , outputFile: './build/polyclass-full.js'
     }
-]
+}
+
 
 const groupedFileOutputs = function(){
     let res = []
-    for(let obj of groupedFiles){
+    for(let obj of Object.values(groupedFiles)){
         res.push(obj.outputFile)
     }
     return res;
 }
 
-export default {
-  input: [          // Specify the entry point
-    // "./src/module.js"
-    // , ...core
-    // , ...addons
-    // , ...polyclass
+// https://rollupjs.org/command-line-interface/#configuration-files
+export default [
+    /*{
+        input: groupedFiles.core.outputFile
+        , output: [
+                {
+                    file: 'dist/core-cjs.js'
+                    , format: 'cjs'
+                }, {
+                    file: 'dist/core-es.js'
+                    , format: 'es'
+                }, {
+                    file: 'dist/core-iife.js'
+                    , format: 'iife'
+                }, {
+                    file: 'dist/core-umd.js'
+                    , format: 'umd'
+                    , name: 'polybundle'
+                }
+            ]
+    },*/
+     {
+      input: [
+        // "./src/module.js"
+        // , ...CORE
+        // , ...ADDONS
+        // , ...POLYCLASS
 
-    /* Created during the `concat` phase. */
-    ...groupedFileOutputs()
-  ],
-  output: {
-    dir: 'dist/', // Output file
-    // file: 'dist/polyclass-browser.js', // Output file
-    // format: 'iife', // Output format
-    name: 'polyclass', // Global variable name when included directly in the browser
-    sourcemap: false, // Optional: generates a source map
-    // inlineDynamicImports: true
-  },
-  plugins: [
+        /* Created during the `concat` phase. */
+        ...groupedFileOutputs()
+      ],
+      output: {
+        dir: 'dist/', // Output file
+        // file: 'dist/polyclass-browser.js', // Output file
+        // format: 'iife', // Output format
+        name: 'polyclass', // Global variable name when included directly in the browser
+        sourcemap: false, // Optional: generates a source map
+        // inlineDynamicImports: true
+      },
+      plugins: [
 
-    concat({
-        groupedFiles,
-    }),
-    // Resolve external modules from node_modules
-    resolve(),
-    // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
-    // commonjs(),
-    // Minify the output
-    terser(),
-  ],
-};
+        concat({
+            groupedFiles: Object.values(groupedFiles)
+        }),
+        // Resolve external modules from node_modules
+        resolve(),
+        // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
+        // commonjs(),
+        // Minify the output
+        terser(),
+      ],
+    }
+]
