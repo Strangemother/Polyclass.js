@@ -7,6 +7,8 @@
 
 A procedural just-in-time declarative stylesheet for instant well-behaved CSS styling.
 
+![NPM Version](https://img.shields.io/npm/v/polyclass?registry_uri=https%3A%2F%2Fregistry.npmjs.com&style=flat&logo=npm)
+
 ---
 
 </div>
@@ -28,17 +30,18 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
 + [Quick Install](#usage)
 + [Example](#example)
 + Extras:
-  + [Fonts](./docs/font-pack.md): Install and use fonts dynamically with `font-pack-*`
-  + [Vendor Prefix](./docs/vendor-prefix.md): Scope Polyclass usage to a prefix such as `acme-company-background-black`
-  + [Aliases](./docs/aliases.md): Reduce typing by aliasing long words `background` => `bg` == `bg-color-*`
-  + [Inserting Rules](./docs/inserting-rules.md): Inject CSS declarations and custom class detection functions.
-  + Variables:
-    + [CSS `var()`](./docs/css-var.md): Utilise variables for declarative properties and values `color-var-primary-text`
-    + [Polyclass `vars()` object](./docs/vars-object.md): Use Javascript objects as CSS `--var` definitions.
-+ Deeper:
+  + [Fonts](./docs/font-pack.md) Install and use fonts dynamically
+  + [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
+  + [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
+  + [Events](./docs/events.md) Apply JavaScript event listeners using class-names
+  + [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions.
+  + Variables
+    + [CSS `var()`](./docs/css-var.md) Utilise variables for declarative properties and values
+    + [Polyclass `vars()` object](./docs/vars-object.md) Use JavaScript objects as CSS vars
++ Deeper
   + [Running Instances](./docs/running-polyclass.md)
-  + [Polyclass and CSS Anatomy](./docs/anatomy.md): Understand a CSS Property
-  + [Addons](./docs/addons.md): Read more on the addon platform for customising Polyclass internals
+  + [Polyclass and CSS Anatomy](./docs/anatomy.md) Understand a CSS Property
+  + [Addons](./docs/addons.md) Read more on the addon platform for customising Polyclass internals
 + Knowledge
   + [What is JIT](#what-is-just-in-time)
   + [What is Declarative](#what-is-declarative-css)
@@ -90,78 +93,56 @@ Whether you're working with pre-rendered content or making live DOM changes, Pol
 
 ## 🚀 In a Hurry?
 
-Include:
+Include from jsdelivr:
 
 ```jinja
-<script src="https://cdn.jsdelivr.net/npm/polyclass@0.0.22/dist/polyclass.full.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
 ```
 
-Polyclass automatic:
+**All Done. Let's use it.**
+
+Apply `polyclass` to your target, such as the `body`:
 
 ```jinja
 <body polyclass> <!-- Activate -->
-  <h1
-    class='color-#999'> <!-- Write classes -->
-    Grey Title!</h1>
+  <h1 css='color-rebeccapurple'> <!-- Write classes -->
+    Purple Title!
+  </h1>
 </body>
 ```
 
 **Polyclass anything!**
 
-```jinja
-<div class="my-container some-other-primary-area
-    font-pack-roboto-100-400-i400
-    background-#333">
-
-      <div class="demo-box
-        gap-1em
-        display-flex
-        flex-direction-column">
-
-          <div class="text
-            background-color-#111
-            border-solid-3px-green
-            border-radius-0.4em
-            padding-.8em-1.4em
-            color-#EEE
-            font-roboto-400
-            margin-1em">
-
-              Styled, Flexed, Fonted
-              <span class='color-red'>❤</span>
-          </div>
-      </div>
-</div>
-```
 
 ## Usage
 
 Polyclass is designed to be quick to initiate.
 
+
 ### Install
 
-Include Polyclass as a script:
+Include Polyclass from local source:
 
 ```jinja
-<script src="polyclass.js"></script>
+<script src="dist/polyclass.full.js"></script>
 ```
 
-Grab from NPM
+[Grab from jsdelivr](https://www.jsdelivr.com/package/npm/polyclass) and apply it directly to your HTML:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/polyclass@0.0.23/dist/polyclass.full.min.js"></script>
+```
+
+[Grab from NPM](https://www.npmjs.com/package/polyclass) and do node things:
 
 ```bash
 npm install polyclass
 ```
 
-Grab from unpkg:
-
-```
-TBD
-```
-
 ### Load
 
-To load Polyclass, use the automatic attribute, or a JavaScript instance.
-Multiple instances of Polyclass can exist in one view:
+To load Polyclass use the automatic attribute `polyclass`, or create a new JavaScript instance `Polyclass()`. Multiple instances of Polyclass can exist in one view
+
 
 #### HTML `polyclass` attribute
 
@@ -173,7 +154,8 @@ Use the Polyclass automatic detection:
 </body>
 ```
 
-Read more in [Running Polyclass:Auto](./docs/running-polyclass.md#auto-polyclass)
+Read more in [Running Polyclass: Auto](./docs/running-polyclass.md#auto-polyclass)
+
 
 #### JavaScipt `Polyclass` Instance
 
@@ -192,14 +174,15 @@ const pc = Polyclass()
 pc.process(document.body) // detect after load
 ```
 
-Read more in [Running Polyclass:Instance](./docs/running-polyclass.md#polyclass-instance)
+Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
 
 
-#### Use
+#### Using Classes
 
-And you're ready to go! Populate the html classes to see it in action:
+Once installed, populate the html classes to see it in action:
 
 ```jinja
+<!-- previously imported polyclass -->
 <div id="demo_space"
     class='foo
            padding-1em-2em
@@ -209,6 +192,17 @@ And you're ready to go! Populate the html classes to see it in action:
     <p>Styled content from <strong>only</strong> CSS classes.</p>
 </div>
 ```
+
+Useful Functionality:
+
++ [Fonts](./docs/font-pack.md) Install and use fonts dynamically
++ [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
++ [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
++ [Events](./docs/events.md) Apply JavaScript event listeners using class-names
++ [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions.
++ [CSS `var()`](./docs/css-var.md) Utilise `--vars` for declarative properties and values
++ [Polyclass `vars()` object](./docs/vars-object.md) Use JavaScript objects as CSS vars
+
 
 #### What's Created
 
@@ -232,7 +226,7 @@ Here's the CSS Polyclass created:
     margin: 1em;
 }
 
-.color-#333 {
+.color-\#333 {
     color: #333;
 }
 ```
@@ -246,7 +240,7 @@ Iterate on your styles until you're happy. With a **massive** base of rules ther
 
 ### Developers
 
-Don't spend time caring for your _base styles_. Use a declarative naming convension for your class names for easy to document, easy to integrate core styles, and less bytes to download.
+Don't spend time caring for your _base styles_. Use a declarative naming convention for your class names for easy to document, easy to integrate core styles, and less bytes to download.
 
 ### Vendors
 
@@ -257,9 +251,9 @@ Build your layout engine or style library. Enable the _vendor_ prefix and invent
 + **Reduce Boilerplate**
   Ideas change. Designs alter. Polyclass can help kill the junk CSS and massive boiler-sheets of _pre defined classes_.
 + **Become your own vendor!**
-  Don't settle for a _forever_ locked-in eco-system, supporting enourmous stylesheets. Build out your own boilerplate, add a vendor switch and job done!
+  Don't settle for a _forever_ locked-in eco-system, supporting enormous stylesheets. Build out your own boilerplate, add a vendor switch and job done!
 + **Generate _Dynamic Classes_**
-  Build dyanamic names to write base and generate layouts without limits, such as a column-stucture: `acme-grid-columms-4`,  `acme-grid-columms-3`, `acme-grid-columms-12`
+  Build dynamic names to write base and generate layouts without limits, such as a column-structure: `acme-grid-columms-4`,  `acme-grid-columms-3`, `acme-grid-columms-12`
 + **Faster page load times**
   CSS mean bytes down the pipe. Polyclass builds CSS on the fly.
 + **Dynamic CSS tooling**

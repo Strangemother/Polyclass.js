@@ -2,17 +2,15 @@
 
 Fully install Google fonts with one CSS class. Use a font-family on a target
 
+
 ```jinja
-<div polyclass>
-    <div class='background-#333 color-#DDD font-size-1.2em'>
-        <div
-            class="font-pack-roboto-100-300-400
-                   font-roboto-400"> <!-- Create fonts, use font (400) -->
-            Roboto Font!
-        </div>
-    </div>
-</div>
+<body class="font-pack-roboto-100-300-400"> <!-- Create the font -->
+    <p class="font-roboto-400"> <!-- use font (size 400) -->
+      Roboto Font!
+    </p>
+</body>
 ```
+
 
 ## Install
 
@@ -67,27 +65,47 @@ What does it do:
 2. Write a receiver for the `font-*` polyclass.
 
 
+---
+
+You can apply the `font-pack-*` request, and the `font-*` to the same entity:
+
+```jinja
+<div polyclass>
+    <div class='background-#333 color-#DDD font-size-1.2em'>
+        <div
+            class="font-pack-roboto-100-300-400
+                   font-roboto-400"> <!-- Create fonts, use font (400) -->
+            Roboto Font!
+        </div>
+    </div>
+</div>
+```
+
+
 ## Synax
 
 1. `font-pack-*` installs a font
 2. `font-*` uses an installed font
 
+
+The font pack request downloads the font informtion from the Google service.
+
 ```
-font-pack
-    [font-name]
-        [integer]
-        i [integer]
+single-font:
+    font-pack-font+name-[i]integer[-...]
+
+multi-font:
+    font-pack-font+name-[i]integer[-...][-font+name[-[i]integer[-...]]]
+```
+
+Apply a font through the created `.font-font+name` class. An optional size can be applied.
+
+```
+font-font+name[-[i]integer]
 ```
 
 
-```
-font-
-    [font-name]
-        [integer] | i [integer]
-```
-
-
-+ the `font-name` is any google font name in a lowercase, kebab-string.
++ the `font+name` is any google font name in a lowercase, plus+string.
 + The `integer` is any acceptable font-size, such as `100` or `400`.
 + An `i` integer is denotes _italic_, such as `i100`, `i400`
 
@@ -133,12 +151,37 @@ Each font can be accessed with their individual names:
 <div class="font-protest+strike"></div>
 <div class="font-protest+strike-400"></div>
 
-<div class="font-reducated-script"></div>
-<div class="font-reducated-script-300"></div>
-<div class="font-reducated-script-400"></div>
+<div class="font-reducated+script"></div>
+<div class="font-reducated+script-300"></div>
+<div class="font-reducated+script-400"></div>
 
 <div class="font-alata"></div>
 <div class="font-alata-400"></div>
+```
+
+### String Casing
+
+By default Google All fonts are "Title Case" including any acronyms. As such the _real_ request to the service corrects the applied font string:
+
+    font-reducated+script   ->   Reducated+Script
+
+You can apply the correct casing to the class-name:
+
+```jinja
+<div class="font-pack-Reducated+Script-400"></div>
+```
+
+However class-names always is accessible through the `lower+case` version of the name:
+
+```jinja
+<div class="font-reducated+script">
+    Lower case accessors will work
+</div>
+
+
+<div class="font-Reducated+Script">
+    Title case accessors will not work
+</div>
 ```
 
 
