@@ -78,6 +78,7 @@ It's open-source, lightweight and runtime pluggable. With only HTML class names,
 + **No opinion!** factory, forced, or predefined CSS not included!
 + Supports **any** CSS length you need, from `px` to `cqmax`
 + **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
++ **Less than 15 Kilobytes** (minified) including all addons.
 + over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 
 Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.

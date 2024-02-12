@@ -6,9 +6,7 @@
         "require": "./dist/foo.cjs",
         "default": "./dist/foo.modern.js"
     },
-    "main": "dist/polyclass.umd.js",
-    "module": "dist/polyclass.modern.js",
-    "unpkg": "./dist/foo.umd.js",
+    "browser": "dist/polyclass-full.js",
     "version": "0.0.21",
     "scripts": {
         "build": "rollup -c"

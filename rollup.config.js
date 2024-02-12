@@ -5,6 +5,7 @@ import terser from '@rollup/plugin-terser'; // Minifies the bundle
 // import ClassGraph from "./src/classgraph.js"
 import concat from 'rollup-plugin-concat';
 
+
 const ADDONS = [
     "./src/addons/events.js"
     , "./src/addons/font-pack.js"
@@ -13,29 +14,32 @@ const ADDONS = [
     , "./src/addons/var-translate.js"
 ]
 
+
 const CORE = [
     "./src/dcss.js"
     , "./src/classgraph.js"
 ]
+
 
 const POLYCLASS = [
     ...CORE
     , "./src/polyclass.js"
 ]
 
+
 const groupedFiles =  {
     core: {
         files: POLYCLASS
         // files: CORE.concat(POLYCLASS)
-        , outputFile: './build/polyclass-only.js'
+        , outputFile: './build/polyclass.core.js'
     }
-    ,addons: {
+    , addons: {
         files: ADDONS
-        , outputFile: './build/all-addons.js'
+        , outputFile: './build/addons.all.js'
     }
-    ,full: {
+    , full: {
         files: POLYCLASS.concat(ADDONS)
-        , outputFile: './build/polyclass-full.js'
+        , outputFile: './build/polyclass.full.js'
     }
 }
 
@@ -48,29 +52,38 @@ const groupedFileOutputs = function(){
     return res;
 }
 
-// https://rollupjs.org/command-line-interface/#configuration-files
-export default [
-    /*{
-        input: groupedFiles.core.outputFile
-        , output: [
-                {
-                    file: 'dist/core-cjs.js'
-                    , format: 'cjs'
-                }, {
-                    file: 'dist/core-es.js'
-                    , format: 'es'
-                }, {
-                    file: 'dist/core-iife.js'
-                    , format: 'iife'
-                }, {
-                    file: 'dist/core-umd.js'
-                    , format: 'umd'
-                    , name: 'polybundle'
-                }
-            ]
-    },*/
-     {
-      input: [
+
+const coreConfig = {
+    input: groupedFiles.core.outputFile
+    , output: [
+       {
+            file: 'dist/core.js'
+            , format: 'esm'
+        }, {
+            file: 'dist/core.umd.js'
+            , format: 'umd'
+            , name: 'polybundle'
+        }
+    ]
+    , plugins: [
+        concat({
+            groupedFiles: Object.values(groupedFiles)
+        })
+        // Resolve external modules from node_modules
+        // resolve(),
+        // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
+        // commonjs(),
+        // Minify the output
+        , terser()
+    ]
+}
+
+const buildFilesConfig = {
+    /* All files created during the concat stage, with the merge files
+       within the `build/`.
+       Create a minified `dist/` of each file discovered.
+    */
+    input: [
         // "./src/module.js"
         // , ...CORE
         // , ...ADDONS
@@ -78,26 +91,62 @@ export default [
 
         /* Created during the `concat` phase. */
         ...groupedFileOutputs()
-      ],
-      output: {
-        dir: 'dist/', // Output file
-        // file: 'dist/polyclass-browser.js', // Output file
-        // format: 'iife', // Output format
-        name: 'polyclass', // Global variable name when included directly in the browser
-        sourcemap: false, // Optional: generates a source map
-        // inlineDynamicImports: true
-      },
-      plugins: [
-
+    ]
+    , output: [{
+            dir: 'dist/', // Output file
+            // file: 'dist/polyclass-browser.js', // Output file
+            // format: 'iife', // Output format
+            name: 'polyclass', // Global variable name when included directly in the browser
+            sourcemap: false, // Optional: generates a source map
+            // inlineDynamicImports: true
+            format: 'esm'
+        }/*,{
+            dir: 'dist/' // Output file
+            // file: 'dist/polyclass-browser.js', // Output file
+            // format: 'iife', // Output format
+            , sourcemap: false // Optional: generates a source map
+            // inlineDynamicImports: true
+            , format: 'umd'
+            , name: 'polyclass'
+        }*/]
+    , plugins: [
         concat({
             groupedFiles: Object.values(groupedFiles)
         }),
         // Resolve external modules from node_modules
         resolve(),
-        // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
-        // commonjs(),
         // Minify the output
         terser(),
-      ],
+    ]
+}
+
+const addonsConfig = {
+     /* Create a minified `dist/addon` of each file within the ADDONS list.
+     */
+    input: [
+        // "./src/module.js"
+        // , ...CORE
+        ...ADDONS
+        // , ...POLYCLASS
+    ]
+    , output: {
+        dir: 'dist/addons/', // Output file
+        // file: 'dist/polyclass-browser.js', // Output file
+        // format: 'iife', // Output format
+        name: 'polyclass', // Global variable name when included directly in the browser
+        sourcemap: false, // Optional: generates a source map
+        // inlineDynamicImports: true
     }
+    , plugins: [
+        // Minify the output
+        terser()
+    ]
+}
+
+
+// https://rollupjs.org/command-line-interface/#configuration-files
+export default [
+    /*coreConfig
+    , */buildFilesConfig
+    , addonsConfig
 ]

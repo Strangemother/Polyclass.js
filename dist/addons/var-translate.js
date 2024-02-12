@@ -1,0 +1,1 @@
+!function(){let e;const n=function(e,n,r,t){let a=n.slice(t).slice(1),s=`var(--${a.join("-")})`;return r.push(s),[[],r,t+a.length]};console.log("var-translate insertReceiver"),ClassGraph.addons.varTranslateReceiver=function(r){e=r,e.insertTranslator("var",n)}}();
