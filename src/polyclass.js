@@ -17,12 +17,22 @@ class PolyObject {
         let cg = new ClassGraph(config)
         cg.generate()
         this._graph = cg
+
         if(config?.processOnLoad) {
             this.processOnLoad(config.processOnLoad)
         }
 
         if(config?.target) {
             this.process(config.target)
+        }
+
+
+        if(config?.isInline) {
+            // test for active attributes
+            const attrValue = this.getParsedAttrValue('monitor', config.target)
+            if(attrValue !== false) {
+                this._graph.monitor(config.target)
+            }
         }
 
 
@@ -61,6 +71,21 @@ class PolyObject {
         }
 
         this.proxy = new Proxy(this.innerHead, this.innerProxyHandler)
+    }
+
+    getParsedAttrValue(name, target, _default=undefined) {
+        target = target || this._graph.conf.target;
+        const attrs = target.attributes
+        const attrv = attrs.getNamedItem(name);
+        if(attrv === null) {
+            return _default 
+        }
+
+        let val = attrv.value
+        if(val.length == 0) { return _default }
+        
+        const attrValue = JSON.parse(val)
+        return attrValue;
     }
 
     processOnLoad(){
@@ -225,7 +250,7 @@ const onDomLoaded = function() {
     console.log('Discovered', targets.length)
     for(let target of targets){
         let polyclassId = Math.random().toString(32).slice(2)
-        let pc = new Polyclass({target})
+        let pc = new Polyclass({target, isInline:true})
         target.dataset.polyclassId = polyclassId
         // polyUnits[polyclassId] = pc;
         polyUnits.set(polyclassId, pc)
