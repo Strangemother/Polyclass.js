@@ -341,3 +341,9 @@ class DynamicCSSStyleSheet {
  * @type {Object}
  */
 DynamicCSSStyleSheet.addons = {}
+
+
+export {
+    DynamicCSSStyleSheet,
+    RenderArray
+}

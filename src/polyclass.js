@@ -6,7 +6,7 @@
  */
 
 
-;(()=>{
+(()=>{
 
 class PolyObject {
 
@@ -78,12 +78,12 @@ class PolyObject {
         const attrs = target.attributes
         const attrv = attrs.getNamedItem(name);
         if(attrv === null) {
-            return _default 
+            return _default
         }
 
         let val = attrv.value
         if(val.length == 0) { return _default }
-        
+
         const attrValue = JSON.parse(val)
         return attrValue;
     }

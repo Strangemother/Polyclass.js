@@ -36,7 +36,7 @@ const colorPrebits = function() {
 }
 
 
-class ClassGraph {
+export default class ClassGraph {
 
     sep = '-'
     escapeRegex = /[<>*%#()=.@+?\/]/g
@@ -826,3 +826,7 @@ class ClassGraph {
 
 
 ;ClassGraph.addons = {};
+
+export {
+    ClassGraph
+}
