@@ -105,7 +105,7 @@ Apply `polyclass` to your target, such as the `body`:
 
 ```jinja
 <body polyclass> <!-- Activate -->
-  <h1 css='color-rebeccapurple'> <!-- Write classes -->
+  <h1 class='color-rebeccapurple'> <!-- Write classes -->
     Purple Title!
   </h1>
 </body>
@@ -143,6 +143,7 @@ npm install polyclass
 
 To load Polyclass use the automatic attribute `polyclass`, or create a new JavaScript instance `Polyclass()`. Multiple instances of Polyclass can exist in one view
 
+---
 
 #### HTML `polyclass` attribute
 
@@ -156,6 +157,7 @@ Use the Polyclass automatic detection:
 
 Read more in [Running Polyclass: Auto](./docs/running-polyclass.md#auto-polyclass)
 
+---
 
 #### JavaScipt `Polyclass` Instance
 
@@ -176,6 +178,7 @@ pc.process(document.body) // detect after load
 
 Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
 
+---
 
 #### Using Classes
 
@@ -192,17 +195,6 @@ Once installed, populate the html classes to see it in action:
     <p>Styled content from <strong>only</strong> CSS classes.</p>
 </div>
 ```
-
-Useful Functionality:
-
-+ [Fonts](./docs/font-pack.md) Install and use fonts dynamically
-+ [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
-+ [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
-+ [Events](./docs/events.md) Apply JavaScript event listeners using class-names
-+ [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions.
-+ [CSS `var()`](./docs/css-var.md) Utilise `--vars` for declarative properties and values
-+ [Polyclass `vars()` object](./docs/vars-object.md) Use JavaScript objects as CSS vars
-
 
 #### What's Created
 
@@ -230,6 +222,17 @@ Here's the CSS Polyclass created:
     color: #333;
 }
 ```
+
+Useful Functionality:
+
++ [Fonts](./docs/font-pack.md) Install and use fonts dynamically
++ [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
++ [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
++ [Events](./docs/events.md) Apply JavaScript event listeners using class-names
++ [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions.
++ [CSS `var()`](./docs/css-var.md) Utilise `--vars` for declarative properties and values
++ [Polyclass `vars()` object](./docs/vars-object.md) Use JavaScript objects as CSS vars
+
 
 
 ## Who is this for?
