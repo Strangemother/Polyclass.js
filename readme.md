@@ -7,12 +7,8 @@
 
 A procedural just-in-time declarative stylesheet for instant well-behaved CSS styling.
 
-<a href="https://www.npmjs.com/package/polyclass">
-
-
-![NPM Version](https://img.shields.io/npm/v/polyclass?registry_uri=https%3A%2F%2Fregistry.npmjs.com&style=flat&logo=npm)
-
-
+<a href="https://www.npmjs.org/package/polyclass">
+  <img src="https://img.shields.io/npm/v/polyclass?registry_uri=https%3A%2F%2Fregistry.npmjs.com&style=flat&logo=npm" alt="npm">
 </a>
 
 
