@@ -32,7 +32,7 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
 
 ## Table of Contents
 
-+ [Quick Install](#usage)
++ [Quick Install](#-in-a-hurry)
 + [Example](#example)
 + Extras:
   + [Fonts](./docs/font-pack.md) Install and use fonts dynamically
@@ -51,6 +51,37 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
   + [What is JIT](#what-is-just-in-time)
   + [What is Declarative](#what-is-declarative-css)
   + [5 Quadrillion?](./docs/class-count.md)
+
+
+## 🚀 In a Hurry?
+
+Include from [jsdelivr](https://www.jsdelivr.com/package/npm/polyclass):
+
+```jinja
+<script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
+```
+
+**All Done. Let's use it.**
+
+Apply `polyclass` to your target, such as the `body`:
+
+```jinja
+<body polyclass> <!-- Activate -->
+  <h1 class='color-rebeccapurple'> <!-- Write classes -->
+    Purple Title!
+  </h1>
+</body>
+```
+
+**Polyclass anything!**
+
+
+## Features
+
++ Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
++ Instant plug-and-play, No compilation required
++ Pure JavaScript with no dependencies
++ MIT License
 
 ## Your Instant, Pluggable, Dynamic CSS Base Library
 
@@ -91,32 +122,6 @@ It's open-source, lightweight and runtime pluggable. With only HTML class names,
 
 Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.
 
-+ Instantly plug-and-play
-+ No Dependencies: works along-side all the major libraries.
-+ Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
-
-
-## 🚀 In a Hurry?
-
-Include from jsdelivr:
-
-```jinja
-<script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
-```
-
-**All Done. Let's use it.**
-
-Apply `polyclass` to your target, such as the `body`:
-
-```jinja
-<body polyclass> <!-- Activate -->
-  <h1 class='color-rebeccapurple'> <!-- Write classes -->
-    Purple Title!
-  </h1>
-</body>
-```
-
-**Polyclass anything!**
 
 
 ## Usage
@@ -180,6 +185,17 @@ If the page is already loaded, run the `process()` method:
 const pc = Polyclass()
 pc.process(document.body) // detect after load
 ```
+
+Provide a `target` to process immediately:
+
+
+```js
+const pc = Polyclass({ target: document.body })
+// pc.process(document.body) // Not required.
+```
+
+
+**Note: This isn't required when using the \<\* polyclass\\\> attribute** as it processes the attached entity.
 
 Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
 
@@ -390,6 +406,14 @@ As expected each class exactly represents the `key:value` of any _declarable_ CS
 
 Without using any existing CSS sheets, Polyclass will generate all the expected CSS as a constructed stylesheet.
 
+## Build
+
+Polyclass utilises Rollup
+
+```bash
+npm run build
+npx rollup -c
+```
 
 
 ## License
