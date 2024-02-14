@@ -78,13 +78,16 @@ Apply `polyclass` to your target, such as the `body`:
 
 ## Features
 
-+ Works real-time or with pre-rendered content
-+ No compilation required, Instant plug-and-play
-+ Pure JavaScript with no dependencies
+It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS declarations in a dynamic stylesheet:
+
++ Real-time or pre-render compatible
++ Instant plug-and-play with No compilation required
++ No dependencies, pure JavaScript
 + MIT License
 
----
+### Your Instant, Pluggable, Dynamic CSS Base Library
 
+Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built dynamically from your class-names using "[Declarative CSS](#what-is-declarative-css)".
 
 + **Just-in-Time** runtime to declare CSS on-the-fly
 + **No opinion** no factory, forced, or predefined CSS included!
@@ -92,12 +95,6 @@ Apply `polyclass` to your target, such as the `body`:
 + **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
 + **Less than 15 Kilobytes** (minified) including all addons.
 + over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
-
-
-### Your Instant, Pluggable, Dynamic CSS Base Library
-
-
-Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built dynamically from your class-names using "[Declarative CSS](#what-is-declarative-css)".
 
 
 ```jinja
@@ -114,9 +111,20 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 </div>
 ```
 
+<small>### Invisible.</small>
+
+Consider Polyclass as the missing link for `class` attribute  your CSS stylesheet.
+
++ The `style` attribute works as expected
++ Existing classes and libraries remain unaffected
++ Override Polyclass declarations without complex selectors
++ Works along-side any JavaScript library
+
+It's an instant CSS base - use the classical CSS for your seriously cool stuff.
+
 ### Don't Tree-Shake! Tree Build!
 
-It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet:
+Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed. No compilation steps or tree-shaking required, as Polyclass detects usage through a runtime tree immediately.
 
 ```jinja
 <header
@@ -126,8 +134,6 @@ It's open-source, lightweight and runtime pluggable. With only HTML class names,
     Flexy sticky header! No mess!
 </header>
 ```
-
-Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed. No pre-compilation or tree-shaking required, as Polyclass detects usage through a runtime tree immediately.
 
 Polyclass possibilities are loaded from the processed HTML entity, ensuring the library is always ever-green, naturally adopting CSS engine changes as soon as they exist, such as [Use Logical Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values)
 
