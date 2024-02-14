@@ -18,14 +18,30 @@ class PolyObject {
         cg.generate()
         this._graph = cg
 
+
+        // PolyWrapped or {} classical
+        let func = (config instanceof HTMLElement)? this.hotLoad: this.loadConfig
+        func.bind(this)(config)
+    }
+
+    hotLoad(node) {
+        console.log('Hotload')
+        this.loadConfig({
+            target: node
+            , process: false
+            // , isInline: true
+        })
+    }
+
+    loadConfig(config) {
+        console.log('load', config)
         if(config?.processOnLoad) {
             this.processOnLoad(config.processOnLoad)
         }
 
-        if(config?.target) {
+        if(config?.target && config?.process != false) {
             this.process(config.target)
         }
-
 
         if(config?.isInline) {
             // test for active attributes
@@ -34,7 +50,6 @@ class PolyObject {
                 this._graph.monitor(config.target)
             }
         }
-
 
         this.innerProxyHandler = {
             reference: this
@@ -73,6 +88,26 @@ class PolyObject {
         this.proxy = new Proxy(this.innerHead, this.innerProxyHandler)
     }
 
+    /* Return the current poly graph of keys. */
+    get graph() {
+        return this._graph
+    }
+
+    /*
+        Return the graph CSS dynamic Stylesheet instance.
+    */
+    get sheet() {
+        return this._graph.dcss
+    }
+
+    /*
+        Return the given configuration for this Polyclass instance.
+        return object
+    */
+    get config() {
+        return this._graph.conf
+    }
+
     getParsedAttrValue(name, target, _default=undefined) {
         target = target || this._graph.conf.target;
         const attrs = target.attributes
@@ -86,6 +121,16 @@ class PolyObject {
 
         const attrValue = JSON.parse(val)
         return attrValue;
+    }
+
+    /*
+    Return the instance from the units, matching the entity.
+    if the entity is undefined, return the polyobject for _this_ target.
+     */
+    getInstance(entity) {
+        if(entity === undefined) { entity = this.target }
+        let id = entity?.dataset?.polyclassId || entity
+        return polyUnits.get(id)
     }
 
     processOnLoad(){
@@ -158,7 +203,7 @@ class PolyObject {
     }
 
     asString() {
-        return this._graph.asCSSText()
+        return this._graph.getCSSText()
     }
 }
 
@@ -174,6 +219,7 @@ const polyclassHead = function(){
 };
 
 const polyUnits = new Map()
+
 
 const polyclassProxy = {
     /* The handler for the main polyclass instance.
@@ -225,7 +271,11 @@ const polyclassProxy = {
             Polyclass(argsList)
             new Polyclass(argsList)
          */
-        console.log('Polyclass apply...', argsList)
+        console.log('Polyclass apply...', target, thisArg, argsList)
+         if(argsList[0] instanceof HTMLElement) {
+            console.log('Wrapped', )
+            return this.newInstance.apply(this, argsList)
+         }
         // get singleton
         return this.getInstance.apply(this, argsList)
     }
@@ -233,28 +283,37 @@ const polyclassProxy = {
 
 
 window.Polyclass = new Proxy(polyclassHead, polyclassProxy)
-
 // window.polyUnits = polyUnits
 
-/* Upon document load, process and *[polyclass] entity. Similar to process() */
+
+/*
+    Upon document load, process and *[polyclass] entity. Similar to process()
+*/
 const autoActivator = function(watch=document){
-
-    // console.log('Monitor', watch)
-
     watch.addEventListener('DOMContentLoaded', function(){
         onDomLoaded()
     }.bind(this))
 };
 
+const getOrCreateId = function(target) {
+    return target.dataset.polyclassId || Math.random().toString(32).slice(2)
+}
 
+const ensureId = function(target) {
+    return target.dataset.polyclassId = getOrCreateId(target)
+}
+
+/* Execute when the DOMContentLoaded event executes on the original _watched_
+item.
+This discovers any polyclass Attributes. and loads a Polyclass instance
+into the units.
+*/
 const onDomLoaded = function() {
     const targets = document.querySelectorAll('*[polyclass]');
     console.log('Discovered', targets.length)
     for(let target of targets){
-        let polyclassId = Math.random().toString(32).slice(2)
+        let polyclassId = ensureId(target)
         let pc = new Polyclass({target, isInline:true})
-        target.dataset.polyclassId = polyclassId
-        // polyUnits[polyclassId] = pc;
         polyUnits.set(polyclassId, pc)
     }
 }
