@@ -156,6 +156,7 @@
                 900:{int: 900, regu: 1, ital: 1}
          */
         let res = {}
+        const asSelector = cg.asSelectorString.bind(cg)
         for(let token of Object.values(pack.tokens)) {
             // console.log('making on token' , token)
             let def = {
@@ -171,8 +172,8 @@
                 }
 
                 let selectorRange = selectorBits.concat([key.token])
-                let packName = cg.asSelectorString(selectorRange)
-                let packNameLower = cg.asSelectorString(selectorRange).toLowerCase()
+                let packName = asSelector(selectorRange)
+                let packNameLower = asSelector(selectorRange).toLowerCase()
                 // console.log(packName, newDef)
                 res[`${packName}, ${packNameLower}`] = newDef
             }
@@ -181,8 +182,16 @@
 
         // Produce a default, withouta size: "font-pack-alta-400-500-600"
         // font-alta-400, ..., font-alta
-        let fontOnlyName = cg.asSelectorString(['font', pack.first])
-        res[fontOnlyName] = {
+        let fontOnlyPlusName = asSelector(['font', pack.first])
+        let fontOnlyDashName = asSelector(['font'].concat(pack.first.split('+')))
+        let strings = new Set([
+                        fontOnlyPlusName
+                        , fontOnlyDashName
+                        , fontOnlyPlusName.toLowerCase()
+                        , fontOnlyDashName.toLowerCase()
+                        ])
+
+        res[Array.from(strings).join(', ')] = {
                 'font-family': `'${pack.cleanName}', sans-serif`
             }
         return res
