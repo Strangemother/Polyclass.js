@@ -771,30 +771,32 @@ class ClassGraph {
         // this.isBranch(spl2)
     }
 
-    getAllClasses(parent=document.body, deep=false) {
+    getAllClasses(parent=document.body, deep=false, includeParent=true) {
         // console.log('Process.')
 
-        if(deep) {
-
-            let allClasses = new Map()
-            parent.querySelectorAll('*').forEach(function(node) {
-                allClasses.set(node, new Set(node.classList)) // .forEach(x=>allClasses.add(x))
-            });
-
-            // then test in the tree.
-            // console.log(allClasses)
-            return allClasses
+        let stackClasses = function(node) {
+            // Do whatever you want with the node object.
+            node.classList.forEach(x=>allClasses.add(x))
         }
 
         let allClasses = new Set()
-        parent.querySelectorAll('*').forEach(function(node) {
-            // Do whatever you want with the node object.
 
-            node.classList.forEach(x=>allClasses.add(x))
-        });
+        if(deep) {
+            /* Remap the outbound unit to a Map rather than a Set
+            each map key is the entry node for the classes.
 
-        // then test in the tree.
-        // console.log(allClasses)
+            Rewrite the stacking function to use a Map */
+
+            allClasses = new Map()
+            stackClasses = function(node) {
+                allClasses.set(node, new Set(node.classList)) // .forEach(x=>allClasses.add(x))
+            }
+        }
+
+        ;includeParent && stackClasses(parent);
+
+        parent.querySelectorAll('*').forEach(stackClasses);
+
         return allClasses
     }
 
