@@ -1,7 +1,7 @@
 /**
  * # Mouse Events mouse-[event]-*
  */
-(function(){
+;(function(){
 
     let cg;
 
@@ -54,7 +54,7 @@
                 /* Perform a class "toggle" in some shape. */
                 console.log(parts, others, action)
                 e.currentTarget.classList.toggle(parts.join('-'))
-                
+
             }
         }
 
@@ -112,7 +112,7 @@
  *
  *
  */
-const fontPackReceiver = (function(){
+;(function(){
 
     let cg;
 
@@ -499,7 +499,7 @@ const fontPackReceiver = (function(){
  * If the view is a SPA or all the possible classes are _used_ on
  * the view, this isn't required.
  */
-(()=>{
+;(()=>{
 
 let cg;
 
@@ -627,7 +627,7 @@ Manipulating the var propagates to the view:
 
  */
 
-const varsReceiver = (function(){
+;(function(){
 
     let cg;
     let rootDeclaration = {};
@@ -734,7 +734,7 @@ const varsReceiver = (function(){
  *          "border-top": var(--primary-edges)
  *      }
  */
-const varTranslateReceiver = (function(){
+;(function(){
 
     let cg;
 

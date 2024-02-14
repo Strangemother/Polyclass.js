@@ -1,3 +1,25 @@
+const kebabCase = function(str, sep='-') {
+    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
+    return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
+}
+
+
+const colorPrebits = function() {
+    /*
+        hex     1
+        rgba    4
+        rgb     3   3/1
+        hsl     3   3/1
+        hwb     3   3/1
+        lab     3   3/1
+        lch     3   3/1
+        oklab   3   3/1
+        oklch   3   3/1
+        color   4   4/1
+     */
+}
+
+
 /**
  * A DynamicCSSStyleSheet allows the developer to manipulate the
  * CSS Style objects within the sheet, rather than switching classes
@@ -340,7 +362,7 @@ class DynamicCSSStyleSheet {
  * Represents the addons for the class.
  * @type {Object}
  */
-DynamicCSSStyleSheet.addons = {}
+;DynamicCSSStyleSheet.addons = {};
 
 
 // export {
@@ -356,32 +378,10 @@ to generate a graph of possible values.
     const cg = generateClassGraph()
  */
 
-const kebabCase = function(str, sep='-') {
-    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
-    return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
-}
-
-
 const generateClassGraph = function(config={}){
     let cg = new ClassGraph(config)
     cg.generate()
     return cg
-}
-
-
-const colorPrebits = function() {
-    /*
-        hex     1
-        rgba    4
-        rgb     3   3/1
-        hsl     3   3/1
-        hwb     3   3/1
-        lab     3   3/1
-        lch     3   3/1
-        oklab   3   3/1
-        oklch   3   3/1
-        color   4   4/1
-     */
 }
 
 
@@ -1188,7 +1188,7 @@ class ClassGraph {
  */
 
 
-(()=>{
+;(()=>{
 
 class PolyObject {
 
