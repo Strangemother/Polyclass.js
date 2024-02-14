@@ -126,24 +126,19 @@ It's open-source, lightweight and runtime pluggable. With only HTML class names,
 
 Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed. No pre-compilation or tree-shaking required, as Polyclass detects usage through a runtime tree immediately.
 
-Polyclass possibilities are loaded from the processed HTML entity, ensuring the library is always ever-green, naturally adopting CSS engine changes as soon as they exist.
+Polyclass possibilities are loaded from the processed HTML entity, ensuring the library is always ever-green, naturally adopting CSS engine changes as soon as they exist, such as [Use Logical Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values)
 
 ```jinja
 <h2 class='scroll-margin-top-var-header-height text-wrap-balance'>
-  Text balanced h2, With a scrolling margin for the page header from the CSS Var "header-height"
+  Text balanced h2,
+  With a scrolling margin,
+  for the page header from the CSS Var "header-height"
 </h2>
 ```
 
-Use Logical Properties https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values
-
-## Usage
+### Install &amp; Use
 
 Polyclass is designed to be quick to initiate.
-
-
-### Install
-
-Include Polyclass from local source:
 
 [Grab from jsdelivr](https://www.jsdelivr.com/package/npm/polyclass) and apply it directly to your HTML:
 
@@ -210,7 +205,7 @@ const pc = Polyclass({ target: document.body })
 ```
 
 
-**Note: This isn't required when using the \<\* polyclass\\\> attribute** as it processes the attached entity.
+**Note: This isn't required when using the `\<\* polyclass\\\>` attribute** as it processes the attached entity.
 
 Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
 
@@ -374,22 +369,22 @@ If there is a CSS Property, it can be defined in Polyclass. Here's some HTML, wi
 ```jinja
 <div class="my-container some-other-primary-area
     font-pack-roboto-100-400-i400
-    background-#333">
+    background-#333"> <!-- Load fonts, and a background-color -->
 
       <div class="demo-box
         gap-1em
         display-flex
         flex-direction-column
-        ">
+        "> <!-- convert to the flex box model, with a gap -->
 
-          <div class="text
+          <div class="my-text-thing
             background-color-#111
             border-solid-3px-green
             border-radius-.4em
             padding-.8em-1.4em
             color-#EEE
             font-roboto-400
-            margin-1em">
+            margin-1em"> <!-- A rounded border, background, color, and font changes -->
 
               Text content.
 
