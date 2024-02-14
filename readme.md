@@ -83,7 +83,7 @@ Apply `polyclass` to your target, such as the `body`:
 + Pure JavaScript with no dependencies
 + MIT License
 
-## Your Instant, Pluggable, Dynamic CSS Base Library
+### Your Instant, Pluggable, Dynamic CSS Base Library
 
 
 Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built dynamically from your class-names using "[Declarative CSS](#what-is-declarative-css)".
@@ -104,7 +104,7 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 ```
 
 
-## Don't Tree-Shake! Tree Build!
+### Don't Tree-Shake! Tree Build!
 
 It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet:
 
@@ -155,7 +155,8 @@ npm install polyclass
 Or if you have the source-code locally:
 
 ```jinja
-<script src="dist/polyclass.full.js"></script>
+<!-- All included -->
+<script src="polyclass/dist/polyclass.full.js"></script>
 ```
 
 
@@ -170,6 +171,7 @@ To load Polyclass use the automatic attribute `polyclass`, or create a new JavaS
 Use the Polyclass automatic detection:
 
 ```jinja
+<!-- previously installed -->
 <body polyclass>
   <h1 class='color-#999'>Grey Title!</h1>
 </body>
@@ -184,6 +186,7 @@ Read more in [Running Polyclass: Auto](./docs/running-polyclass.md#auto-polyclas
 Run `Polyclass` somewhere in your code. It can run in the `<head>`, the `<footer>`, or installed asynchronously.
 
 ```js
+// Run when the DOM is prepared
 const pc = Polyclass({
   processOnLoad: document.body
 })
@@ -192,22 +195,15 @@ const pc = Polyclass({
 If the page is already loaded, run the `process()` method:
 
 ```js
+// DOM Loaded
 const pc = Polyclass()
 pc.process(document.body) // detect after load
-```
 
-Provide a `target` to process immediately:
-
-
-```js
+// or provide a `target` to process immediately:
 const pc = Polyclass({ target: document.body })
-// pc.process(document.body) // Not required.
 ```
 
-
-**Note: This isn't required when using the `\<\* polyclass\\\>` attribute** as it processes the attached entity.
-
-Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
+Processing isn't required when using the `<Node polyclass></Node>` attribute. Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
 
 ---
 
