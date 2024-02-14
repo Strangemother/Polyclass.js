@@ -116,13 +116,7 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 </body
 ```
 
-<small>
-<small><small>
-
-### Invisible.
-
-</small></small>
-</small>
+### Invisible
 
 Consider Polyclass as the missing link for `class` attribute  your CSS stylesheet.
 
@@ -138,12 +132,17 @@ It's an instant CSS base - use the classical CSS for your seriously cool stuff.
 Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed. No compilation steps or tree-shaking required, as Polyclass detects usage through a runtime tree immediately.
 
 ```jinja
-<header
+<header polyclass
     class='display-flex
            position-sticky
            top-1em'>
     Flexy sticky header! No mess!
 </header>
+```
+
+``` js
+Polyclass.getInstance(header).asString()
+// Rendered CSS Stylesheet.
 ```
 
 Polyclass possibilities are loaded from the processed HTML entity, ensuring the library is always ever-green, naturally adopting CSS engine changes as soon as they exist, such as [Use Logical Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values)
