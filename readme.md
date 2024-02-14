@@ -83,6 +83,17 @@ Apply `polyclass` to your target, such as the `body`:
 + Pure JavaScript with no dependencies
 + MIT License
 
+---
+
+
++ **Just-in-Time** runtime to declare CSS on-the-fly
++ **No opinion** no factory, forced, or predefined CSS included!
++ Supports **any** CSS length you need, from `px` to `cqmax`
++ **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
++ **Less than 15 Kilobytes** (minified) including all addons.
++ over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
+
+
 ### Your Instant, Pluggable, Dynamic CSS Base Library
 
 
@@ -103,7 +114,6 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 </div>
 ```
 
-
 ### Don't Tree-Shake! Tree Build!
 
 It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet:
@@ -116,13 +126,6 @@ It's open-source, lightweight and runtime pluggable. With only HTML class names,
     Flexy sticky header! No mess!
 </header>
 ```
-
-+ **Just-in-Time** runtime to declare CSS on-the-fly
-+ **No opinion** no factory, forced, or predefined CSS included!
-+ Supports **any** CSS length you need, from `px` to `cqmax`
-+ **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
-+ **Less than 15 Kilobytes** (minified) including all addons.
-+ over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 
 Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed. No pre-compilation or tree-shaking required, as Polyclass detects usage through a runtime tree immediately.
 
