@@ -81,9 +81,10 @@ Apply `polyclass` to your target, such as the `body`:
 It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS declarations in a dynamic stylesheet:
 
 + Real-time or pre-render compatible
-+ Instant plug-and-play with No compilation required
++ Instant plug-and-play with no compilation required
 + No dependencies, pure JavaScript
 + MIT License
+
 
 ### Your Instant, Pluggable, Dynamic CSS Base Library
 
@@ -96,22 +97,28 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 + **Less than 15 Kilobytes** (minified) including all addons.
 + over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 
-
 ```jinja
-<div class='display-flex
-            max-width-80vw
-            font-size-1.222ch
-            padding-0-10vw'>
+<head>
+  <script type="text/javascript" src='polyclass.full.js'></script>
+</head>
 
-        <h1 class='font-size-5rem'>
-          Instant styling,
-          Immediately generated,
-          Never stale.
-        </h1>
-</div>
+<body polyclass
+  class="margin-0
+         padding-0
+         background-color-#111
+         font-roboto
+         font-pack-roboto-100-400-i400-800-900
+         color-#DDD
+         display-grid
+         grid-template-flow-columns">
+
+      <h1 class"font-size-5rem">ET VOILÀ! Polyclassed.</h1>
+</body
 ```
 
-<small>### Invisible.</small>
+<small>
+### Invisible.
+</small>
 
 Consider Polyclass as the missing link for `class` attribute  your CSS stylesheet.
 
@@ -365,6 +372,21 @@ A declarative method for CSS styles ensure:
   Using a clean naming convention allows the developer to instantly update the view to reflect changes with no cleanup of old classes is required.
 
 Polyclass's JIT approach exemplifies how on-demand generation of styles can streamline development workflows, offering a flexible, efficient solution for real-time CSS management.
+
+
+```jinja
+<div class='display-flex
+            max-width-80vw
+            font-size-1.222ch
+            padding-0-10vw'>
+
+        <h1 class='font-size-5rem'>
+          Instant styling,
+          Immediately generated,
+          Never stale.
+        </h1>
+</div>
+```
 
 
 ## Example
