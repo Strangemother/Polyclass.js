@@ -117,7 +117,9 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 ```
 
 <small>
+
 ### Invisible.
+
 </small>
 
 Consider Polyclass as the missing link for `class` attribute  your CSS stylesheet.
