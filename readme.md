@@ -136,7 +136,7 @@ Polyclass possibilities are loaded from the processed HTML entity, ensuring the 
 </h2>
 ```
 
-### Install &amp; Use
+# Install &amp; Use
 
 Polyclass is designed to be quick to initiate.
 
@@ -159,13 +159,13 @@ Or if you have the source-code locally:
 ```
 
 
-### Load
+## Load
 
 To load Polyclass use the automatic attribute `polyclass`, or create a new JavaScript instance `Polyclass()`. Multiple instances of Polyclass can exist in one view
 
 ---
 
-#### HTML `polyclass` attribute
+### HTML `polyclass` attribute
 
 Use the Polyclass automatic detection:
 
@@ -179,7 +179,7 @@ Read more in [Running Polyclass: Auto](./docs/running-polyclass.md#auto-polyclas
 
 ---
 
-#### JavaScipt `Polyclass` Instance
+### JavaScipt `Polyclass` Instance
 
 Run `Polyclass` somewhere in your code. It can run in the `<head>`, the `<footer>`, or installed asynchronously.
 
@@ -211,7 +211,7 @@ Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass
 
 ---
 
-#### Using Classes
+## Using Classes
 
 Once installed, populate the html classes to see it in action:
 
