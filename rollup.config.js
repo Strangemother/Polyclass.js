@@ -16,7 +16,8 @@ const ADDONS = [
 
 
 const CORE = [
-    "./src/dcss.js"
+    "./src/tools.js"
+    , "./src/dcss.js"
     , "./src/classgraph.js"
 ]
 

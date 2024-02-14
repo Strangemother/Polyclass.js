@@ -1,7 +1,7 @@
 /**
  * # Mouse Events mouse-[event]-*
  */
-(function(){
+;(function(){
 
     let cg;
 
@@ -54,7 +54,7 @@
                 /* Perform a class "toggle" in some shape. */
                 console.log(parts, others, action)
                 e.currentTarget.classList.toggle(parts.join('-'))
-                
+
             }
         }
 
