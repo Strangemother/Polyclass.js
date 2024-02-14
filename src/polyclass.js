@@ -6,7 +6,7 @@
  */
 
 
-(()=>{
+;(()=>{
 
 class PolyObject {
 
@@ -215,6 +215,7 @@ const polyclassProxy = {
             return this._instance
         }
         this._instance = this.newInstance.apply(this, arguments)
+        this.safeSpace['instance'] = this._instance
         return this._instance
     }
 
@@ -232,7 +233,8 @@ const polyclassProxy = {
 
 
 window.Polyclass = new Proxy(polyclassHead, polyclassProxy)
-window.polyUnits = polyUnits
+
+// window.polyUnits = polyUnits
 
 /* Upon document load, process and *[polyclass] entity. Similar to process() */
 const autoActivator = function(watch=document){

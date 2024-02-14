@@ -340,7 +340,7 @@ class DynamicCSSStyleSheet {
  * Represents the addons for the class.
  * @type {Object}
  */
-DynamicCSSStyleSheet.addons = {}
+;DynamicCSSStyleSheet.addons = {};
 
 
 // export {

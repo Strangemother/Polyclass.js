@@ -9,7 +9,7 @@
  * If the view is a SPA or all the possible classes are _used_ on
  * the view, this isn't required.
  */
-(()=>{
+;(()=>{
 
 let cg;
 

@@ -42,7 +42,7 @@
  *
  *
  */
-const fontPackReceiver = (function(){
+;(function(){
 
     let cg;
 
