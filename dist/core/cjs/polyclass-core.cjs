@@ -1,23 +1,11 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
 const kebabCase = function(str, sep='-') {
-    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
+    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase();
     return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
-}
-
-
-const colorPrebits = function() {
-    /*
-        hex     1
-        rgba    4
-        rgb     3   3/1
-        hsl     3   3/1
-        hwb     3   3/1
-        lab     3   3/1
-        lch     3   3/1
-        oklab   3   3/1
-        oklch   3   3/1
-        color   4   4/1
-     */
-}
+};
 
 
 /**
@@ -36,7 +24,7 @@ const colorPrebits = function() {
 class RenderArray extends Array {
     renderAll() {
         for(let node of this) {
-            node.render()
+            node.render();
         }
     }
 }
@@ -61,7 +49,7 @@ class DynamicCSSStyleSheet {
      * @param {Object} cg - Class graph.
      */
     constructor(cg) {
-        this.installAddons(cg, this.constructor.addons)
+        this.installAddons(cg, this.constructor.addons);
     }
 
     /**
@@ -71,8 +59,8 @@ class DynamicCSSStyleSheet {
      */
     installAddons(cg, addons){
         for(let key in addons) {
-            let addon = addons[key]
-            addon(cg)
+            let addon = addons[key];
+            addon(cg);
         }
     }
 
@@ -105,7 +93,7 @@ class DynamicCSSStyleSheet {
      */
     getEnsureStyleSheet(_sheet) {
         let styleNode = _sheet || this.styleEl;
-        let v
+        let v;
         if(styleNode != undefined) {
             return styleNode
         }
@@ -116,17 +104,17 @@ class DynamicCSSStyleSheet {
                 document.head.appendChild(styleNode);
 
             // return styleNode
-            v = styleNode.sheet
+            v = styleNode.sheet;
         }
 
         if(this.insertMethod == 'adopt') {
             const ss = new CSSStyleSheet();
             // ss.title = 'dcss-sheet'
-            document.adoptedStyleSheets.push(ss)
-            v = ss
+            document.adoptedStyleSheets.push(ss);
+            v = ss;
         }
         if(this.styleEl == undefined) {
-            this.styleEl = v
+            this.styleEl = v;
         }
         return v
     }
@@ -138,13 +126,13 @@ class DynamicCSSStyleSheet {
      * @returns {RenderArray} - An array of rendered rules.
      */
     addStylesheetRulesArray(rules, _sheet) {
-        let styleNode = this.getEnsureStyleSheet(_sheet)
+        let styleNode = this.getEnsureStyleSheet(_sheet);
 
-        let res = new RenderArray()
-        let styleSheet = styleNode//.sheet;
+        let res = new RenderArray();
+        let styleSheet = styleNode;//.sheet;
         for (let i = 0; i < rules.length; i++) {
             let rule = rules[i];
-            this.pushResponse(res, styleSheet, rule)
+            this.pushResponse(res, styleSheet, rule);
         }
 
         return res
@@ -159,8 +147,8 @@ class DynamicCSSStyleSheet {
      */
     pushResponse(res, styleSheet, rule) {
         // console.log(rule)
-        let _rule = this.pushArrayRule(styleSheet, rule)
-        res.push(_rule)
+        let _rule = this.pushArrayRule(styleSheet, rule);
+        res.push(_rule);
         return _rule
     }
 
@@ -180,17 +168,17 @@ class DynamicCSSStyleSheet {
      * @returns {RenderArray} - An array of rendered rules.
      */
     addStylesheetRulesObject(rules, _sheet) {
-        let styleNode = this.getEnsureStyleSheet(_sheet)
+        let styleNode = this.getEnsureStyleSheet(_sheet);
 
-        let res = new RenderArray()
-        let styleSheet = styleNode//.sheet;
+        let res = new RenderArray();
+        let styleSheet = styleNode;//.sheet;
 
         for(let selector in rules) {
-            let rule = rules[selector]
-            let entries = Object.entries(rule)
-            let newRule = [selector, entries]
+            let rule = rules[selector];
+            let entries = Object.entries(rule);
+            let newRule = [selector, entries];
             // console.log(newRule)
-            this.pushResponse(res, styleSheet, newRule)
+            this.pushResponse(res, styleSheet, newRule);
         }
 
         return res
@@ -203,7 +191,7 @@ class DynamicCSSStyleSheet {
      * @returns {boolean} - True if selector exists, otherwise false.
      */
     selectorExists(selector, _sheet){
-        let sheet = this.getEnsureStyleSheet(_sheet)
+        let sheet = this.getEnsureStyleSheet(_sheet);
 
         for(let rule of sheet.cssRules) {
             if(selector == rule.selectorText) {
@@ -220,7 +208,7 @@ class DynamicCSSStyleSheet {
      * @returns {string|undefined} - The rule if found, otherwise undefined.
      */
     getRuleBySelector(selector, _sheet){
-        let sheet = this.getEnsureStyleSheet(_sheet)
+        let sheet = this.getEnsureStyleSheet(_sheet);
 
         for(let rule of sheet.cssRules) {
             if(selector == rule.selectorText) {
@@ -239,42 +227,42 @@ class DynamicCSSStyleSheet {
     pushArrayRule(styleSheet, conf) {
         // If the second argument of a rule is an array of arrays,
         // correct our variables.
-        let _this = this
+        let _this = this;
         return {
             conf
             , styleSheet
             , getPropStr(rules) {
-                rules = rules == undefined ? this.conf: rules
-                let rightIndex = 1
-                let rule = rules
+                rules = rules == undefined ? this.conf: rules;
+                let rightIndex = 1;
+                let rule = rules;
 
                 if (Array.isArray(rules[1][0])) {
-                    rule = rule[1]
-                    rightIndex = 0
+                    rule = rule[1];
+                    rightIndex = 0;
                 }
 
-                let propStr = _this.buildPropStr(rule, rightIndex)
+                let propStr = _this.buildPropStr(rule, rightIndex);
                 return propStr
             }
 
             , render(content) {
-                let rules = this.conf
-                let propStr = content || this.getPropStr(rules)
+                let rules = this.conf;
+                let propStr = content || this.getPropStr(rules);
                 let selector = rules[0];
-                let _ruleIndex = _this.insertRuleSelectorPropStr(this.styleSheet, selector, propStr)
-                this.sheetRule = this.styleSheet.rules[_ruleIndex]
-                this.rule = _ruleIndex
+                let _ruleIndex = _this.insertRuleSelectorPropStr(this.styleSheet, selector, propStr);
+                this.sheetRule = this.styleSheet.rules[_ruleIndex];
+                this.rule = _ruleIndex;
             }
             , replace(content) {
                 if(!this.sheetRule) {
                     return this.render(content)
                 }
-                let before = this.sheetRule.cssText
-                let rules = this.conf
+                let before = this.sheetRule.cssText;
+                let rules = this.conf;
                 let selector = rules[0];
-                let propStr = content == undefined ? this.getPropStr(this.conf): content
-                let after = `${selector} {${propStr}}`
-                this.styleSheet.replace(`${before} ${after}`)
+                let propStr = content == undefined ? this.getPropStr(this.conf): content;
+                let after = `${selector} {${propStr}}`;
+                this.styleSheet.replace(`${before} ${after}`);
             }
         }
     }
@@ -291,24 +279,24 @@ class DynamicCSSStyleSheet {
         let propStr = '';
 
         for (let ruleLength = rule.length; j < ruleLength; j++) {
-            let prop = rule[j]
+            let prop = rule[j];
             // console.log('prop', prop)
-            let name = prop[0]
-            let value = prop[1]
+            let name = prop[0];
+            let value = prop[1];
 
             if(this.isLiteralObject(value)) {
                 /*[{background: '#111'}
                     , {color: '#11AA11'} ]*/
                 for(let key in value) {
-                    let subVal = value[key]
-                    propStr += this.stringEntry(key, subVal, value.important)
+                    let subVal = value[key];
+                    propStr += this.stringEntry(key, subVal, value.important);
                     // propStr += `${key}: ${subVal}${importantStr};\n`
                 }
 
                 continue
             }
 
-            propStr += this.stringEntry(name, value, prop[2] != undefined)
+            propStr += this.stringEntry(name, value, prop[2] != undefined);
 
         }
 
@@ -346,7 +334,7 @@ class DynamicCSSStyleSheet {
     insertRuleSelectorPropStr(styleSheet, selector, propStr) {
         // Insert CSS Rule
 
-        let ruleStr = `${selector} {${propStr}}`
+        let ruleStr = `${selector} {${propStr}}`;
         // console.log(ruleStr)
         let _ruleIndex = styleSheet.insertRule(
                         ruleStr,
@@ -356,33 +344,7 @@ class DynamicCSSStyleSheet {
         return _ruleIndex
     }
 }
-
-
-/**
- * Represents the addons for the class.
- * @type {Object}
- */
-;DynamicCSSStyleSheet.addons = {};
-
-
-// export {
-//     DynamicCSSStyleSheet,
-//     RenderArray
-// }
-/* Class Graph
-The primary functionality to read and adapt class strings.
-
-Functionally it's just a string splitter, using the built-in CSS attributes
-to generate a graph of possible values.
-
-    const cg = generateClassGraph()
- */
-
-const generateClassGraph = function(config={}){
-    let cg = new ClassGraph(config)
-    cg.generate()
-    return cg
-}
+DynamicCSSStyleSheet.addons = {};
 
 
 class ClassGraph {
@@ -392,7 +354,7 @@ class ClassGraph {
     dcss = new DynamicCSSStyleSheet(this)
 
     constructor(conf) {
-        this.conf = conf || {}
+        this.conf = conf || {};
 
         /*
             A simple key -> function dictionary to capture special (simple)
@@ -401,21 +363,21 @@ class ClassGraph {
          */
         this.translateMap = {
             // 'var': this.variableDigest,
-        }
+        };
 
         if(this.conf.addons !== false) {
-            this.installAddons(this.getPreAddons())
+            this.installAddons(this.getPreAddons());
         }
 
-        this.vendorLocked = conf?.vendorLocked == undefined? false: conf.vendorLocked
-        this.sep = conf?.sep || this.sep
-        this.aliasMap = {}
-        this.parentSelector = conf?.parentSelector
-        this.processAliases(this.conf?.aliases)
+        this.vendorLocked = conf?.vendorLocked == undefined? false: conf.vendorLocked;
+        this.sep = conf?.sep || this.sep;
+        this.aliasMap = {};
+        this.parentSelector = conf?.parentSelector;
+        this.processAliases(this.conf?.aliases);
     }
 
     insertTranslator(key, func) {
-        this.translateMap[key] = func
+        this.translateMap[key] = func;
     }
 
     getPreAddons(){
@@ -424,8 +386,8 @@ class ClassGraph {
 
     installAddons(addons){
         for(let key in addons) {
-            let addon = addons[key]
-            addon(this)
+            let addon = addons[key];
+            addon(this);
         }
     }
 
@@ -436,19 +398,19 @@ class ClassGraph {
      */
     generate(node){
 
-        node = node || this?.document?.body
-        let items = Object.entries(node?.style || {})
+        node = node || this?.document?.body;
+        let items = Object.entries(node?.style || {});
         for(let [name, value] of items) {
-            this.addCamelString(name)
+            this.addCamelString(name);
         }
     }
 
     addCamelString(name) {
         // convert to kebab-case, then push into the graph
-        let kebab = kebabCase(name)
+        let kebab = kebabCase(name);
         // console.log(name, kebab)
-        let keys = kebab.split('-')
-        this.addTree(keys)
+        let keys = kebab.split('-');
+        this.addTree(keys);
     }
 
     /*
@@ -480,15 +442,15 @@ class ClassGraph {
     addTree(keys, func) {
 
         let graphNode = this.getRoot();
-        let nodesWord = this.nodeWord()
-        let position = []
+        let nodesWord = this.nodeWord();
+        let position = [];
         for(let key of keys) {
-            position.push(key)
+            position.push(key);
             if(!graphNode[nodesWord]) {
                 // Make new nodes when required.
-                graphNode[nodesWord] = {}
+                graphNode[nodesWord] = {};
             }
-            let newNode = graphNode[nodesWord][key]
+            let newNode = graphNode[nodesWord][key];
             if(newNode == undefined) {
                 // Create the new tree point.
                 // console.log('Making new node', key)
@@ -497,13 +459,13 @@ class ClassGraph {
                     key
                     , position
                     // meta: { key }
-                }
+                };
             }
-            graphNode = newNode
+            graphNode = newNode;
         }
-        graphNode.leaf = true
+        graphNode.leaf = true;
         if(func!=undefined) {
-            graphNode.handler = func
+            graphNode.handler = func;
         }
         return graphNode
     }
@@ -518,7 +480,7 @@ class ClassGraph {
                 [this.nodeWord()]: {}
                 , meta: { key: 'root', isRoot: true }
                 , key: 'root'
-            }
+            };
         }
         return this.graph
     }
@@ -526,12 +488,12 @@ class ClassGraph {
 
     processAliases(aliases) {
         for(let key in aliases) {
-            this.addAliases(key, aliases[key])
+            this.addAliases(key, aliases[key]);
         }
     }
 
     getPrefixes(){
-        let c = this.conf
+        let c = this.conf;
         if(c.prefixes){
             return c.prefixes
         }
@@ -546,10 +508,8 @@ class ClassGraph {
         prefixes = prefixes == undefined? this.getPrefixes(): prefixes;
 
         for (var i = 0; i < prefixes.length; i++) {
-            let prefix = prefixes[i]
-            if(keys[i] == prefix) {
-                //pass
-            } else {
+            let prefix = prefixes[i];
+            if(keys[i] == prefix) ; else {
                 //fail
                 return false
             }
@@ -564,13 +524,13 @@ class ClassGraph {
     */
     aliasConvert(rawKeys) {
 
-        let prefixes = this.conf.prefixes
+        this.conf.prefixes;
 
 
-        let r = []
+        let r = [];
         for(let rk of rawKeys) {
             // If alias, replace
-            r.push(this.aliasMap[rk] || rk)
+            r.push(this.aliasMap[rk] || rk);
         }
 
         return r
@@ -578,13 +538,13 @@ class ClassGraph {
 
     addAliases(key, aliases) {
         for(let a of aliases) {
-            this.addAlias(key, a)
+            this.addAlias(key, a);
         }
     }
 
     /*Insert a key value alias "bg" == "background" */
     addAlias(key, alias) {
-        this.aliasMap[alias] = key
+        this.aliasMap[alias] = key;
     }
 
     /* Split a string into its constituents; the CSS key and value
@@ -628,14 +588,14 @@ class ClassGraph {
             // - but "c" is usually a 0 index counter
             , c1 = 0
             , keys = this.aliasConvert(rawKeys)
-            , l = keys.length
+            ; keys.length
             ;
 
         if(this.isVendorPrefixMatch(keys)) {
             // console.log('Vendor Match!')
             //
             // Slice away the vendor.
-            keys = keys.slice(this.getPrefixes().length)
+            keys = keys.slice(this.getPrefixes().length);
         } else {
             // console.log('does not match vendor', keys)
             if(this.vendorLocked) {
@@ -652,35 +612,33 @@ class ClassGraph {
 
         for(let k of keys) {
             // loop until a leaf, where the _next_ key is not a value node.
-            currentNode = node[nodeWord][k]
-            c1 += 1
-            let isLastNode = (l == c1)
+            currentNode = node[nodeWord][k];
+            c1 += 1;
 
             if(currentNode == undefined) {
-                if(safe) { break };
-                continue
+                if(safe) { break }                continue
             }
 
             if(currentNode.leaf === true) {
                 // if the next node is invalid, the next keys are values.
-                let nextKey = keys[c1]
-                let currentGraph = currentNode[nodeWord]
+                let nextKey = keys[c1];
+                let currentGraph = currentNode[nodeWord];
                 if( (currentGraph && currentGraph[nextKey]) == undefined ) {
                     break
                 }
             }
 
-            node = currentNode
+            node = currentNode;
         }
 
         // grab the next keys
-        let props = keys.slice(0, c1)
-        let values = keys.slice(c1)
+        let props = keys.slice(0, c1);
+        let values = keys.slice(c1);
         let r = {
             props, values, str,
             node: currentNode,
             valid: currentNode && (values.length > 0) || false
-        }
+        };
 
         // this.translateValue(r)
         return r
@@ -692,7 +650,7 @@ class ClassGraph {
         Therefore isn't seen in the split object.
      */
     objectSplitTranslateValue(str, sep=this.sep, safe=true) {
-        let splitObj = this.objectSplit(str, sep, safe)
+        let splitObj = this.objectSplit(str, sep, safe);
         return this.translateValue(splitObj)
     }
 
@@ -717,7 +675,7 @@ class ClassGraph {
     returns the result from insertRule, an Array of Rules.
     */
     insertLine(selectorStatement, props) {
-        let spl = this.objectSplit(selectorStatement)
+        let spl = this.objectSplit(selectorStatement);
         return this.insertRule(spl, props)
     }
 
@@ -799,11 +757,11 @@ class ClassGraph {
             oklch(60% 0.15 50)
             oklch(60% 0.15 50 / 0.5)
         */
-        let vals = splitObj.values
-        let valueVal = vals?.join(' ')
+        let vals = splitObj.values;
+        vals?.join(' ');
         // console.log('translateValue', valueVal)
 
-        let outStack = this.forwardDigestKeys(splitObj, vals)
+        let outStack = this.forwardDigestKeys(splitObj, vals);
 
         // console.log('Stacked', outStack.join(' '))
         // console.log('value  ', valueVal)
@@ -834,8 +792,8 @@ class ClassGraph {
         let iterating = true;
         let inStack = (vals || []);
         let maxIndex = 100;
-        let currentIndex = 0
-        let outStack = []
+        let currentIndex = 0;
+        let outStack = [];
 
         /* Discover any "special" keys to digest the value processing,
         such as "vars-*" */
@@ -843,18 +801,18 @@ class ClassGraph {
             // Each function return a _result_ (appended or untouched),
             // and the next keys. Next keys > 0 == iterating
 
-            let currentValKey = inStack[currentIndex]
-            let digestFunc = this.translateMap[currentValKey]
+            let currentValKey = inStack[currentIndex];
+            let digestFunc = this.translateMap[currentValKey];
             if(digestFunc){
                 // console.log('digesting', inStack);
                 [inStack, outStack, currentIndex] = digestFunc(splitObj,
-                                            inStack, outStack, currentIndex)
+                                            inStack, outStack, currentIndex);
                 // console.log('Results.', inStack, outStack, currentIndex)
             } else {
-                outStack.push(inStack[currentIndex])
+                outStack.push(inStack[currentIndex]);
             }
 
-            currentIndex += 1
+            currentIndex += 1;
             if(currentIndex >= inStack.length || currentIndex > maxIndex) {
                 // Instack exausted.
                 iterating = false;
@@ -885,38 +843,38 @@ class ClassGraph {
       5. Insert into the stylesheet + renderAll
      */
     insertRule(splitObj, props=undefined, withParentSelector=true) {
-        let valueKey = splitObj?.props?.join('-')
+        let valueKey = splitObj?.props?.join('-');
         // The class selector e.g. ".margin-top-\special"
-        let propStr = this.asSelectorString(splitObj, withParentSelector)
+        let propStr = this.asSelectorString(splitObj, withParentSelector);
 
-        let exists = this.dcss.selectorExists(propStr)
+        let exists = this.dcss.selectorExists(propStr);
         if(exists) {
             // Prop created. Return the original.
             return this.dcss.getRuleBySelector(propStr)
         }
 
-        let valueVal = this.translateValue(splitObj)
+        let valueVal = this.translateValue(splitObj);
 
         // The style object applied to the prop string:
         // .propSt { declarations }
-        let declarations = {[valueKey]: valueVal}
+        let declarations = {[valueKey]: valueVal};
 
         if(props) {
             // Apply any user enforced object overrides.
-            Object.assign(declarations, props)
+            Object.assign(declarations, props);
         }
 
 
         let handlerRes = {
             insert:true
-        }
-        let handlerFunc = splitObj.node?.handler?.bind(splitObj)
+        };
+        let handlerFunc = splitObj.node?.handler?.bind(splitObj);
         if(handlerFunc) {
             // executing the handler and replace the handlerRes if required.
             if(typeof(handlerFunc) == 'function') {
-                let potentialRes = handlerFunc(splitObj)
+                let potentialRes = handlerFunc(splitObj);
                 if(potentialRes !== undefined) {
-                    handlerRes = potentialRes
+                    handlerRes = potentialRes;
                 }
             }
         }
@@ -927,7 +885,7 @@ class ClassGraph {
                 [propStr]: declarations
             });
 
-            renderArray.renderAll()
+            renderArray.renderAll();
             return renderArray
         }
     }
@@ -942,8 +900,8 @@ class ClassGraph {
     */
     insertReceiver(keys, handler) {
 
-        let leaf = this.addTree(keys)
-        leaf.handler = handler
+        let leaf = this.addTree(keys);
+        leaf.handler = handler;
 
         return leaf
     }
@@ -969,29 +927,29 @@ class ClassGraph {
         // array
         if(Array.isArray(entity)) {
             // prop bits
-            let a = entity.join('-')
-            clean = this.escapeStr(a)
+            let a = entity.join('-');
+            clean = this.escapeStr(a);
         }
 
         // string,
         if(typeof(entity) == 'string') {
             // is str
-            clean = this.escapeStr(entity)
+            clean = this.escapeStr(entity);
         }
 
         // object
         if(entity.props) {
             // is splitObj
-            let a = entity.props.join('-')
-            clean = this.escapeStr(a)
+            let a = entity.props.join('-');
+            clean = this.escapeStr(a);
         }
 
         if(entity.str) {
             // splitobject before props.
-            clean = this.escapeStr(entity.str)
+            clean = this.escapeStr(entity.str);
         }
 
-        let propStr = `.${clean}`
+        let propStr = `.${clean}`;
 
         if(withParentSelector) {
             return this.prependParent(propStr, entity)
@@ -1009,7 +967,7 @@ class ClassGraph {
      */
     prependParent(cleanString, originalEntity) {
         if(this.parentSelector != undefined) {
-            let v = this.parentSelector
+            let v = this.parentSelector;
             return `${v}${cleanString}`
         }
 
@@ -1028,22 +986,22 @@ class ClassGraph {
             > isAttribute('margin-bottom')
             true
         */
-        let res = this.objectSplit(parts)
+        let res = this.objectSplit(parts);
         return res.values.length == 0
     }
 
     isDeclaration(parts, sep=this.sep) {
-        let res = this.objectSplit(parts)
+        let res = this.objectSplit(parts);
         return res.values.length > 0 &&  res.props.length > 0
     }
 
     getCSSText() {
-        let strRes = ''
-        let lineEnd = '\n'
-        let sheet = this.dcss.getSheet()
+        let strRes = '';
+        let lineEnd = '\n';
+        let sheet = this.dcss.getSheet();
         // debugger
         for(let rule of sheet.rules) {
-            strRes += `${rule.cssText};${lineEnd}`
+            strRes += `${rule.cssText};${lineEnd}`;
         }
 
         return strRes
@@ -1065,12 +1023,12 @@ class ClassGraph {
             if(str.length == 0) {
                 continue
             }
-            let splitObj = cg.objectSplit(str)
-            splitObj.origin = origin
-            let n = splitObj.node?.handler
+            let splitObj = cg.objectSplit(str);
+            splitObj.origin = origin;
+            let n = splitObj.node?.handler;
             // debugger
-            let func = n? n.bind(splitObj): cg.insertRule.bind(cg)
-            let res = func(splitObj)
+            let func = n? n.bind(splitObj): cg.insertRule.bind(cg);
+            func(splitObj);
             // console.log(str, res)
         }
     }
@@ -1089,32 +1047,32 @@ class ClassGraph {
         }
 
         (watch || node).addEventListener('DOMContentLoaded', function(){
-            this.process(node)
-            this.domContentLoaded = true
-        }.bind(this))
+            this.process(node);
+            this.domContentLoaded = true;
+        }.bind(this));
     }
 
     process(parent=document.body) {
-        let classes = this.getAllClasses(parent, true)
+        let classes = this.getAllClasses(parent, true);
         // for(let name of classes) {
         //     debugger
         //     this.safeInsertLine(name)
         // }
-        classes.forEach((vals, key)=> this.safeInsertMany(key, vals))
+        classes.forEach((vals, key)=> this.safeInsertMany(key, vals));
     }
 
     safeInsertMany(entity, classes) {
         for(let name of classes) {
-            this.safeInsertLine(name, entity)
+            this.safeInsertLine(name, entity);
         }
     }
 
     safeInsertLine(name, entity) {
-        let spl2 = this.objectSplit(name)
+        let spl2 = this.objectSplit(name);
         if(spl2.valid) {
             // console.log('Inserting', spl2)
-            spl2.origin = entity
-            this.insertRule(spl2)
+            spl2.origin = entity;
+            this.insertRule(spl2);
         }
         // console.log(spl2)
         // this.isBranch(spl2)
@@ -1125,10 +1083,10 @@ class ClassGraph {
 
         let stackClasses = function(node) {
             // Do whatever you want with the node object.
-            node.classList.forEach(x=>allClasses.add(x))
-        }
+            node.classList.forEach(x=>allClasses.add(x));
+        };
 
-        let allClasses = new Set()
+        let allClasses = new Set();
 
         if(deep) {
             /* Remap the outbound unit to a Map rather than a Set
@@ -1136,13 +1094,12 @@ class ClassGraph {
 
             Rewrite the stacking function to use a Map */
 
-            allClasses = new Map()
+            allClasses = new Map();
             stackClasses = function(node) {
-                allClasses.set(node, new Set(node.classList)) // .forEach(x=>allClasses.add(x))
-            }
+                allClasses.set(node, new Set(node.classList)); // .forEach(x=>allClasses.add(x))
+            };
         }
-
-        ;includeParent && stackClasses(parent);
+includeParent && stackClasses(parent);
 
         parent.querySelectorAll('*').forEach(stackClasses);
 
@@ -1150,33 +1107,31 @@ class ClassGraph {
     }
 
     addClass(entity, ...tokens) {
-        let nodes = this.asNodes(entity)
+        let nodes = this.asNodes(entity);
         for(let node of nodes) {
             for(let token of tokens) {
                 for(let t of token.split(' '))
-                node.classList.add(t)
+                node.classList.add(t);
             }
         }
     }
 
     removeClass(entity, ...tokens) {
-        let nodes = this.asNodes(entity)
+        let nodes = this.asNodes(entity);
         for(let node of nodes) {
-            node.classList.remove(...tokens)
+            node.classList.remove(...tokens);
         }
     }
 
     asNodes(entity) {
-        let nodes = [entity]
+        let nodes = [entity];
         if(typeof(entity) == 'string') {
-            nodes = document.querySelectorAll(entity)
+            nodes = document.querySelectorAll(entity);
         }
         return nodes
     }
 }
-
-
-;ClassGraph.addons = {};
+ClassGraph.addons = {};
 
 // export {
 //     ClassGraph
@@ -1196,42 +1151,42 @@ class PolyObject {
 
     // constructor() {
     constructor([config]=[]) {
-        this.units = polyUnits
-        console.log('me:', config)
-        let cg = new ClassGraph(config)
-        cg.generate()
-        this._graph = cg
+        this.units = polyUnits;
+        console.log('me:', config);
+        let cg = new ClassGraph(config);
+        cg.generate();
+        this._graph = cg;
 
-        const _htmlNode = this?.HTMLElement || function(){}
+        const _htmlNode = this?.HTMLElement || function(){};
         // PolyWrapped or {} classical
-        let func = (config instanceof _htmlNode)? this.hotLoad: this.loadConfig
-        func.bind(this)(config)
+        let func = (config instanceof _htmlNode)? this.hotLoad: this.loadConfig;
+        func.bind(this)(config);
     }
 
     hotLoad(node) {
-        console.log('Hotload')
+        console.log('Hotload');
         this.loadConfig({
             target: node
             , process: false
             // , isInline: true
-        })
+        });
     }
 
     loadConfig(config) {
-        console.log('load', config)
+        console.log('load', config);
         if(config?.processOnLoad) {
-            this.processOnLoad(config.processOnLoad)
+            this.processOnLoad(config.processOnLoad);
         }
 
         if(config?.target && config?.process != false) {
-            this.process(config.target)
+            this.process(config.target);
         }
 
         if(config?.isInline) {
             // test for active attributes
-            const attrValue = this.getParsedAttrValue('monitor', config.target)
+            const attrValue = this.getParsedAttrValue('monitor', config.target);
             if(attrValue !== false) {
-                this._graph.monitor(config.target)
+                this._graph.monitor(config.target);
             }
         }
 
@@ -1250,8 +1205,7 @@ class PolyObject {
                         return realTarget[property].bind(realTarget)
                     }
                     return realTarget[property]
-                };
-            }
+                }            }
 
             , apply(target, thisArg, argsList){
                 /* Called as a function, wrapping an entity as scope
@@ -1259,17 +1213,17 @@ class PolyObject {
                     Polyclass(argsList)
                     new Polyclass(argsList)
                  */
-                console.log('innerProxyHandler apply...', argsList)
+                console.log('innerProxyHandler apply...', argsList);
                 // get singleton
             }
-        }
+        };
 
         this.innerHead = function(entity){
             /* inner head accepts a thing to manpulate*/
 
-        }
+        };
 
-        this.proxy = new Proxy(this.innerHead, this.innerProxyHandler)
+        this.proxy = new Proxy(this.innerHead, this.innerProxyHandler);
     }
 
     /* Return the current poly graph of keys. */
@@ -1294,16 +1248,16 @@ class PolyObject {
 
     getParsedAttrValue(name, target, _default=undefined) {
         target = target || this._graph.conf.target;
-        const attrs = target.attributes
+        const attrs = target.attributes;
         const attrv = attrs.getNamedItem(name);
         if(attrv === null) {
             return _default
         }
 
-        let val = attrv.value
+        let val = attrv.value;
         if(val.length == 0) { return _default }
 
-        const attrValue = JSON.parse(val)
+        const attrValue = JSON.parse(val);
         return attrValue;
     }
 
@@ -1312,8 +1266,8 @@ class PolyObject {
     if the entity is undefined, return the polyobject for _this_ target.
      */
     getInstance(entity) {
-        if(entity === undefined) { entity = this.target }
-        let id = entity?.dataset?.polyclassId || entity
+        if(entity === undefined) { entity = this.target; }
+        let id = entity?.dataset?.polyclassId || entity;
         return polyUnits.get(id)
     }
 
@@ -1398,11 +1352,11 @@ class PolyObject {
     proxt, If called with `new Polyclass`
 */
 const polyclassHead = function(){
-    console.log('new', arguments)
+    console.log('new', arguments);
     return polyclassProxy.newInstance.apply(polyclassProxy, arguments)
 };
 
-const polyUnits = new Map()
+const polyUnits = new Map();
 
 
 const polyclassProxy = {
@@ -1427,15 +1381,14 @@ const polyclassProxy = {
                 return realTarget[property].bind(realTarget)
             }
             return realTarget[property]
-        };
-        // console.warn(`No property ${property} on receiver`, realTarget)
+        }        // console.warn(`No property ${property} on receiver`, realTarget)
 
         return this.safeSpace[property]
     }
 
     , newInstance() {
-        console.log('new instance', Array.from(arguments))
-        let r = new PolyObject(Array.from(arguments))
+        console.log('new instance', Array.from(arguments));
+        let r = new PolyObject(Array.from(arguments));
         return r
         // return r.proxy
     }
@@ -1444,8 +1397,8 @@ const polyclassProxy = {
         if(this._instance)  {
             return this._instance
         }
-        this._instance = this.newInstance.apply(this, arguments)
-        this.safeSpace['instance'] = this._instance
+        this._instance = this.newInstance.apply(this, arguments);
+        this.safeSpace['instance'] = this._instance;
         return this._instance
     }
 
@@ -1455,28 +1408,26 @@ const polyclassProxy = {
             Polyclass(argsList)
             new Polyclass(argsList)
          */
-        console.log('Polyclass apply...', target, thisArg, argsList)
+        console.log('Polyclass apply...', target, thisArg, argsList);
          if(argsList[0] instanceof HTMLElement) {
-            console.log('Wrapped', )
+            console.log('Wrapped', );
             return this.newInstance.apply(this, argsList)
          }
         // get singleton
         return this.getInstance.apply(this, argsList)
     }
-}
+};
 
 
-const Polyclass = new Proxy(polyclassHead, polyclassProxy)
+const Polyclass = new Proxy(polyclassHead, polyclassProxy);
 // window.polyUnits = polyUnits
 const parent = function() {
     return this?.window != undefined
-}
+};
 
 if(parent()) {
-    window.Polyclass = Polyclass
+    window.Polyclass = Polyclass;
 }
-
-export {Polyclass as default, Polyclass}
 
 
 /*
@@ -1485,17 +1436,17 @@ export {Polyclass as default, Polyclass}
 const autoActivator = function(watch=this?.document){
 
     watch?.addEventListener('DOMContentLoaded', function(){
-        onDomLoaded()
-    }.bind(this))
+        onDomLoaded();
+    }.bind(this));
 };
 
 const getOrCreateId = function(target) {
     return target.dataset.polyclassId || Math.random().toString(32).slice(2)
-}
+};
 
 const ensureId = function(target) {
     return target.dataset.polyclassId = getOrCreateId(target)
-}
+};
 
 /* Execute when the DOMContentLoaded event executes on the original _watched_
 item.
@@ -1504,15 +1455,17 @@ into the units.
 */
 const onDomLoaded = function() {
     const targets = document.querySelectorAll('*[polyclass]');
-    console.log('Discovered', targets.length)
+    console.log('Discovered', targets.length);
     for(let target of targets){
-        let polyclassId = ensureId(target)
-        let pc = new Polyclass({target, isInline:true})
-        polyUnits.set(polyclassId, pc)
+        let polyclassId = ensureId(target);
+        let pc = new Polyclass({target, isInline:true});
+        polyUnits.set(polyclassId, pc);
     }
-}
+};
 
 autoActivator();
 
 // })();
 
+exports.Polyclass = Polyclass;
+exports.default = Polyclass;

@@ -1476,7 +1476,9 @@ if(parent()) {
     window.Polyclass = Polyclass
 }
 
-export {Polyclass as default, Polyclass}
+module.exports = { Polyclass };
+
+// export default Polyclass
 
 
 /*
@@ -2411,4 +2413,3 @@ Manipulating the var propagates to the view:
 
     ;insertReceiver();
 })()
-

@@ -1,12 +1,12 @@
 /**
- * # Mouse Events mouse-[event]-*
+ * # Events mouse-[event]-*
  */
 ;(function(){
 
     let cg;
 
     const insertReceiver = function(){
-        console.log('mouse-event receiver')
+        console.log('event receiver')
 
         ClassGraph.addons.varTranslateReceiver = function(_cg){
             cg = _cg;
@@ -193,7 +193,7 @@
         return str.replace(/(^|[\s+])\S/g, function(t) { return t.toUpperCase() });
     }
 
-    window.toTitleCase = toTitleCase
+    // window.toTitleCase = toTitleCase
 
     const createFamilyString = function(values, fonts) {
         fonts = fonts || createFontObjects(values)
@@ -226,6 +226,7 @@
                 900:{int: 900, regu: 1, ital: 1}
          */
         let res = {}
+        const asSelector = cg.asSelectorString.bind(cg)
         for(let token of Object.values(pack.tokens)) {
             // console.log('making on token' , token)
             let def = {
@@ -241,8 +242,8 @@
                 }
 
                 let selectorRange = selectorBits.concat([key.token])
-                let packName = cg.asSelectorString(selectorRange)
-                let packNameLower = cg.asSelectorString(selectorRange).toLowerCase()
+                let packName = asSelector(selectorRange)
+                let packNameLower = asSelector(selectorRange).toLowerCase()
                 // console.log(packName, newDef)
                 res[`${packName}, ${packNameLower}`] = newDef
             }
@@ -251,8 +252,16 @@
 
         // Produce a default, withouta size: "font-pack-alta-400-500-600"
         // font-alta-400, ..., font-alta
-        let fontOnlyName = cg.asSelectorString(['font', pack.first])
-        res[fontOnlyName] = {
+        let fontOnlyPlusName = asSelector(['font', pack.first])
+        let fontOnlyDashName = asSelector(['font'].concat(pack.first.split('+')))
+        let strings = new Set([
+                        fontOnlyPlusName
+                        , fontOnlyDashName
+                        , fontOnlyPlusName.toLowerCase()
+                        , fontOnlyDashName.toLowerCase()
+                        ])
+
+        res[Array.from(strings).join(', ')] = {
                 'font-family': `'${pack.cleanName}', sans-serif`
             }
         return res
@@ -388,24 +397,49 @@
         return fonts
     }
 
+    /*
+    Ensure the pack contains one or more tokens.
+
+    This mutates pack.tokens if no tokens are given.
+    returns a list of tokenValues, or the _tokens_ of the pack.
+     */
+    const ensureTokens = function(pack) {
+
+        let tokenValues = Object.values(pack.tokens)
+
+        if(tokenValues.length == 0) {
+            pack.tokens["400"] = {
+                    int: 400,
+                    regu:1,
+                    keys: new Set([
+                            { isItal: undefined, token: "400"}
+                          ])
+                } // Install a default font size
+        }
+
+        return Object.values(pack.tokens)
+    }
+
     const extendPack = function(pack) {
-        let titleToken = toTitleCase(pack.first);
+        let titleToken = toTitleCase(pack.first)
+            , tokenValues = ensureTokens(pack)
+            , allTokens = Object.assign({}, ...tokenValues)
+            , hasItal = allTokens.ital != undefined
+            , formatStringParts = []
+            , weightValues = new Set
+            ;
 
-        let allTokens = Object.assign({}, ...Object.values(pack.tokens))
-        let hasItal = allTokens.ital != undefined
-
-        let formatStringParts = []
         if(hasItal) { formatStringParts.push('ital') }
         if(hasItal || allTokens.regu) { formatStringParts.push('wght') }
 
-        let weightValues = new Set
 
         for(let key in pack.tokens) {
             let token = pack.tokens[key]
-            // console.log(token)
-            let ital = token.ital? 1: 0
-            let int = token.int
-            let a = hasItal? [ital]: []
+                , ital = token.ital? 1: 0
+                , int = token.int
+                , a = hasItal? [ital]: []
+                ;
+
             a.push(int)
             let weightStr = a.join(',')
             weightValues.add(weightStr)
@@ -419,7 +453,8 @@
             }
         }
 
-        let weights = Array.from(weightValues).sort()//.join(';')
+        let weights = Array.from(weightValues).sort()
+
         let totalWeightStr = weights.join(';')
         let formatString = formatStringParts.join(',')
         let str = `${titleToken}:${formatString}@${totalWeightStr}`
