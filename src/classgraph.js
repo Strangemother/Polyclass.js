@@ -65,8 +65,8 @@ class ClassGraph {
      */
     generate(node){
 
-        node = node || document.body
-        let items = Object.entries(node.style)
+        node = node || this?.document?.body
+        let items = Object.entries(node?.style || {})
         for(let [name, value] of items) {
             this.addCamelString(name)
         }
