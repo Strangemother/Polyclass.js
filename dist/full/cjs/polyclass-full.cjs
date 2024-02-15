@@ -1,7 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 const kebabCase = function(str, sep='-') {
     let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase();
     return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
@@ -1428,42 +1426,6 @@ const parent = function() {
 if(parent()) {
     window.Polyclass = Polyclass;
 }
-
-
-/*
-    Upon document load, process and *[polyclass] entity. Similar to process()
-*/
-const autoActivator = function(watch=this?.document){
-
-    watch?.addEventListener('DOMContentLoaded', function(){
-        onDomLoaded();
-    }.bind(this));
-};
-
-const getOrCreateId = function(target) {
-    return target.dataset.polyclassId || Math.random().toString(32).slice(2)
-};
-
-const ensureId = function(target) {
-    return target.dataset.polyclassId = getOrCreateId(target)
-};
-
-/* Execute when the DOMContentLoaded event executes on the original _watched_
-item.
-This discovers any polyclass Attributes. and loads a Polyclass instance
-into the units.
-*/
-const onDomLoaded = function() {
-    const targets = document.querySelectorAll('*[polyclass]');
-    console.log('Discovered', targets.length);
-    for(let target of targets){
-        let polyclassId = ensureId(target);
-        let pc = new Polyclass({target, isInline:true});
-        polyUnits.set(polyclassId, pc);
-    }
-};
-
-autoActivator();
 (function(){
 
     let cg;
@@ -1615,7 +1577,7 @@ autoActivator();
 
         // Tokenize as a family string.
         //
-        values = obj.values;
+        const values = obj.values;
 
         let fonts = createFontObjects(values);
         let familyStrings = createFamilyString(values, fonts);
@@ -2265,5 +2227,7 @@ Manipulating the var propagates to the view:
     ;insertReceiver();
 })();
 
+exports.ClassGraph = ClassGraph;
+exports.DynamicCSSStyleSheet = DynamicCSSStyleSheet;
 exports.Polyclass = Polyclass;
-exports.default = Polyclass;
+exports.RenderArray = RenderArray;

@@ -152,7 +152,7 @@
 
         // Tokenize as a family string.
         //
-        values = obj.values
+        const values = obj.values
 
         let fonts = createFontObjects(values)
         let familyStrings = createFamilyString(values, fonts)
