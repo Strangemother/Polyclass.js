@@ -327,24 +327,49 @@
         return fonts
     }
 
+    /*
+    Ensure the pack contains one or more tokens.
+
+    This mutates pack.tokens if no tokens are given.
+    returns a list of tokenValues, or the _tokens_ of the pack.
+     */
+    const ensureTokens = function(pack) {
+
+        let tokenValues = Object.values(pack.tokens)
+
+        if(tokenValues.length == 0) {
+            pack.tokens["400"] = {
+                    int: 400,
+                    regu:1,
+                    keys: new Set([
+                            { isItal: undefined, token: "400"}
+                          ])
+                } // Install a default font size
+        }
+
+        return Object.values(pack.tokens)
+    }
+
     const extendPack = function(pack) {
-        let titleToken = toTitleCase(pack.first);
+        let titleToken = toTitleCase(pack.first)
+            , tokenValues = ensureTokens(pack)
+            , allTokens = Object.assign({}, ...tokenValues)
+            , hasItal = allTokens.ital != undefined
+            , formatStringParts = []
+            , weightValues = new Set
+            ;
 
-        let allTokens = Object.assign({}, ...Object.values(pack.tokens))
-        let hasItal = allTokens.ital != undefined
-
-        let formatStringParts = []
         if(hasItal) { formatStringParts.push('ital') }
         if(hasItal || allTokens.regu) { formatStringParts.push('wght') }
 
-        let weightValues = new Set
 
         for(let key in pack.tokens) {
             let token = pack.tokens[key]
-            // console.log(token)
-            let ital = token.ital? 1: 0
-            let int = token.int
-            let a = hasItal? [ital]: []
+                , ital = token.ital? 1: 0
+                , int = token.int
+                , a = hasItal? [ital]: []
+                ;
+
             a.push(int)
             let weightStr = a.join(',')
             weightValues.add(weightStr)
@@ -358,7 +383,8 @@
             }
         }
 
-        let weights = Array.from(weightValues).sort()//.join(';')
+        let weights = Array.from(weightValues).sort()
+
         let totalWeightStr = weights.join(';')
         let formatString = formatStringParts.join(',')
         let str = `${titleToken}:${formatString}@${totalWeightStr}`
