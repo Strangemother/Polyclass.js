@@ -73,7 +73,7 @@ Apply `polyclass` to your target, such as the `body`:
 </body>
 ```
 
-**Polyclass anything!**
+**Polyclass anything!** [More Install](#install--use)
 
 
 ## Features
@@ -171,11 +171,42 @@ Polyclass is designed to be quick to initiate.
 npm install polyclass
 ```
 
+An ESM import:
+
+```js
+import Polyclass from "polyclass"
+
+new Polyclass()
+```
+
+`import()` on the `node` terminal:
+
+```js
+// Fetch the esm node default using import()
+const { default: Polyclass } = await import("polyclass")
+
+new Polyclass()
+```
+
+`require()` on the terminal:
+
+```js
+// Collect a .cjs module with require()
+const polyclass = await require("polyclass")
+
+new polyclass.Polyclass()
+```
+
+
 Or if you have the source-code locally:
 
 ```jinja
 <!-- All included -->
 <script src="polyclass/dist/polyclass.full.js"></script>
+
+<script type="text/javascript">
+    new Polyclass()
+</script>
 ```
 
 
