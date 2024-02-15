@@ -1,12 +1,12 @@
 /**
- * # Mouse Events mouse-[event]-*
+ * # Events mouse-[event]-*
  */
 ;(function(){
 
     let cg;
 
     const insertReceiver = function(){
-        console.log('mouse-event receiver')
+        console.log('event receiver')
 
         ClassGraph.addons.varTranslateReceiver = function(_cg){
             cg = _cg;

@@ -123,7 +123,7 @@
         return str.replace(/(^|[\s+])\S/g, function(t) { return t.toUpperCase() });
     }
 
-    window.toTitleCase = toTitleCase
+    // window.toTitleCase = toTitleCase
 
     const createFamilyString = function(values, fonts) {
         fonts = fonts || createFontObjects(values)
