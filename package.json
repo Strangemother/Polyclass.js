@@ -3,8 +3,8 @@
     "type": "module",
     "source": "src/foo.js",
     "exports": {
-        "require": "./dist/foo.cjs",
-        "default": "./dist/foo.modern.js"
+        "require": "./dist/full/cjs/polyclass-full.cjs",
+        "default": "./dist/full/esm/polyclass-full.js"
     },
     "browser": "dist/polyclass.full.js",
     "version": "0.0.25",
