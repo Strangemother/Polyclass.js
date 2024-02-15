@@ -25,6 +25,14 @@ const CORE = [
 const POLYCLASS = [
     ...CORE
     , "./src/polyclass.js"
+    , "./src/export-statements.js"
+]
+
+
+const POLYCLASS_BROWSER = [
+    ...CORE
+    , "./src/auto-loader.js"
+    , "./src/polyclass.js"
 ]
 
 
@@ -41,6 +49,17 @@ const groupedFiles =  {
     , full: {
         files: POLYCLASS.concat(ADDONS)
         , outputFile: './build/polyclass.full.js'
+    }
+
+    // The browser requires the DOM loader and no ESM export.
+    , browser: {
+        files: POLYCLASS_BROWSER
+        , outputFile: './build/polyclass.browser-core.js'
+    }
+
+    , browserFull: {
+        files: POLYCLASS_BROWSER.concat(ADDONS)
+        , outputFile: './build/polyclass.browser-full.js'
     }
 }
 
@@ -113,6 +132,68 @@ const coreConfigMin = {
         terser()
     ]
 }
+
+
+const coreConfigBrowser = {
+    input: groupedFiles.browser.outputFile
+    , output: [
+       {
+            file: 'dist/browser/esm/polyclass-core.js'
+            , format: 'esm'
+        }, {
+            file: 'dist/browser/umd/polyclass-core.js'
+            , format: 'umd'
+            , name: 'polybundle'
+        }, {
+            file: 'dist/browser/cjs/polyclass-core.cjs'
+            , format: 'cjs'
+            , name: 'polybundle'
+        }
+
+    ]
+    , plugins: [
+        // concat({
+        //     groupedFiles: Object.values(groupedFiles)
+        // })
+        // Resolve external modules from node_modules
+        // resolve(),
+        // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
+        // commonjs(),
+        // Minify the output
+        // terser()
+    ]
+}
+
+const coreConfigBrowserMin = {
+    input: groupedFiles.browser.outputFile
+    , output: [
+       {
+            file: 'dist/browser/esm/polyclass-core.min.js'
+            , format: 'esm'
+        }, {
+            file: 'dist/browser/umd/polyclass-core.min.js'
+            , format: 'umd'
+            , name: 'polybundle'
+        }, {
+            file: 'dist/browser/cjs/polyclass-core.min.cjs'
+            , format: 'cjs'
+            , name: 'polybundle'
+        }
+
+    ]
+    , plugins: [
+        // concat({
+        //     groupedFiles: Object.values(groupedFiles)
+        // })
+        // Resolve external modules from node_modules
+        // resolve(),
+        // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
+        // commonjs(),
+        // Minify the output
+        terser()
+    ]
+}
+
 
 /* All files created during the concat stage, with the merge files
    within the `build/`.
@@ -228,6 +309,8 @@ const addonsConfig = {
 export default [
     coreConfig
     , coreConfigMin
+    , coreConfigBrowser
+    , coreConfigBrowserMin
     , buildFilesConfig
     , polyclassFullConfig
     , polyclassFullConfigMin
