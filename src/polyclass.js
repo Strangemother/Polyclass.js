@@ -6,7 +6,7 @@
  */
 
 
-;(()=>{
+// ;(()=>{
 
 class PolyObject {
 
@@ -18,9 +18,9 @@ class PolyObject {
         cg.generate()
         this._graph = cg
 
-
+        const _htmlNode = this?.HTMLElement || function(){}
         // PolyWrapped or {} classical
-        let func = (config instanceof HTMLElement)? this.hotLoad: this.loadConfig
+        let func = (config instanceof _htmlNode)? this.hotLoad: this.loadConfig
         func.bind(this)(config)
     }
 
@@ -282,15 +282,25 @@ const polyclassProxy = {
 }
 
 
-window.Polyclass = new Proxy(polyclassHead, polyclassProxy)
+const Polyclass = new Proxy(polyclassHead, polyclassProxy)
 // window.polyUnits = polyUnits
+const parent = function() {
+    return this?.window != undefined
+}
+
+if(parent()) {
+    window.Polyclass = Polyclass
+}
+
+export {Polyclass as default, Polyclass}
 
 
 /*
     Upon document load, process and *[polyclass] entity. Similar to process()
 */
-const autoActivator = function(watch=document){
-    watch.addEventListener('DOMContentLoaded', function(){
+const autoActivator = function(watch=this?.document){
+
+    watch?.addEventListener('DOMContentLoaded', function(){
         onDomLoaded()
     }.bind(this))
 };
@@ -320,4 +330,4 @@ const onDomLoaded = function() {
 
 autoActivator();
 
-})();
+// })();
