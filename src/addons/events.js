@@ -1,5 +1,12 @@
 /**
- * # Events mouse-[event]-*
+ * # Events event-[eventName]-[action]-[params]*
+ *
+ * Create event handlers for actions on an entity.
+ *
+ * For example on "click" event, toggle the class "border-var-generic-border"
+ *
+ *      "event-click-toggle-border-var-generic-border"
+ *
  */
 ;(function(){
 
@@ -54,7 +61,9 @@
                 /* Perform a class "toggle" in some shape. */
                 console.log(parts, others, action)
                 e.currentTarget.classList.toggle(parts.join('-'))
-
+            }
+            , setvar() {
+                /* Set the variable name to the given value */
             }
         }
 
