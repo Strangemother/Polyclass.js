@@ -31,7 +31,7 @@ const POLYCLASS = [
 
 const POLYCLASS_BROWSER = [
     ...CORE
-    , "./src/auto-loader.js"
+    , "./src/dom-property-activator.js"
     , "./src/polyclass.js"
 ]
 
