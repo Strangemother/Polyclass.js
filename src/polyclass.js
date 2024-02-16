@@ -15,7 +15,7 @@ class PolyObject {
         this.units = polyUnits
         console.log('me:', config)
         let cg = new ClassGraph(config)
-        cg.generate()
+        cg.generate(config?.target)
         this._graph = cg
 
         const _htmlNode = this?.HTMLElement || function(){}
@@ -26,7 +26,7 @@ class PolyObject {
 
     hotLoad(node) {
         console.log('Hotload')
-        this.loadConfig({
+        return this.loadConfig({
             target: node
             , process: false
             // , isInline: true
@@ -238,11 +238,12 @@ const polyclassProxy = {
         let realTarget = this.getInstance();
 
         if(property in realTarget) {
+            let val = realTarget[property];
 
-            if(realTarget[property] && realTarget[property].bind) {
-                return realTarget[property].bind(realTarget)
+            if(val && val.bind) {
+                return val.bind(realTarget)
             }
-            return realTarget[property]
+            return val
         };
         // console.warn(`No property ${property} on receiver`, realTarget)
 
@@ -284,7 +285,6 @@ const polyclassProxy = {
 
 const Polyclass = new Proxy(polyclassHead, polyclassProxy)
 // window.polyUnits = polyUnits
-window.Polyclass = Polyclass
 
 
 // })();
