@@ -64,8 +64,7 @@ class ClassGraph {
         If the _next_ node is a tree node, continue - if it's a value node, release
      */
     generate(node){
-
-        node = node || document.body
+        //node = node || document.body
         let items = Object.entries(node?.style || {})
         for(let [name, value] of items) {
             this.addCamelString(name)
@@ -143,13 +142,17 @@ class ClassGraph {
 
     getRoot(){
         if(!this.graph) {
-            this.graph = {
-                [this.nodeWord()]: {}
-                , meta: { key: 'root', isRoot: true }
-                , key: 'root'
-            }
+            this.graph = this.generateRootGraph()
         }
         return this.graph
+    }
+
+    generateRootGraph() {
+        return {
+            [this.nodeWord()]: {}
+            , meta: { key: 'root', isRoot: true }
+            , key: 'root'
+        }
     }
 
 
