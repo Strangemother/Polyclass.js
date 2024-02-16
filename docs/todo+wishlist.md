@@ -32,6 +32,8 @@ Items I want in the lib - some in progress
 + Dynamic Css Import
 + _though_ key function
 
+
+
 ## polyclass active switch
 
 Enable polyclass in the view without JS, using an auto-switch in the
@@ -448,3 +450,27 @@ Apply a function to capture the usage of a key using transition through a node:
 
     // margin-* was called
     // margin-* was called
+
+
+## through key prefix populate
+
+apply _through_ key capture to apply pre selector components to the css declaration
+
+    cg.addThrough(['dark'], function(splitObj){
+        return splitObj.prefixAppend('.dark ')
+    })
+
+    <div class='dark-margin-top-10em'></div>
+
+    .dark .margin-top-10em,
+    .dark dark-margin-top-10em {
+        margin-top: 10em;
+    }
+
+This only activates if a parent has the class of dark
+
+    <div class='margin-top-10em'>
+        <div class='dark-margin-top-10em'></div>
+    </div>
+
+An issue may arise with the prefix within the class-name, as during the dark-phase the class-name must loose its prefix; pretty ugly.
