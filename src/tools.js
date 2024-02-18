@@ -28,10 +28,46 @@ var textColor = function(bgColor) {
   return (yiq >= 128) ? 'black' : 'white';
 }
 
+
 function standardize_color(str){
     var ctx = document.createElement("canvas").getContext("2d");
     ctx.fillStyle = str;
     return ctx.fillStyle;
+}
+
+const covertColorEntity = document.createElement("span")
+function convertColor(v) {
+    let st = covertColorEntity.style
+    let b4 = st.color
+    st.color = v
+    f = st.getPropertyValue('color')
+    console.log(f, f!=b4)
+    return f
+}
+
+function hexAny(str) {
+    return standardize_color(str)
+}
+
+function rgbAny(str) {
+    return hexToRgb(hexAny(str).slice(1))
+}
+
+function hexToRgb(hex) {
+    var bigint = parseInt(hex, 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+    return [r,g,b];//.join(',');
+}
+
+function rgbAnyString(str) {
+    let rgb = (a,b,c) => `rgb(${a},${b},${c})`
+    return rgb.apply(this, rgbAny(str))
+}
+
+function hexToRgbStr(hex) {
+    return hexToRgb(hex.slice(1)).join(',');
 }
 
 
