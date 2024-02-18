@@ -78,8 +78,8 @@ const classMutationDetection = function(mutation) {
     //             , mutation.target
     //             , `classes: "${classes}"`
     //         )
-    let new_spl = classes.split(' ')
-    let old_spl = old.split(' ').map((v)=>v.trim())
+    let new_spl = classes.split(/(?!\(.*)\s(?![^(]*?\))/g); //split(' ')
+    let old_spl = old == null ? []: old.split(' ').map((v)=>v.trim())
     let newItems = old_spl? difference(new_spl, old_spl): new_spl
     console.log('new', newItems)
     // let removedItems = difference(old_spl, new_spl)
