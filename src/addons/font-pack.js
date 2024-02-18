@@ -82,10 +82,9 @@
 
         // Tokenize as a family string.
         //
-        const values = obj.values
-
-        let fonts = createFontObjects(values)
-        let familyStrings = createFamilyString(values, fonts)
+        const values = obj.values, origin = obj.origin;
+        let fonts = createFontObjects(values, origin, obj)
+        let familyStrings = createFamilyString(values, fonts, origin)
 
         // let families = tokenize(values)
 
@@ -93,12 +92,12 @@
         // console.info('Installing Google fonts: familyStrings:', familyStrings)
         generateGoogleLinks(familyStrings).forEach((x)=>document.head.appendChild(x))
 
-
         // Install additional css additions
-        installFontObjects(fonts)
+        installFontObjects(fonts, obj)
     }
 
-    const installFontObjects = function(fonts) {
+    const installFontObjects = function(fonts, splitObj) {
+
         // // For value create a font-family;
         for(let pack of Object.values(fonts)) {
             let name = pack.first
@@ -112,7 +111,6 @@
         }
     }
 
-
     const toTitleCase = function(str) {
         /*convert a string (expected font string) to a title case version
         This also title-cases +prefix string
@@ -125,8 +123,8 @@
 
     // window.toTitleCase = toTitleCase
 
-    const createFamilyString = function(values, fonts) {
-        fonts = fonts || createFontObjects(values)
+    const createFamilyString = function(values, fonts, origin) {
+        fonts = fonts || createFontObjects(values, origin)
         let fs = function(e) {
             return `family=${e.str}`
         }
