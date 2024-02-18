@@ -17,7 +17,7 @@ const generateClassGraph = function(config={}){
 class ClassGraph {
 
     sep = '-'
-    escapeRegex = /[<>*%#()=.@+?\/]/g
+    escapeRegex = /[<>*% #():=.@+?\/]/g
     dcss = new DynamicCSSStyleSheet(this)
 
     constructor(conf) {
@@ -248,7 +248,7 @@ class ClassGraph {
         If the leafs' next step is not a node, parse the values.
         reject leaf-only definitions.
      */
-    objectSplit(str, sep=this.sep, safe=true) {
+    objectSplit(str, sep=this.sep, safe=true, index=-1) {
         /* Parse a potential new css class. */
 
         let rawKeys = typeof(str) == 'string'? str.split(sep): str
@@ -266,6 +266,86 @@ class ClassGraph {
         if(this.isVendorPrefixMatch(keys)) {
             // console.log('Vendor Match!')
             //
+            // Slice away the vendor.
+            keys = keys.slice(this.getPrefixes().length)
+        } else {
+            // console.log('does not match vendor', keys)
+            if(this.vendorLocked) {
+                // nully obj.
+                return {
+                    props:undefined,
+                    values:undefined,
+                    str,
+                    index,
+                    node: currentNode,
+                    valid: false
+                }
+            }
+        }
+
+        for(let k of keys) {
+            // loop until a leaf, where the _next_ key is not a value node.
+            currentNode = node[nodeWord][k]
+            c1 += 1
+            let isLastNode = (l == c1)
+
+            if(currentNode == undefined) {
+                if(safe) { break };
+                continue
+            }
+
+            if(currentNode.leaf === true) {
+                // if the next node is invalid, the next keys are values.
+                let nextKey = keys[c1]
+                let currentGraph = currentNode[nodeWord]
+                if( (currentGraph && currentGraph[nextKey]) == undefined ) {
+                    break
+                }
+            }
+
+            node = currentNode
+        }
+
+        // grab the next keys
+        let props = keys.slice(0, c1)
+        let values = keys.slice(c1)
+        let r = {
+            props, values, str,
+            node: currentNode,
+            index,
+            valid: currentNode && (values.length > 0) || false
+        }
+
+        // this.translateValue(r)
+        return r
+    }
+
+    minorCapture(str, sep=this.sep, safe=true) {
+        /* Parse a potential new css class. */
+
+        let rawKeys = typeof(str) == 'string'? str.split(sep): str
+            // The forward keys to iterate such as [foo, bar],
+            // early converted through the aliasing.
+            // Will change later due to vendor prefix.
+            , keys = this.aliasConvert(rawKeys)
+            , l = keys.length
+            // The key 'word' used to hold the nested object
+            // within a node.
+            , nodeWord = this.nodeWord()
+            // The _current_ position starts at the root base
+            // of the tree - rewritten during iteration to match
+            // the _currentnode_
+            , node = this.getRoot()
+            // The iterative current state node, usually matching `node` unless
+            // an error occurs.
+            , currentNode
+            // c1 rather than c (count).
+            // As all references require the count+1
+            // - but "c" is usually a 0 index counter
+            , c1 = 0
+            ;
+
+        if(this.isVendorPrefixMatch(keys)) {
             // Slice away the vendor.
             keys = keys.slice(this.getPrefixes().length)
         } else {
@@ -333,20 +413,20 @@ class ClassGraph {
         res = cg.insertLine('alpha-red', {color: 'red'})
         res.renderAll()
 
-    Creates:
+        Creates:
 
-        .alpha-red {
-            color: red
-        }
+            .alpha-red {
+                color: red
+            }
 
-    render must be called on each returned rule. `renderAll`
-    is a special function on the returned array, calling `render` on
-    each sub item.
+        render must be called on each returned rule. `renderAll`
+        is a special function on the returned array, calling `render` on
+        each sub item.
 
-    The function converts the statement into a splitobject,
-    and applies it to the stylesheet through `insertRule`
+        The function converts the statement into a splitobject,
+        and applies it to the stylesheet through `insertRule`
 
-    returns the result from insertRule, an Array of Rules.
+        returns the result from insertRule, an Array of Rules.
     */
     insertLine(selectorStatement, props) {
         let spl = this.objectSplit(selectorStatement)
@@ -444,23 +524,23 @@ class ClassGraph {
     }
 
     /* Walk forward through a list of values, until the walk is exausted.
-    The loop is goverened by each discovered function, A receiver function
-    must return `[inStack, outStack, currentIndex]`, for the next function
-    to receive.
+        The loop is goverened by each discovered function, A receiver function
+        must return `[inStack, outStack, currentIndex]`, for the next function
+        to receive.
 
-        const receiver =  function(splitObj, inStack, outStack, currentIndex) {
-            return [inStack, outStack, currentIndex]
-        }
+            const receiver =  function(splitObj, inStack, outStack, currentIndex) {
+                return [inStack, outStack, currentIndex]
+            }
 
-    Digest any keys from `inStack`,
-    Add any values to `outStack` to push results to the final results.
-    currentIndex defines where (within the vals) the forward processor is -
-    at the time of functional entry.
+        Digest any keys from `inStack`,
+        Add any values to `outStack` to push results to the final results.
+        currentIndex defines where (within the vals) the forward processor is -
+        at the time of functional entry.
 
-    The function returns the index for the next iteration, when the
-    inStack.slice(currentIndex) to digest the _ongoing_ keys.
+        The function returns the index for the next iteration, when the
+        inStack.slice(currentIndex) to digest the _ongoing_ keys.
 
-    returning an index _past_ the length of the `inStack` will end the loop.
+        returning an index _past_ the length of the `inStack` will end the loop.
      */
     forwardDigestKeys(splitObj, vals) {
         let iterating = true;
@@ -471,6 +551,7 @@ class ClassGraph {
 
         /* Discover any "special" keys to digest the value processing,
         such as "vars-*" */
+
         while (iterating) {
             // Each function return a _result_ (appended or untouched),
             // and the next keys. Next keys > 0 == iterating
@@ -483,7 +564,7 @@ class ClassGraph {
                                             inStack, outStack, currentIndex)
                 // console.log('Results.', inStack, outStack, currentIndex)
             } else {
-                outStack.push(inStack[currentIndex])
+                outStack.push(this.beforeOutStack(inStack[currentIndex], currentIndex, splitObj))
             }
 
             currentIndex += 1
@@ -492,6 +573,7 @@ class ClassGraph {
                 iterating = false;
             }
         }
+
         // for (var i = 0; i < (vals || []).length; i++) {
         //     let k = vals[i]
         //     let digest = this.translateMap[k]
@@ -506,6 +588,174 @@ class ClassGraph {
 
     }
 
+    /*
+    A map of all functions to perform single item value checking before the
+    value is pushed into the outbound stack.
+
+    These functions execute on every input value
+     */
+    keyValueFunctions = new Map()
+    beforeOutStack(inStackValue, currentIndex, splitObj) {
+        // console.log('Pushing', inStackValue, splitObj)
+        let callList = this.getKeyFunctionMatch(inStackValue)
+        let res = this.collapseFunctions(callList, splitObj)
+        return res == undefined? inStackValue: res;
+        // return (res && res?.handler(res, splitObj)) || inStackValue
+    }
+
+    /*
+        Receive a call list generated by the key function matching tool
+        to reduce the chained functions to a single value.
+
+            let s = "red.functionName.anotherFunction"
+            let callList = this.getKeyFunctionMatch(s)
+            let resultString = this.collapseFunctions(callList, splitObj)
+
+        The splitObj is not utilised during the collapse (only given
+        to the handler function.)
+
+        Note; the calllist iterates in reverse as the _last_ item in the calllist tree is
+        the first (from left) function split
+
+        The iterator collapses upward, giving the _previous result_ to the next.
+     */
+    collapseFunctions(callList, splitObj) {
+
+        // run backward, passing the _last_ value resolved to the previous function
+        // "color-red.raise.forceGreen"
+        // color: forceGreen(raise(red))
+        let result = undefined;
+        for (var i = callList.length - 1; i >= 0; i--) {
+            let item = callList[i]
+            let value = result == undefined? item.remainder: result
+            let handler = item.handler
+            // If the handler is missing at this point, the developer
+            // assigned an unknown function.
+            // Capture and default to the _previous_ result,
+            // this essentially _skips_ unknown functional calls.
+            // However an Error may be better.
+            result = handler && handler(value, item, i, splitObj) || result
+        }
+        return result
+
+    }
+
+    getKeyFunctionMatch(fullString) {
+        /* iterate backward, tokensizing dicovered functions
+        until the resource is exausted.*/
+        let backLoop = fullString != undefined;
+        let lastVal = fullString
+        let res = []
+        while(backLoop) {
+            let item = this.getKeyFunctionMatchOnce(lastVal)
+            if(item.success == false) {
+                // console.log('breakout on', item.match.name)
+                // console.log('breakout on', item)
+                //break
+            }
+
+            backLoop = item.match.start > -1
+            if(backLoop) {
+                /* Parsing errors yield "partial" keys if success is false.
+                If this occurs on the very last item,
+                the indexed iterator yields a poor value to push into a
+                _non_ function.*/
+                lastVal = item.remainder
+                res.push(item)
+            }
+
+        }
+
+        // take one from the end and
+        // reloop:
+        //      color-red.raise.forceGreen
+        //                      forceGreen  red.raise -> 'Green'
+        //                raise 'Green' -> `shadeUp(color)` -> lighterGreen
+        //           lighterGreen
+
+
+        // the preceding function should accept the value of
+        // the last return.
+        // the last return should provide a _new_ string for back-slicing.
+
+        return res
+    }
+
+    getKeyFunctionMatchOnce(fullString, keyDelimiter='.', argumentDelimiter=':') {
+
+        let start = fullString.lastIndexOf(keyDelimiter)
+        let end = fullString.length
+        let bits = fullString.slice(start+1, end).split(argumentDelimiter)
+        let name = bits[0]
+        let args = bits.slice(1)
+
+        let handler = this.keyValueFunctions.get(name)
+
+        let res = {
+            // The input string
+            value: fullString
+            // The result from the split of the discovered functio
+            , remainder: fullString.slice(0, start)
+            // The mapped function and any discovered argments
+            , handler, args
+            // The object denoting the position of the match.
+            , match: {
+                start
+                , end
+                , name
+            }
+        }
+
+        res.success = handler != undefined
+
+        return res
+    }
+
+    /*
+        Use minimal processing to capture any classes with starting with the
+        given keys.
+
+        return a list of matching keys
+     */
+    filterClasses(origin, keys, asDict=false) {
+        let classList = origin.classList
+            , res = asDict? {}: []
+            , push = (k, e, i) => res.push([i,e])
+            ;
+        if(asDict) {
+            push = (k, e, i) => res[k] = [i, e]
+        }
+
+        classList.forEach(function(e, i, a){
+            let first = e.split('-')[0]
+            if(keys.indexOf(first) > -1) {
+                push(first, e, i)
+                // res.push(e)
+                // res[first] = e
+            }
+        })
+
+        return res
+    }
+
+    /* Perform a filterClasses and process each entry as as a split.*/
+    filterSplit(origin, keys, asDict=false) {
+        let classes = this.filterClasses(origin, keys, asDict)
+        if(asDict) {
+            let res = {}, index =0
+            for(let k in classes) {
+                let e = classes[k]; // [index, value]
+                res[k] = this.objectSplit(e[1], undefined, undefined, e[0])
+            }
+            return res
+        }
+
+        let res = []
+        classes.forEach((e)=>{
+            res.push(this.objectSplit(e))
+        })
+        return res
+    }
 
     /*Given a special splitobject using `objectSplit()`, convert to a css
       style and insert into the dynamic stylesheet.
@@ -542,6 +792,7 @@ class ClassGraph {
         let handlerRes = {
             insert:true
         }
+
         let handlerFunc = splitObj.node?.handler?.bind(splitObj)
         if(handlerFunc) {
             // executing the handler and replace the handlerRes if required.
@@ -581,19 +832,19 @@ class ClassGraph {
     }
 
     /* Convert the given `entity` to a CSS Selector string. The entity may be:
-    + array: of strings
-    + string
-    + object: with `props`: array of strings
-    + object: with `str` as string
+        + array: of strings
+        + string
+        + object: with `props`: array of strings
+        + object: with `str` as string
 
-        this.asString('margin-top-.5em', withParentSelector=false)
-        ".margin-top-\\.5em"
+            this.asString('margin-top-.5em', withParentSelector=false)
+            ".margin-top-\\.5em"
 
-        this.asString('margin-top-.5em', withParentSelector=true)
-        ".acme-labs .margin-top-\\.5em"
+            this.asString('margin-top-.5em', withParentSelector=true)
+            ".acme-labs .margin-top-\\.5em"
 
-    If a parent selector exists, this is applied as a prefix to the selector
-    Return a string, CSS selector escaped
+        If a parent selector exists, this is applied as a prefix to the selector
+        Return a string, CSS selector escaped
     */
 
     asSelectorString(entity, withParentSelector=true) {
@@ -736,13 +987,14 @@ class ClassGraph {
     }
 
     safeInsertMany(entity, classes) {
+        let index = 0 
         for(let name of classes) {
-            this.safeInsertLine(name, entity)
+            this.safeInsertLine(name, entity, index++)
         }
     }
 
-    safeInsertLine(name, entity) {
-        let spl2 = this.objectSplit(name)
+    safeInsertLine(name, entity, index=-1) {
+        let spl2 = this.objectSplit(name, undefined, undefined, index)
         if(spl2.valid) {
             // console.log('Inserting', spl2)
             spl2.origin = entity
@@ -813,3 +1065,4 @@ class ClassGraph {
 // export {
 //     ClassGraph
 // }
+
