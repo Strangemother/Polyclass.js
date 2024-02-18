@@ -159,7 +159,7 @@
             // console.log('making on token' , token)
             let def = {
                 'font-weight': token.int
-                , 'font-family': `'${pack.cleanName}', sans-serif`
+                , 'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
             let selectorBits = ['font', pack.first]
 
@@ -190,22 +190,86 @@
                         ])
 
         res[Array.from(strings).join(', ')] = {
-                'font-family': `'${pack.cleanName}', sans-serif`
+                'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
         return res
     }
 
-    const createFontObjects = function(values) {
+    /*
+        Given a list of keys, return class-name properties with any
+        matching key.
+
+            "font-pack-roboto default-sans-serif"
+
+            getSiblingMutators(['default'], origin)
+
+            default: 'sans-serif
+     */
+    const getSiblingMutators = function(keys, origin) {
+        let results = cg.filterSplit(origin, keys, true)
+        console.log('getSiblingMutators', results)
+        return results
+    }
+
+    const createFontObjects = function(values, origin, splitObj) {
         // family=Roboto:wght@300
         // let familyStrings = '' //"family=Roboto:wght@300"
         let index = 0
         let fonts = {}
-
+        let _origin = splitObj?.origin || origin;
         let currentFont;
         let regex = /([a-zA-Z-]{0,}?)(\d+)/;
         let REGULAR = 'r' // a no definition (standard) font
+        /*
+           skip bad tokens
+         */
         let skipEmpty = true
+        /*
+            Enable many fonts to be applied within one class-name
+            If false, the string will be classified as a bad tokenised
+            string and any _additional_ bad token properties are
+            considered Values.
+         */
         let manyFont = true
+        /*
+            If true, allow the appliance of modifiers with an index
+            before the primary class.
+            If False, the modifier is ignored
+         */
+        let softIndex = true
+        /*
+            If true, error out if the modifier index is above the
+            primary class index.
+            If False, the contribution will continue and potentially
+            allow the softmax to continue.
+         */
+        let errorSoftIndex = false
+        // capture the default font from an additional class.
+        let sibling = getSiblingMutators(['default'], _origin)
+        let defaultFont = 'sans-serif'
+        let d = sibling['default']
+        if(d) {
+            if(d.index <= splitObj.index) {
+                // The modifier class is applied before the appliance class.
+                // if softIndex = True, allow it.
+                // if false, ignore it.
+                let func = softIndex? 'warn': 'error'
+                let s = 'font default-* modifier should be indexed after font'
+                console[func](s)
+                if(!softIndex) {
+                    // ignore this entry
+                    if(errorSoftIndex) {
+                        throw new Error(s)
+                    }
+                } else {
+                    // Apply anyway
+                    defaultFont = d.values.join(' ')
+                }
+            } else {
+                defaultFont = d.values.join(' ')
+            }
+
+        }
 
         for(let t in values) {
 
@@ -228,7 +292,7 @@
             // if token is weight, stack into the previous (current) font.
             if(index == 0) {
                 // the first token should be a font.
-                fonts[index] = { first: token, tokens:{} }
+                fonts[index] = { first: token, tokens:{}, defaultFonts: defaultFont }
                 currentFont = index
                 index++;
                 continue
