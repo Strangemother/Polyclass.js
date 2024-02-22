@@ -237,9 +237,10 @@ class DynamicCSSStyleSheet {
 
             , render(content) {
                 let rules = this.conf
-                let propStr = content || this.getPropStr(rules)
-                let selector = rules[0];
-                let _ruleIndex = _this.insertRuleSelectorPropStr(this.styleSheet, selector, propStr)
+                    , propStr = content || this.getPropStr(rules)
+                    , selector = rules[0]
+                    , _ruleIndex = _this.insertRuleSelectorPropStr(this.styleSheet, selector, propStr)
+                    ;
                 this.sheetRule = this.styleSheet.rules[_ruleIndex]
                 this.rule = _ruleIndex
             }
@@ -248,10 +249,11 @@ class DynamicCSSStyleSheet {
                     return this.render(content)
                 }
                 let before = this.sheetRule.cssText
-                let rules = this.conf
-                let selector = rules[0];
-                let propStr = content == undefined ? this.getPropStr(this.conf): content
-                let after = `${selector} {${propStr}}`
+                    , rules = this.conf
+                    , selector = rules[0]
+                    , propStr = content == undefined ? this.getPropStr(this.conf): content
+                    , after = `${selector} {${propStr}}`
+                    ;
                 this.styleSheet.replace(`${before} ${after}`)
             }
         }
@@ -340,7 +342,7 @@ class DynamicCSSStyleSheet {
  * Represents the addons for the class.
  * @type {Object}
  */
-DynamicCSSStyleSheet.addons = {}
+;DynamicCSSStyleSheet.addons = {};
 
 
 // export {

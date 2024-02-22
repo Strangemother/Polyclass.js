@@ -104,7 +104,6 @@ Apply a font through the created `.font-font+name` class. An optional size can b
 font-font+name[-[i]integer]
 ```
 
-
 + the `font+name` is any google font name in a lowercase, plus+string.
 + The `integer` is any acceptable font-size, such as `100` or `400`.
 + An `i` integer is denotes _italic_, such as `i100`, `i400`
@@ -206,7 +205,6 @@ Using the font name within the class is **always lowercase** for access:
 </div>
 ```
 
-
 ### Italic Font Variant
 
 We can install both italic and standard set fonts using an `i` prefix before a number:
@@ -231,3 +229,19 @@ You can choose any font at any time using the `font-*` polyclass:
 
 <div class="font-roboto-mono-i400"></div>
 ```
+
+
+### `default-*` Modifier
+
+The `font-pack-*` accepts a modifer class-name `default-*`, to apply the _default_ class of a the primary-class `font-pack-*`.
+
+```jinja
+<div class="font-pack-bad+fontname default-times-new-roman">
+
+    <div class='font-bad+fontname'>
+        font-style will be "Times New Roman", because `bad+fontname` returns 400
+    </div>
+</div>
+```
+
+When a font is not installed (such as this `bad+fontname` we request), CSS `font-family` can use the default font `Times New Roman`. The modifier should be applied _after_ the primary class-name.

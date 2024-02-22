@@ -60,7 +60,7 @@ pc.insertReceiver(['font','pack'], function(splitObj){
 
 Anything _after_ your discovery selector within your class-name becomes a property:
 
-```html
+```jinja
 <div polyclass>
     <div class="font-pack-roboto-100 font-roboto-400">
         the "Fontpack" function handles special strings formatted similar to the google font string.

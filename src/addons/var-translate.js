@@ -12,7 +12,7 @@
  *          "border-top": var(--primary-edges)
  *      }
  */
-const varTranslateReceiver = (function(){
+;(function(){
 
     let cg;
 

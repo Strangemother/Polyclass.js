@@ -35,7 +35,7 @@ Manipulating the var propagates to the view:
 
  */
 
-const varsReceiver = (function(){
+;(function(){
 
     let cg;
     let rootDeclaration = {};

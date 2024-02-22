@@ -44,3 +44,52 @@ Issues:
     How do I prepare myself for attempting to document **all** possible Polyclass names.it's generally a case of documenting what "margin", then "padding" is etc... However I don't know _all CSS properties_, and if challenged it would become years of just documenting CSS.
 
 
+---
+
+# Glossary
+
++ `class-name`
+  The class-name is a just a HTML class but written for Polyclass to include the property, and value of a CSS declaration.
+
+    class-name
+    border-solid-1px
+    text-align-center
+
+  When reading this, we can assume the class-name, is the extended parameter string of which Polyclass can process
+
++ Declaration
+  A CSS Declaration is the body of content containing the property-value pairs.
+  When writing a declaration to the dynamic stylesheet it becomes _declared_, and becomes part of the active rendering.
+
++ Alias
+  A pseudo name of a key within the tree. Translated before acessing the tree.
+
+    "background-red" // no alias
+    "bg-red"
+
+  An alias performs a literal change to the keys before use.
+
++ Tree
+  All Polyclass _possible_ keys are generated in a nested dictionary. This _tree_ is inspected to perform class-name splits.
+
++ Sibling
+  A class-name associated with another class-name, for the purposes of overloading a primary class with a modifier or other paired problems
+
++ Modifer
+  A special class-name to adapt the declaration of a class-name during creation. The Modifier isn't generally applied to the tree, and instead discovered as a sibling when required.
+
+    "primary-class-name modifier-class"
+
+  In general cases it's preferred to apply a modifier _after_ the primary.
+
++ Primary [class-name]
+  Refering to a class-name may include a sibling and other associated classes. The _primary_ defines the first, or target class-name declaration.
+
+    primary     sibling|modifier
+    "font-pack-roboto default-times-new-roman"
+
++ Function
+  A function resides upon a Value until its _collapsed_ into a final value when declared. A function modifies the end-state value to perform computation changes to a value during runtime:
+
+    class-name.function:arg[:...]
+    "color-red.reshade:1"

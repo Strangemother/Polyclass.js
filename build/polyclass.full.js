@@ -1,3 +1,236 @@
+const kebabCase = function(str, sep='-') {
+    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
+    return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
+}
+
+
+const colorPrebits = function() {
+    /*
+        hex     1
+        rgba    4
+        rgb     3   3/1
+        hsl     3   3/1
+        hwb     3   3/1
+        lab     3   3/1
+        lch     3   3/1
+        oklab   3   3/1
+        oklch   3   3/1
+        color   4   4/1
+     */
+}
+
+
+var textColor = function(bgColor) {
+  var r = bgColor.r * 255,
+      g = bgColor.g * 255,
+      b = bgColor.b * 255;
+  var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return (yiq >= 128) ? 'black' : 'white';
+}
+
+
+function standardize_color(str){
+    var ctx = document.createElement("canvas").getContext("2d");
+    ctx.fillStyle = str;
+    return ctx.fillStyle;
+}
+
+const covertColorEntity = document.createElement("span")
+function convertColor(v) {
+    let st = covertColorEntity.style
+    let b4 = st.color
+    st.color = v
+    f = st.getPropertyValue('color')
+    console.log(f, f!=b4)
+    return f
+}
+
+function hexAny(str) {
+    return standardize_color(str)
+}
+
+function rgbAny(str) {
+    return hexToRgb(hexAny(str).slice(1))
+}
+
+function hexToRgb(hex) {
+    var bigint = parseInt(hex, 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+    return [r,g,b];//.join(',');
+}
+
+function rgbAnyString(str) {
+    let rgb = (a,b,c) => `rgb(${a},${b},${c})`
+    return rgb.apply(this, rgbAny(str))
+}
+
+function hexToRgbStr(hex) {
+    return hexToRgb(hex.slice(1)).join(',');
+}
+
+
+;(()=>{
+
+
+var round = Math.round
+    , asInt = parseInt
+    , rgb = (a,b,c) => `rgb(${a},${b},${c})`
+    ;
+
+// https://github.com/PimpTrizkit/PJs/wiki/
+// 12.-Shade,-Blend-and-Convert-a-Web-Color-(pSBC.js)#--version-2-universal-b--
+//
+
+let getDefaultHex = function(val, defaultLow="#000000", defaultHigh="#FFFFFF") {
+    if(val){ return val }
+
+    if(p_lt_0) { return defaultLow }
+    return defaultHigh
+}
+
+let getDefault = function(val) {
+    return getDefaultHex(val, rgb(0,0,0), rgb(255,255,255))
+}
+
+let shift = function(v, c, and) {
+    let r = v >> c
+    return and ? r & and: r
+}
+
+let shiftRoundNegFlip = function(t, shiftVal, and, val)  {
+    let innerVal = shift(t, shiftVal, and)
+    return roundNegFlip(innerVal, val)
+}
+
+let convert = (t, val) => {
+    return roundNegFlip(asInt(t), val)
+}
+
+let roundNegFlip = function(a, b) {
+    return round(negFlip(a - b)) + b
+}
+
+let negFlip = function(val){
+    return val * neg
+}
+
+var neg
+    , p_lt_0
+    ;
+
+function shadeBlend(p,c0,c1) {
+    /*
+        var color1 = "#FF343B";
+        var color2 = "#343BFF";
+        var color3 = "rgb(234,47,120)";
+        var color4 = "rgb(120,99,248)";
+        var shadedcolor1 = shadeBlend(0.75,color1);
+        var shadedcolor3 = shadeBlend(-0.5,color3);
+        var blendedcolor1 = shadeBlend(0.333,color1,color2);
+        var blendedcolor34 = shadeBlend(-0.8,color3,color4); // Same as using 0.8
+
+     */
+    p_lt_0 = p < 0;
+    neg = p_lt_0? p * -1: p
+
+    if(c0.length > 7){
+        return rbgConvert(p, c0, c1)
+    }
+
+    return hexConvert(p, c0, c1)
+}
+
+function shiftShift(f, t, shiftVal, andHex) {
+        // , R1 = shift(f, 16, 0)
+        // , roundR = shiftRoundNegFlip(t, 16, 0, R1)
+
+        let G1 = shift(f, shiftVal, andHex)
+        return shiftRoundNegFlip(t, shiftVal, andHex, G1)
+}
+
+function hexConvert(p, c0, c1) {
+
+    var f = asInt(c0.slice(1), 16)
+        , cv = getDefaultHex(c1).slice(1)
+        , t = asInt(cv, 16)
+        , roundR = shiftShift(f, t, 16, 0)
+        , roundG = shiftShift(f, t, 8, 0x00FF)
+        , roundB = shiftShift(f, t, 0, 0x0000FF)
+        ;
+        // , R1 = shift(f, 16, 0)
+        // , G1 = shift(f, 8, 0x00FF)
+        // , B1 = shift(f, 0, 0x0000FF)
+        // , roundR = shiftRoundNegFlip(t, 16, 0, R1)
+        // , roundG = shiftRoundNegFlip(t, 8, 0x00FF, G1)
+        // , roundB = shiftRoundNegFlip(t, 0, 0x0000FF, B1)
+        // ;)
+
+    let val = 0x1000000 + roundR
+              * 0x10000 + roundG
+                * 0x100 + roundB
+                ;
+
+    let v = val.toString(16).slice(1)
+    return `#${v}`
+
+}
+
+function rbgConvert(p, c0, c1) {
+    let f = c0.split(",")
+        , tSplit = getDefault(c1)
+        , t = tSplit.split(",")
+        , R = asInt(f[0].slice(4))
+        , G = asInt(f[1])
+        , B = asInt(f[2])
+        , r = convert(t[0].slice(4), R)
+        , g = convert(t[1], G)
+        , b = convert(t[2], B)
+        ;
+    return rgb(r,g,b)
+}
+
+
+
+function origShadeBlend(p,c0,c1) {
+    var n=p<0?p*-1:p,u=Math.round,w=parseInt;
+    if(c0.length>7){
+        var f=c0.split(","),t=(c1?c1:p<0?"rgb(0,0,0)":"rgb(255,255,255)").split(","),R=w(f[0].slice(4)),G=w(f[1]),B=w(f[2]);
+        return "rgb("+(u((w(t[0].slice(4))-R)*n)+R)+","+(u((w(t[1])-G)*n)+G)+","+(u((w(t[2])-B)*n)+B)+")"
+    }else{
+        var f=w(c0.slice(1),16),t=w((c1?c1:p<0?"#000000":"#FFFFFF").slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF;
+        return "#"+(0x1000000+(u(((t>>16)-R1)*n)+R1)*0x10000+(u(((t>>8&0x00FF)-G1)*n)+G1)*0x100+(u(((t&0x0000FF)-B1)*n)+B1)).toString(16).slice(1)
+    }
+}
+
+
+var color1 = "#FF343B";
+var color2 = "#343BFF";
+var color3 = "rgb(234,47,120)";
+var color4 = "rgb(120,99,248)";
+blendedcolor = shadeBlend(-0.8,color3,color4); // Same as using 0.8
+blendedcolor2 = origShadeBlend(-0.8,color3,color4); // Same as using 0.8
+
+if(blendedcolor != blendedcolor2) {
+    console.error('Fault', blendedcolor, blendedcolor2)
+}
+console.log(blendedcolor, blendedcolor2)
+
+
+blendedcolor = shadeBlend(-0.8,color1,color2); // Same as using 0.8
+blendedcolor2 = origShadeBlend(-0.8,color1,color2); // Same as using 0.8
+
+
+if(blendedcolor != blendedcolor2) {
+    console.error('Fault', blendedcolor, blendedcolor2)
+}
+
+
+console.log(blendedcolor, blendedcolor2)
+
+})();
+
 /**
  * A DynamicCSSStyleSheet allows the developer to manipulate the
  * CSS Style objects within the sheet, rather than switching classes
@@ -237,9 +470,10 @@ class DynamicCSSStyleSheet {
 
             , render(content) {
                 let rules = this.conf
-                let propStr = content || this.getPropStr(rules)
-                let selector = rules[0];
-                let _ruleIndex = _this.insertRuleSelectorPropStr(this.styleSheet, selector, propStr)
+                    , propStr = content || this.getPropStr(rules)
+                    , selector = rules[0]
+                    , _ruleIndex = _this.insertRuleSelectorPropStr(this.styleSheet, selector, propStr)
+                    ;
                 this.sheetRule = this.styleSheet.rules[_ruleIndex]
                 this.rule = _ruleIndex
             }
@@ -248,10 +482,11 @@ class DynamicCSSStyleSheet {
                     return this.render(content)
                 }
                 let before = this.sheetRule.cssText
-                let rules = this.conf
-                let selector = rules[0];
-                let propStr = content == undefined ? this.getPropStr(this.conf): content
-                let after = `${selector} {${propStr}}`
+                    , rules = this.conf
+                    , selector = rules[0]
+                    , propStr = content == undefined ? this.getPropStr(this.conf): content
+                    , after = `${selector} {${propStr}}`
+                    ;
                 this.styleSheet.replace(`${before} ${after}`)
             }
         }
@@ -340,7 +575,7 @@ class DynamicCSSStyleSheet {
  * Represents the addons for the class.
  * @type {Object}
  */
-DynamicCSSStyleSheet.addons = {}
+;DynamicCSSStyleSheet.addons = {};
 
 
 // export {
@@ -356,12 +591,6 @@ to generate a graph of possible values.
     const cg = generateClassGraph()
  */
 
-const kebabCase = function(str, sep='-') {
-    let replaceFunc =  ($, ofs) => (ofs ? sep : "") + $.toLowerCase()
-    return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, replaceFunc)
-}
-
-
 const generateClassGraph = function(config={}){
     let cg = new ClassGraph(config)
     cg.generate()
@@ -369,26 +598,10 @@ const generateClassGraph = function(config={}){
 }
 
 
-const colorPrebits = function() {
-    /*
-        hex     1
-        rgba    4
-        rgb     3   3/1
-        hsl     3   3/1
-        hwb     3   3/1
-        lab     3   3/1
-        lch     3   3/1
-        oklab   3   3/1
-        oklch   3   3/1
-        color   4   4/1
-     */
-}
-
-
 class ClassGraph {
 
     sep = '-'
-    escapeRegex = /[<>*%#()=.@+?\/]/g
+    escapeRegex = /[<>*% #():=.@+?\/]/g
     dcss = new DynamicCSSStyleSheet(this)
 
     constructor(conf) {
@@ -435,9 +648,8 @@ class ClassGraph {
         If the _next_ node is a tree node, continue - if it's a value node, release
      */
     generate(node){
-
-        node = node || document.body
-        let items = Object.entries(node.style)
+        //node = node || document.body
+        let items = Object.entries(node?.style || {})
         for(let [name, value] of items) {
             this.addCamelString(name)
         }
@@ -514,13 +726,17 @@ class ClassGraph {
 
     getRoot(){
         if(!this.graph) {
-            this.graph = {
-                [this.nodeWord()]: {}
-                , meta: { key: 'root', isRoot: true }
-                , key: 'root'
-            }
+            this.graph = this.generateRootGraph()
         }
         return this.graph
+    }
+
+    generateRootGraph() {
+        return {
+            [this.nodeWord()]: {}
+            , meta: { key: 'root', isRoot: true }
+            , key: 'root'
+        }
     }
 
 
@@ -616,7 +832,7 @@ class ClassGraph {
         If the leafs' next step is not a node, parse the values.
         reject leaf-only definitions.
      */
-    objectSplit(str, sep=this.sep, safe=true) {
+    objectSplit(str, sep=this.sep, safe=true, index=-1) {
         /* Parse a potential new css class. */
 
         let rawKeys = typeof(str) == 'string'? str.split(sep): str
@@ -634,6 +850,86 @@ class ClassGraph {
         if(this.isVendorPrefixMatch(keys)) {
             // console.log('Vendor Match!')
             //
+            // Slice away the vendor.
+            keys = keys.slice(this.getPrefixes().length)
+        } else {
+            // console.log('does not match vendor', keys)
+            if(this.vendorLocked) {
+                // nully obj.
+                return {
+                    props:undefined,
+                    values:undefined,
+                    str,
+                    index,
+                    node: currentNode,
+                    valid: false
+                }
+            }
+        }
+
+        for(let k of keys) {
+            // loop until a leaf, where the _next_ key is not a value node.
+            currentNode = node[nodeWord][k]
+            c1 += 1
+            let isLastNode = (l == c1)
+
+            if(currentNode == undefined) {
+                if(safe) { break };
+                continue
+            }
+
+            if(currentNode.leaf === true) {
+                // if the next node is invalid, the next keys are values.
+                let nextKey = keys[c1]
+                let currentGraph = currentNode[nodeWord]
+                if( (currentGraph && currentGraph[nextKey]) == undefined ) {
+                    break
+                }
+            }
+
+            node = currentNode
+        }
+
+        // grab the next keys
+        let props = keys.slice(0, c1)
+        let values = keys.slice(c1)
+        let r = {
+            props, values, str,
+            node: currentNode,
+            index,
+            valid: currentNode && (values.length > 0) || false
+        }
+
+        // this.translateValue(r)
+        return r
+    }
+
+    minorCapture(str, sep=this.sep, safe=true) {
+        /* Parse a potential new css class. */
+
+        let rawKeys = typeof(str) == 'string'? str.split(sep): str
+            // The forward keys to iterate such as [foo, bar],
+            // early converted through the aliasing.
+            // Will change later due to vendor prefix.
+            , keys = this.aliasConvert(rawKeys)
+            , l = keys.length
+            // The key 'word' used to hold the nested object
+            // within a node.
+            , nodeWord = this.nodeWord()
+            // The _current_ position starts at the root base
+            // of the tree - rewritten during iteration to match
+            // the _currentnode_
+            , node = this.getRoot()
+            // The iterative current state node, usually matching `node` unless
+            // an error occurs.
+            , currentNode
+            // c1 rather than c (count).
+            // As all references require the count+1
+            // - but "c" is usually a 0 index counter
+            , c1 = 0
+            ;
+
+        if(this.isVendorPrefixMatch(keys)) {
             // Slice away the vendor.
             keys = keys.slice(this.getPrefixes().length)
         } else {
@@ -701,20 +997,20 @@ class ClassGraph {
         res = cg.insertLine('alpha-red', {color: 'red'})
         res.renderAll()
 
-    Creates:
+        Creates:
 
-        .alpha-red {
-            color: red
-        }
+            .alpha-red {
+                color: red
+            }
 
-    render must be called on each returned rule. `renderAll`
-    is a special function on the returned array, calling `render` on
-    each sub item.
+        render must be called on each returned rule. `renderAll`
+        is a special function on the returned array, calling `render` on
+        each sub item.
 
-    The function converts the statement into a splitobject,
-    and applies it to the stylesheet through `insertRule`
+        The function converts the statement into a splitobject,
+        and applies it to the stylesheet through `insertRule`
 
-    returns the result from insertRule, an Array of Rules.
+        returns the result from insertRule, an Array of Rules.
     */
     insertLine(selectorStatement, props) {
         let spl = this.objectSplit(selectorStatement)
@@ -812,23 +1108,23 @@ class ClassGraph {
     }
 
     /* Walk forward through a list of values, until the walk is exausted.
-    The loop is goverened by each discovered function, A receiver function
-    must return `[inStack, outStack, currentIndex]`, for the next function
-    to receive.
+        The loop is goverened by each discovered function, A receiver function
+        must return `[inStack, outStack, currentIndex]`, for the next function
+        to receive.
 
-        const receiver =  function(splitObj, inStack, outStack, currentIndex) {
-            return [inStack, outStack, currentIndex]
-        }
+            const receiver =  function(splitObj, inStack, outStack, currentIndex) {
+                return [inStack, outStack, currentIndex]
+            }
 
-    Digest any keys from `inStack`,
-    Add any values to `outStack` to push results to the final results.
-    currentIndex defines where (within the vals) the forward processor is -
-    at the time of functional entry.
+        Digest any keys from `inStack`,
+        Add any values to `outStack` to push results to the final results.
+        currentIndex defines where (within the vals) the forward processor is -
+        at the time of functional entry.
 
-    The function returns the index for the next iteration, when the
-    inStack.slice(currentIndex) to digest the _ongoing_ keys.
+        The function returns the index for the next iteration, when the
+        inStack.slice(currentIndex) to digest the _ongoing_ keys.
 
-    returning an index _past_ the length of the `inStack` will end the loop.
+        returning an index _past_ the length of the `inStack` will end the loop.
      */
     forwardDigestKeys(splitObj, vals) {
         let iterating = true;
@@ -839,6 +1135,7 @@ class ClassGraph {
 
         /* Discover any "special" keys to digest the value processing,
         such as "vars-*" */
+
         while (iterating) {
             // Each function return a _result_ (appended or untouched),
             // and the next keys. Next keys > 0 == iterating
@@ -851,7 +1148,7 @@ class ClassGraph {
                                             inStack, outStack, currentIndex)
                 // console.log('Results.', inStack, outStack, currentIndex)
             } else {
-                outStack.push(inStack[currentIndex])
+                outStack.push(this.beforeOutStack(inStack[currentIndex], currentIndex, splitObj))
             }
 
             currentIndex += 1
@@ -860,6 +1157,7 @@ class ClassGraph {
                 iterating = false;
             }
         }
+
         // for (var i = 0; i < (vals || []).length; i++) {
         //     let k = vals[i]
         //     let digest = this.translateMap[k]
@@ -874,6 +1172,174 @@ class ClassGraph {
 
     }
 
+    /*
+    A map of all functions to perform single item value checking before the
+    value is pushed into the outbound stack.
+
+    These functions execute on every input value
+     */
+    keyValueFunctions = new Map()
+    beforeOutStack(inStackValue, currentIndex, splitObj) {
+        // console.log('Pushing', inStackValue, splitObj)
+        let callList = this.getKeyFunctionMatch(inStackValue)
+        let res = this.collapseFunctions(callList, splitObj)
+        return res == undefined? inStackValue: res;
+        // return (res && res?.handler(res, splitObj)) || inStackValue
+    }
+
+    /*
+        Receive a call list generated by the key function matching tool
+        to reduce the chained functions to a single value.
+
+            let s = "red.functionName.anotherFunction"
+            let callList = this.getKeyFunctionMatch(s)
+            let resultString = this.collapseFunctions(callList, splitObj)
+
+        The splitObj is not utilised during the collapse (only given
+        to the handler function.)
+
+        Note; the calllist iterates in reverse as the _last_ item in the calllist tree is
+        the first (from left) function split
+
+        The iterator collapses upward, giving the _previous result_ to the next.
+     */
+    collapseFunctions(callList, splitObj) {
+
+        // run backward, passing the _last_ value resolved to the previous function
+        // "color-red.raise.forceGreen"
+        // color: forceGreen(raise(red))
+        let result = undefined;
+        for (var i = callList.length - 1; i >= 0; i--) {
+            let item = callList[i]
+            let value = result == undefined? item.remainder: result
+            let handler = item.handler
+            // If the handler is missing at this point, the developer
+            // assigned an unknown function.
+            // Capture and default to the _previous_ result,
+            // this essentially _skips_ unknown functional calls.
+            // However an Error may be better.
+            result = handler && handler(value, item, i, splitObj) || result
+        }
+        return result
+
+    }
+
+    getKeyFunctionMatch(fullString) {
+        /* iterate backward, tokensizing dicovered functions
+        until the resource is exausted.*/
+        let backLoop = fullString != undefined;
+        let lastVal = fullString
+        let res = []
+        while(backLoop) {
+            let item = this.getKeyFunctionMatchOnce(lastVal)
+            if(item.success == false) {
+                // console.log('breakout on', item.match.name)
+                // console.log('breakout on', item)
+                //break
+            }
+
+            backLoop = item.match.start > -1
+            if(backLoop) {
+                /* Parsing errors yield "partial" keys if success is false.
+                If this occurs on the very last item,
+                the indexed iterator yields a poor value to push into a
+                _non_ function.*/
+                lastVal = item.remainder
+                res.push(item)
+            }
+
+        }
+
+        // take one from the end and
+        // reloop:
+        //      color-red.raise.forceGreen
+        //                      forceGreen  red.raise -> 'Green'
+        //                raise 'Green' -> `shadeUp(color)` -> lighterGreen
+        //           lighterGreen
+
+
+        // the preceding function should accept the value of
+        // the last return.
+        // the last return should provide a _new_ string for back-slicing.
+
+        return res
+    }
+
+    getKeyFunctionMatchOnce(fullString, keyDelimiter='.', argumentDelimiter=':') {
+
+        let start = fullString.lastIndexOf(keyDelimiter)
+        let end = fullString.length
+        let bits = fullString.slice(start+1, end).split(argumentDelimiter)
+        let name = bits[0]
+        let args = bits.slice(1)
+
+        let handler = this.keyValueFunctions.get(name)
+
+        let res = {
+            // The input string
+            value: fullString
+            // The result from the split of the discovered functio
+            , remainder: fullString.slice(0, start)
+            // The mapped function and any discovered argments
+            , handler, args
+            // The object denoting the position of the match.
+            , match: {
+                start
+                , end
+                , name
+            }
+        }
+
+        res.success = handler != undefined
+
+        return res
+    }
+
+    /*
+        Use minimal processing to capture any classes with starting with the
+        given keys.
+
+        return a list of matching keys
+     */
+    filterClasses(origin, keys, asDict=false) {
+        let classList = origin.classList
+            , res = asDict? {}: []
+            , push = (k, e, i) => res.push([i,e])
+            ;
+        if(asDict) {
+            push = (k, e, i) => res[k] = [i, e]
+        }
+
+        classList.forEach(function(e, i, a){
+            let first = e.split('-')[0]
+            if(keys.indexOf(first) > -1) {
+                push(first, e, i)
+                // res.push(e)
+                // res[first] = e
+            }
+        })
+
+        return res
+    }
+
+    /* Perform a filterClasses and process each entry as as a split.*/
+    filterSplit(origin, keys, asDict=false) {
+        let classes = this.filterClasses(origin, keys, asDict)
+        if(asDict) {
+            let res = {}, index =0
+            for(let k in classes) {
+                let e = classes[k]; // [index, value]
+                res[k] = this.objectSplit(e[1], undefined, undefined, e[0])
+            }
+            return res
+        }
+
+        let res = []
+        classes.forEach((e)=>{
+            res.push(this.objectSplit(e))
+        })
+        return res
+    }
 
     /*Given a special splitobject using `objectSplit()`, convert to a css
       style and insert into the dynamic stylesheet.
@@ -910,6 +1376,7 @@ class ClassGraph {
         let handlerRes = {
             insert:true
         }
+
         let handlerFunc = splitObj.node?.handler?.bind(splitObj)
         if(handlerFunc) {
             // executing the handler and replace the handlerRes if required.
@@ -949,19 +1416,19 @@ class ClassGraph {
     }
 
     /* Convert the given `entity` to a CSS Selector string. The entity may be:
-    + array: of strings
-    + string
-    + object: with `props`: array of strings
-    + object: with `str` as string
+        + array: of strings
+        + string
+        + object: with `props`: array of strings
+        + object: with `str` as string
 
-        this.asString('margin-top-.5em', withParentSelector=false)
-        ".margin-top-\\.5em"
+            this.asString('margin-top-.5em', withParentSelector=false)
+            ".margin-top-\\.5em"
 
-        this.asString('margin-top-.5em', withParentSelector=true)
-        ".acme-labs .margin-top-\\.5em"
+            this.asString('margin-top-.5em', withParentSelector=true)
+            ".acme-labs .margin-top-\\.5em"
 
-    If a parent selector exists, this is applied as a prefix to the selector
-    Return a string, CSS selector escaped
+        If a parent selector exists, this is applied as a prefix to the selector
+        Return a string, CSS selector escaped
     */
 
     asSelectorString(entity, withParentSelector=true) {
@@ -1104,13 +1571,14 @@ class ClassGraph {
     }
 
     safeInsertMany(entity, classes) {
+        let index = 0 
         for(let name of classes) {
-            this.safeInsertLine(name, entity)
+            this.safeInsertLine(name, entity, index++)
         }
     }
 
-    safeInsertLine(name, entity) {
-        let spl2 = this.objectSplit(name)
+    safeInsertLine(name, entity, index=-1) {
+        let spl2 = this.objectSplit(name, undefined, undefined, index)
         if(spl2.valid) {
             // console.log('Inserting', spl2)
             spl2.origin = entity
@@ -1120,30 +1588,32 @@ class ClassGraph {
         // this.isBranch(spl2)
     }
 
-    getAllClasses(parent=document.body, deep=false) {
+    getAllClasses(parent=document.body, deep=false, includeParent=true) {
         // console.log('Process.')
 
-        if(deep) {
-
-            let allClasses = new Map()
-            parent.querySelectorAll('*').forEach(function(node) {
-                allClasses.set(node, new Set(node.classList)) // .forEach(x=>allClasses.add(x))
-            });
-
-            // then test in the tree.
-            // console.log(allClasses)
-            return allClasses
+        let stackClasses = function(node) {
+            // Do whatever you want with the node object.
+            node.classList.forEach(x=>allClasses.add(x))
         }
 
         let allClasses = new Set()
-        parent.querySelectorAll('*').forEach(function(node) {
-            // Do whatever you want with the node object.
 
-            node.classList.forEach(x=>allClasses.add(x))
-        });
+        if(deep) {
+            /* Remap the outbound unit to a Map rather than a Set
+            each map key is the entry node for the classes.
 
-        // then test in the tree.
-        // console.log(allClasses)
+            Rewrite the stacking function to use a Map */
+
+            allClasses = new Map()
+            stackClasses = function(node) {
+                allClasses.set(node, new Set(node.classList)) // .forEach(x=>allClasses.add(x))
+            }
+        }
+
+        ;includeParent && stackClasses(parent);
+
+        parent.querySelectorAll('*').forEach(stackClasses);
+
         return allClasses
     }
 
@@ -1180,6 +1650,7 @@ class ClassGraph {
 //     ClassGraph
 // }
 
+
 /**
  * Polyclass.js
  *
@@ -1188,7 +1659,7 @@ class ClassGraph {
  */
 
 
-(()=>{
+// ;(()=>{
 
 class PolyObject {
 
@@ -1197,17 +1668,33 @@ class PolyObject {
         this.units = polyUnits
         console.log('me:', config)
         let cg = new ClassGraph(config)
-        cg.generate()
+        cg.generate(config?.target)
         this._graph = cg
 
+        const _htmlNode = this?.HTMLElement || function(){}
+        // PolyWrapped or {} classical
+        let func = (config instanceof _htmlNode)? this.hotLoad: this.loadConfig
+        func.bind(this)(config)
+    }
+
+    hotLoad(node) {
+        console.log('Hotload')
+        return this.loadConfig({
+            target: node
+            , process: false
+            // , isInline: true
+        })
+    }
+
+    loadConfig(config) {
+        console.log('load', config)
         if(config?.processOnLoad) {
             this.processOnLoad(config.processOnLoad)
         }
 
-        if(config?.target) {
+        if(config?.target && config?.process != false) {
             this.process(config.target)
         }
-
 
         if(config?.isInline) {
             // test for active attributes
@@ -1216,7 +1703,6 @@ class PolyObject {
                 this._graph.monitor(config.target)
             }
         }
-
 
         this.innerProxyHandler = {
             reference: this
@@ -1255,6 +1741,26 @@ class PolyObject {
         this.proxy = new Proxy(this.innerHead, this.innerProxyHandler)
     }
 
+    /* Return the current poly graph of keys. */
+    get graph() {
+        return this._graph
+    }
+
+    /*
+        Return the graph CSS dynamic Stylesheet instance.
+    */
+    get sheet() {
+        return this._graph.dcss
+    }
+
+    /*
+        Return the given configuration for this Polyclass instance.
+        return object
+    */
+    get config() {
+        return this._graph.conf
+    }
+
     getParsedAttrValue(name, target, _default=undefined) {
         target = target || this._graph.conf.target;
         const attrs = target.attributes
@@ -1268,6 +1774,16 @@ class PolyObject {
 
         const attrValue = JSON.parse(val)
         return attrValue;
+    }
+
+    /*
+    Return the instance from the units, matching the entity.
+    if the entity is undefined, return the polyobject for _this_ target.
+     */
+    getInstance(entity) {
+        if(entity === undefined) { entity = this.target }
+        let id = entity?.dataset?.polyclassId || entity
+        return polyUnits.get(id)
     }
 
     processOnLoad(){
@@ -1340,7 +1856,7 @@ class PolyObject {
     }
 
     asString() {
-        return this._graph.asCSSText()
+        return this._graph.getCSSText()
     }
 }
 
@@ -1356,6 +1872,7 @@ const polyclassHead = function(){
 };
 
 const polyUnits = new Map()
+
 
 const polyclassProxy = {
     /* The handler for the main polyclass instance.
@@ -1374,11 +1891,12 @@ const polyclassProxy = {
         let realTarget = this.getInstance();
 
         if(property in realTarget) {
+            let val = realTarget[property];
 
-            if(realTarget[property] && realTarget[property].bind) {
-                return realTarget[property].bind(realTarget)
+            if(val && val.bind) {
+                return val.bind(realTarget)
             }
-            return realTarget[property]
+            return val
         };
         // console.warn(`No property ${property} on receiver`, realTarget)
 
@@ -1397,6 +1915,7 @@ const polyclassProxy = {
             return this._instance
         }
         this._instance = this.newInstance.apply(this, arguments)
+        this.safeSpace['instance'] = this._instance
         return this._instance
     }
 
@@ -1406,52 +1925,44 @@ const polyclassProxy = {
             Polyclass(argsList)
             new Polyclass(argsList)
          */
-        console.log('Polyclass apply...', argsList)
+        console.log('Polyclass apply...', target, thisArg, argsList)
+         if(argsList[0] instanceof HTMLElement) {
+            console.log('Wrapped', )
+            return this.newInstance.apply(this, argsList)
+         }
         // get singleton
         return this.getInstance.apply(this, argsList)
     }
 }
 
 
-window.Polyclass = new Proxy(polyclassHead, polyclassProxy)
-window.polyUnits = polyUnits
+const Polyclass = new Proxy(polyclassHead, polyclassProxy)
+// window.polyUnits = polyUnits
 
-/* Upon document load, process and *[polyclass] entity. Similar to process() */
-const autoActivator = function(watch=document){
 
-    // console.log('Monitor', watch)
+// })();
 
-    watch.addEventListener('DOMContentLoaded', function(){
-        onDomLoaded()
-    }.bind(this))
+
+// Export the modules or components that should be accessible to users
+export {
+  DynamicCSSStyleSheet, RenderArray, ClassGraph, Polyclass
 };
-
-
-const onDomLoaded = function() {
-    const targets = document.querySelectorAll('*[polyclass]');
-    console.log('Discovered', targets.length)
-    for(let target of targets){
-        let polyclassId = Math.random().toString(32).slice(2)
-        let pc = new Polyclass({target, isInline:true})
-        target.dataset.polyclassId = polyclassId
-        // polyUnits[polyclassId] = pc;
-        polyUnits.set(polyclassId, pc)
-    }
-}
-
-autoActivator();
-
-})();
-
 /**
- * # Mouse Events mouse-[event]-*
+ * # Events event-[eventName]-[action]-[params]*
+ *
+ * Create event handlers for actions on an entity.
+ *
+ * For example on "click" event, toggle the class "border-var-generic-border"
+ *
+ *      "event-click-toggle-border-var-generic-border"
+ *
  */
-(function(){
+;(function(){
 
     let cg;
 
     const insertReceiver = function(){
-        console.log('mouse-event receiver')
+        console.log('event receiver')
 
         ClassGraph.addons.varTranslateReceiver = function(_cg){
             cg = _cg;
@@ -1499,7 +2010,9 @@ autoActivator();
                 /* Perform a class "toggle" in some shape. */
                 console.log(parts, others, action)
                 e.currentTarget.classList.toggle(parts.join('-'))
-                
+            }
+            , setvar() {
+                /* Set the variable name to the given value */
             }
         }
 
@@ -1557,7 +2070,7 @@ autoActivator();
  *
  *
  */
-const fontPackReceiver = (function(){
+;(function(){
 
     let cg;
 
@@ -1597,10 +2110,9 @@ const fontPackReceiver = (function(){
 
         // Tokenize as a family string.
         //
-        values = obj.values
-
-        let fonts = createFontObjects(values)
-        let familyStrings = createFamilyString(values, fonts)
+        const values = obj.values, origin = obj.origin;
+        let fonts = createFontObjects(values, origin, obj)
+        let familyStrings = createFamilyString(values, fonts, origin)
 
         // let families = tokenize(values)
 
@@ -1608,12 +2120,12 @@ const fontPackReceiver = (function(){
         // console.info('Installing Google fonts: familyStrings:', familyStrings)
         generateGoogleLinks(familyStrings).forEach((x)=>document.head.appendChild(x))
 
-
         // Install additional css additions
-        installFontObjects(fonts)
+        installFontObjects(fonts, obj)
     }
 
-    const installFontObjects = function(fonts) {
+    const installFontObjects = function(fonts, splitObj) {
+
         // // For value create a font-family;
         for(let pack of Object.values(fonts)) {
             let name = pack.first
@@ -1627,7 +2139,6 @@ const fontPackReceiver = (function(){
         }
     }
 
-
     const toTitleCase = function(str) {
         /*convert a string (expected font string) to a title case version
         This also title-cases +prefix string
@@ -1638,10 +2149,10 @@ const fontPackReceiver = (function(){
         return str.replace(/(^|[\s+])\S/g, function(t) { return t.toUpperCase() });
     }
 
-    window.toTitleCase = toTitleCase
+    // window.toTitleCase = toTitleCase
 
-    const createFamilyString = function(values, fonts) {
-        fonts = fonts || createFontObjects(values)
+    const createFamilyString = function(values, fonts, origin) {
+        fonts = fonts || createFontObjects(values, origin)
         let fs = function(e) {
             return `family=${e.str}`
         }
@@ -1671,11 +2182,12 @@ const fontPackReceiver = (function(){
                 900:{int: 900, regu: 1, ital: 1}
          */
         let res = {}
+        const asSelector = cg.asSelectorString.bind(cg)
         for(let token of Object.values(pack.tokens)) {
             // console.log('making on token' , token)
             let def = {
                 'font-weight': token.int
-                , 'font-family': `'${pack.cleanName}', sans-serif`
+                , 'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
             let selectorBits = ['font', pack.first]
 
@@ -1686,8 +2198,8 @@ const fontPackReceiver = (function(){
                 }
 
                 let selectorRange = selectorBits.concat([key.token])
-                let packName = cg.asSelectorString(selectorRange)
-                let packNameLower = cg.asSelectorString(selectorRange).toLowerCase()
+                let packName = asSelector(selectorRange)
+                let packNameLower = asSelector(selectorRange).toLowerCase()
                 // console.log(packName, newDef)
                 res[`${packName}, ${packNameLower}`] = newDef
             }
@@ -1696,24 +2208,96 @@ const fontPackReceiver = (function(){
 
         // Produce a default, withouta size: "font-pack-alta-400-500-600"
         // font-alta-400, ..., font-alta
-        let fontOnlyName = cg.asSelectorString(['font', pack.first])
-        res[fontOnlyName] = {
-                'font-family': `'${pack.cleanName}', sans-serif`
+        let fontOnlyPlusName = asSelector(['font', pack.first])
+        let fontOnlyDashName = asSelector(['font'].concat(pack.first.split('+')))
+        let strings = new Set([
+                        fontOnlyPlusName
+                        , fontOnlyDashName
+                        , fontOnlyPlusName.toLowerCase()
+                        , fontOnlyDashName.toLowerCase()
+                        ])
+
+        res[Array.from(strings).join(', ')] = {
+                'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
         return res
     }
 
-    const createFontObjects = function(values) {
+    /*
+        Given a list of keys, return class-name properties with any
+        matching key.
+
+            "font-pack-roboto default-sans-serif"
+
+            getSiblingMutators(['default'], origin)
+
+            default: 'sans-serif
+     */
+    const getSiblingMutators = function(keys, origin) {
+        let results = cg.filterSplit(origin, keys, true)
+        console.log('getSiblingMutators', results)
+        return results
+    }
+
+    const createFontObjects = function(values, origin, splitObj) {
         // family=Roboto:wght@300
         // let familyStrings = '' //"family=Roboto:wght@300"
         let index = 0
         let fonts = {}
-
+        let _origin = splitObj?.origin || origin;
         let currentFont;
         let regex = /([a-zA-Z-]{0,}?)(\d+)/;
         let REGULAR = 'r' // a no definition (standard) font
+        /*
+           skip bad tokens
+         */
         let skipEmpty = true
+        /*
+            Enable many fonts to be applied within one class-name
+            If false, the string will be classified as a bad tokenised
+            string and any _additional_ bad token properties are
+            considered Values.
+         */
         let manyFont = true
+        /*
+            If true, allow the appliance of modifiers with an index
+            before the primary class.
+            If False, the modifier is ignored
+         */
+        let softIndex = true
+        /*
+            If true, error out if the modifier index is above the
+            primary class index.
+            If False, the contribution will continue and potentially
+            allow the softmax to continue.
+         */
+        let errorSoftIndex = false
+        // capture the default font from an additional class.
+        let sibling = getSiblingMutators(['default'], _origin)
+        let defaultFont = 'sans-serif'
+        let d = sibling['default']
+        if(d) {
+            if(d.index <= splitObj.index) {
+                // The modifier class is applied before the appliance class.
+                // if softIndex = True, allow it.
+                // if false, ignore it.
+                let func = softIndex? 'warn': 'error'
+                let s = 'font default-* modifier should be indexed after font'
+                console[func](s)
+                if(!softIndex) {
+                    // ignore this entry
+                    if(errorSoftIndex) {
+                        throw new Error(s)
+                    }
+                } else {
+                    // Apply anyway
+                    defaultFont = d.values.join(' ')
+                }
+            } else {
+                defaultFont = d.values.join(' ')
+            }
+
+        }
 
         for(let t in values) {
 
@@ -1736,7 +2320,7 @@ const fontPackReceiver = (function(){
             // if token is weight, stack into the previous (current) font.
             if(index == 0) {
                 // the first token should be a font.
-                fonts[index] = { first: token, tokens:{} }
+                fonts[index] = { first: token, tokens:{}, defaultFonts: defaultFont }
                 currentFont = index
                 index++;
                 continue
@@ -1833,24 +2417,49 @@ const fontPackReceiver = (function(){
         return fonts
     }
 
+    /*
+    Ensure the pack contains one or more tokens.
+
+    This mutates pack.tokens if no tokens are given.
+    returns a list of tokenValues, or the _tokens_ of the pack.
+     */
+    const ensureTokens = function(pack) {
+
+        let tokenValues = Object.values(pack.tokens)
+
+        if(tokenValues.length == 0) {
+            pack.tokens["400"] = {
+                    int: 400,
+                    regu:1,
+                    keys: new Set([
+                            { isItal: undefined, token: "400"}
+                          ])
+                } // Install a default font size
+        }
+
+        return Object.values(pack.tokens)
+    }
+
     const extendPack = function(pack) {
-        let titleToken = toTitleCase(pack.first);
+        let titleToken = toTitleCase(pack.first)
+            , tokenValues = ensureTokens(pack)
+            , allTokens = Object.assign({}, ...tokenValues)
+            , hasItal = allTokens.ital != undefined
+            , formatStringParts = []
+            , weightValues = new Set
+            ;
 
-        let allTokens = Object.assign({}, ...Object.values(pack.tokens))
-        let hasItal = allTokens.ital != undefined
-
-        let formatStringParts = []
         if(hasItal) { formatStringParts.push('ital') }
         if(hasItal || allTokens.regu) { formatStringParts.push('wght') }
 
-        let weightValues = new Set
 
         for(let key in pack.tokens) {
             let token = pack.tokens[key]
-            // console.log(token)
-            let ital = token.ital? 1: 0
-            let int = token.int
-            let a = hasItal? [ital]: []
+                , ital = token.ital? 1: 0
+                , int = token.int
+                , a = hasItal? [ital]: []
+                ;
+
             a.push(int)
             let weightStr = a.join(',')
             weightValues.add(weightStr)
@@ -1864,7 +2473,8 @@ const fontPackReceiver = (function(){
             }
         }
 
-        let weights = Array.from(weightValues).sort()//.join(';')
+        let weights = Array.from(weightValues).sort()
+
         let totalWeightStr = weights.join(';')
         let formatString = formatStringParts.join(',')
         let str = `${titleToken}:${formatString}@${totalWeightStr}`
@@ -1944,7 +2554,7 @@ const fontPackReceiver = (function(){
  * If the view is a SPA or all the possible classes are _used_ on
  * the view, this isn't required.
  */
-(()=>{
+;(()=>{
 
 let cg;
 
@@ -2013,8 +2623,8 @@ const classMutationDetection = function(mutation) {
     //             , mutation.target
     //             , `classes: "${classes}"`
     //         )
-    let new_spl = classes.split(' ')
-    let old_spl = old.split(' ').map((v)=>v.trim())
+    let new_spl = classes.split(/(?!\(.*)\s(?![^(]*?\))/g); //split(' ')
+    let old_spl = old == null ? []: old.split(' ').map((v)=>v.trim())
     let newItems = old_spl? difference(new_spl, old_spl): new_spl
     console.log('new', newItems)
     // let removedItems = difference(old_spl, new_spl)
@@ -2072,7 +2682,7 @@ Manipulating the var propagates to the view:
 
  */
 
-const varsReceiver = (function(){
+;(function(){
 
     let cg;
     let rootDeclaration = {};
@@ -2179,7 +2789,7 @@ const varsReceiver = (function(){
  *          "border-top": var(--primary-edges)
  *      }
  */
-const varTranslateReceiver = (function(){
+;(function(){
 
     let cg;
 

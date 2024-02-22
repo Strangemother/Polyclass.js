@@ -25,7 +25,7 @@ const pc = Polyclass({
     }
 })
 
-
+pc.graph.generate(document.body)
 pc.processOnLoad(document.body)
 
 //// Monitor for future nodes.

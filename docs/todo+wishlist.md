@@ -32,6 +32,168 @@ Items I want in the lib - some in progress
 + Dynamic Css Import
 + _though_ key function
 
+
+---
+
+## sibling mutators
+
+if a class is assigned with a sibling class,mutate the outbound declaration:
+
+primary:
+
+    font-pack-robot-100-300-400
+
+sibling:
+
+    font-family-default-sans-serif
+    font-default-sans-serif
+    default-sans-serif
+
+Result:
+
+    font-family-default-sans-serif font-pack-robot-100-300-400
+    font-pack-robot-100-300-400 default-sans-serif
+
+    font-here-roboto default-sans-serif
+
+
+## value remap
+
+as a value is tested, asset a simple map replacement.
+
+The _unpack_ can be other objects.
+
+
+    color-red           // classical
+    color-var-primary   // vars()
+    color-rebecca       // mapped
+            #336699
+    color-other         // re-mapped
+            rebecca     ...
+    color-follow         // another re-mapped
+            ...
+            we can return additional property values.
+
+To allow _remapping_ of props
+
+
+---
+
+Better addon receiver.
+
++ Plug in before or after instansiation
++ target Polyclass, classgraph, or the other one
+
+
+----
+
+# .reshade-
+
+A first implementation of "functions" on a value.
+
+    color-red.reshade+1
+    color-red.reshade-10
+
+Allowing the reshade relative to a color stepping function (quantized step)
+
+# .revalue
+
+Convert a value to another value through a pre-map
+
+globals
+
+    {
+        red: orange
+    }
+
+property
+
+    {
+        color: {
+            red: #880000
+        }
+
+        background: {
+            red: linear-gradient(red, #880000)
+        }
+    }
+
+entity
+
+    {
+        p: {
+            color: {
+                red: 'color.red.reshade+2'
+            }
+        }
+
+        strong: {
+            color: {
+                red: 'p.color.red.reshade-2'
+            }
+        }
+    }
+
+## Image
+
+With functional values, we can implement more advanced capture and replace methods.  The `*-img*` property can be configured to redirect a _short name_ to a static path location:
+
+    polyclass.staticPath = 'https://imghost/foo/bar?name='
+
+Usage rebinds the inbound path:
+
+    <div class='background-image-img-apples'></div>
+
+result
+
+    {
+        background-image: url('https://imghost/foo/bar?name=apples');
+    }
+
+
+## sub-var:
+
+    color-var-apples
+
+    // no
+    color-var-top-next
+
+    // yes
+    color-var-top.next
+
+
+## var accessor $
+
+Currently to assign a var:
+
+    [prop]-var-[name]
+    color-var-apples
+
+with a short:
+
+    color-v-apples
+
+the accessor uses a special syntax:
+
+    $color-apples
+
+or maybe:
+
+    color-$apples
+    color-$top.next
+
+## Magic @rules
+
+Define any @property : value, where the property can be a "magic" rule to unpack the inner rules and apply them to the outer declaration. This allows multi-decarlation repacking.
+
+## font-here-*
+
+Combine `font-pack-*` and `font-*` into a single statement, binding both classes into a merged object - or as one token
+
+    font-here-roboto-400
+
+
+
 ## polyclass active switch
 
 Enable polyclass in the view without JS, using an auto-switch in the
@@ -448,3 +610,27 @@ Apply a function to capture the usage of a key using transition through a node:
 
     // margin-* was called
     // margin-* was called
+
+
+## through key prefix populate
+
+apply _through_ key capture to apply pre selector components to the css declaration
+
+    cg.addThrough(['dark'], function(splitObj){
+        return splitObj.prefixAppend('.dark ')
+    })
+
+    <div class='dark-margin-top-10em'></div>
+
+    .dark .margin-top-10em,
+    .dark dark-margin-top-10em {
+        margin-top: 10em;
+    }
+
+This only activates if a parent has the class of dark
+
+    <div class='margin-top-10em'>
+        <div class='dark-margin-top-10em'></div>
+    </div>
+
+An issue may arise with the prefix within the class-name, as during the dark-phase the class-name must loose its prefix; pretty ugly.

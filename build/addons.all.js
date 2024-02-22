@@ -1,12 +1,19 @@
 /**
- * # Mouse Events mouse-[event]-*
+ * # Events event-[eventName]-[action]-[params]*
+ *
+ * Create event handlers for actions on an entity.
+ *
+ * For example on "click" event, toggle the class "border-var-generic-border"
+ *
+ *      "event-click-toggle-border-var-generic-border"
+ *
  */
-(function(){
+;(function(){
 
     let cg;
 
     const insertReceiver = function(){
-        console.log('mouse-event receiver')
+        console.log('event receiver')
 
         ClassGraph.addons.varTranslateReceiver = function(_cg){
             cg = _cg;
@@ -54,7 +61,9 @@
                 /* Perform a class "toggle" in some shape. */
                 console.log(parts, others, action)
                 e.currentTarget.classList.toggle(parts.join('-'))
-                
+            }
+            , setvar() {
+                /* Set the variable name to the given value */
             }
         }
 
@@ -112,7 +121,7 @@
  *
  *
  */
-const fontPackReceiver = (function(){
+;(function(){
 
     let cg;
 
@@ -152,10 +161,9 @@ const fontPackReceiver = (function(){
 
         // Tokenize as a family string.
         //
-        values = obj.values
-
-        let fonts = createFontObjects(values)
-        let familyStrings = createFamilyString(values, fonts)
+        const values = obj.values, origin = obj.origin;
+        let fonts = createFontObjects(values, origin, obj)
+        let familyStrings = createFamilyString(values, fonts, origin)
 
         // let families = tokenize(values)
 
@@ -163,12 +171,12 @@ const fontPackReceiver = (function(){
         // console.info('Installing Google fonts: familyStrings:', familyStrings)
         generateGoogleLinks(familyStrings).forEach((x)=>document.head.appendChild(x))
 
-
         // Install additional css additions
-        installFontObjects(fonts)
+        installFontObjects(fonts, obj)
     }
 
-    const installFontObjects = function(fonts) {
+    const installFontObjects = function(fonts, splitObj) {
+
         // // For value create a font-family;
         for(let pack of Object.values(fonts)) {
             let name = pack.first
@@ -182,7 +190,6 @@ const fontPackReceiver = (function(){
         }
     }
 
-
     const toTitleCase = function(str) {
         /*convert a string (expected font string) to a title case version
         This also title-cases +prefix string
@@ -193,10 +200,10 @@ const fontPackReceiver = (function(){
         return str.replace(/(^|[\s+])\S/g, function(t) { return t.toUpperCase() });
     }
 
-    window.toTitleCase = toTitleCase
+    // window.toTitleCase = toTitleCase
 
-    const createFamilyString = function(values, fonts) {
-        fonts = fonts || createFontObjects(values)
+    const createFamilyString = function(values, fonts, origin) {
+        fonts = fonts || createFontObjects(values, origin)
         let fs = function(e) {
             return `family=${e.str}`
         }
@@ -226,11 +233,12 @@ const fontPackReceiver = (function(){
                 900:{int: 900, regu: 1, ital: 1}
          */
         let res = {}
+        const asSelector = cg.asSelectorString.bind(cg)
         for(let token of Object.values(pack.tokens)) {
             // console.log('making on token' , token)
             let def = {
                 'font-weight': token.int
-                , 'font-family': `'${pack.cleanName}', sans-serif`
+                , 'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
             let selectorBits = ['font', pack.first]
 
@@ -241,8 +249,8 @@ const fontPackReceiver = (function(){
                 }
 
                 let selectorRange = selectorBits.concat([key.token])
-                let packName = cg.asSelectorString(selectorRange)
-                let packNameLower = cg.asSelectorString(selectorRange).toLowerCase()
+                let packName = asSelector(selectorRange)
+                let packNameLower = asSelector(selectorRange).toLowerCase()
                 // console.log(packName, newDef)
                 res[`${packName}, ${packNameLower}`] = newDef
             }
@@ -251,24 +259,96 @@ const fontPackReceiver = (function(){
 
         // Produce a default, withouta size: "font-pack-alta-400-500-600"
         // font-alta-400, ..., font-alta
-        let fontOnlyName = cg.asSelectorString(['font', pack.first])
-        res[fontOnlyName] = {
-                'font-family': `'${pack.cleanName}', sans-serif`
+        let fontOnlyPlusName = asSelector(['font', pack.first])
+        let fontOnlyDashName = asSelector(['font'].concat(pack.first.split('+')))
+        let strings = new Set([
+                        fontOnlyPlusName
+                        , fontOnlyDashName
+                        , fontOnlyPlusName.toLowerCase()
+                        , fontOnlyDashName.toLowerCase()
+                        ])
+
+        res[Array.from(strings).join(', ')] = {
+                'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
         return res
     }
 
-    const createFontObjects = function(values) {
+    /*
+        Given a list of keys, return class-name properties with any
+        matching key.
+
+            "font-pack-roboto default-sans-serif"
+
+            getSiblingMutators(['default'], origin)
+
+            default: 'sans-serif
+     */
+    const getSiblingMutators = function(keys, origin) {
+        let results = cg.filterSplit(origin, keys, true)
+        console.log('getSiblingMutators', results)
+        return results
+    }
+
+    const createFontObjects = function(values, origin, splitObj) {
         // family=Roboto:wght@300
         // let familyStrings = '' //"family=Roboto:wght@300"
         let index = 0
         let fonts = {}
-
+        let _origin = splitObj?.origin || origin;
         let currentFont;
         let regex = /([a-zA-Z-]{0,}?)(\d+)/;
         let REGULAR = 'r' // a no definition (standard) font
+        /*
+           skip bad tokens
+         */
         let skipEmpty = true
+        /*
+            Enable many fonts to be applied within one class-name
+            If false, the string will be classified as a bad tokenised
+            string and any _additional_ bad token properties are
+            considered Values.
+         */
         let manyFont = true
+        /*
+            If true, allow the appliance of modifiers with an index
+            before the primary class.
+            If False, the modifier is ignored
+         */
+        let softIndex = true
+        /*
+            If true, error out if the modifier index is above the
+            primary class index.
+            If False, the contribution will continue and potentially
+            allow the softmax to continue.
+         */
+        let errorSoftIndex = false
+        // capture the default font from an additional class.
+        let sibling = getSiblingMutators(['default'], _origin)
+        let defaultFont = 'sans-serif'
+        let d = sibling['default']
+        if(d) {
+            if(d.index <= splitObj.index) {
+                // The modifier class is applied before the appliance class.
+                // if softIndex = True, allow it.
+                // if false, ignore it.
+                let func = softIndex? 'warn': 'error'
+                let s = 'font default-* modifier should be indexed after font'
+                console[func](s)
+                if(!softIndex) {
+                    // ignore this entry
+                    if(errorSoftIndex) {
+                        throw new Error(s)
+                    }
+                } else {
+                    // Apply anyway
+                    defaultFont = d.values.join(' ')
+                }
+            } else {
+                defaultFont = d.values.join(' ')
+            }
+
+        }
 
         for(let t in values) {
 
@@ -291,7 +371,7 @@ const fontPackReceiver = (function(){
             // if token is weight, stack into the previous (current) font.
             if(index == 0) {
                 // the first token should be a font.
-                fonts[index] = { first: token, tokens:{} }
+                fonts[index] = { first: token, tokens:{}, defaultFonts: defaultFont }
                 currentFont = index
                 index++;
                 continue
@@ -388,24 +468,49 @@ const fontPackReceiver = (function(){
         return fonts
     }
 
+    /*
+    Ensure the pack contains one or more tokens.
+
+    This mutates pack.tokens if no tokens are given.
+    returns a list of tokenValues, or the _tokens_ of the pack.
+     */
+    const ensureTokens = function(pack) {
+
+        let tokenValues = Object.values(pack.tokens)
+
+        if(tokenValues.length == 0) {
+            pack.tokens["400"] = {
+                    int: 400,
+                    regu:1,
+                    keys: new Set([
+                            { isItal: undefined, token: "400"}
+                          ])
+                } // Install a default font size
+        }
+
+        return Object.values(pack.tokens)
+    }
+
     const extendPack = function(pack) {
-        let titleToken = toTitleCase(pack.first);
+        let titleToken = toTitleCase(pack.first)
+            , tokenValues = ensureTokens(pack)
+            , allTokens = Object.assign({}, ...tokenValues)
+            , hasItal = allTokens.ital != undefined
+            , formatStringParts = []
+            , weightValues = new Set
+            ;
 
-        let allTokens = Object.assign({}, ...Object.values(pack.tokens))
-        let hasItal = allTokens.ital != undefined
-
-        let formatStringParts = []
         if(hasItal) { formatStringParts.push('ital') }
         if(hasItal || allTokens.regu) { formatStringParts.push('wght') }
 
-        let weightValues = new Set
 
         for(let key in pack.tokens) {
             let token = pack.tokens[key]
-            // console.log(token)
-            let ital = token.ital? 1: 0
-            let int = token.int
-            let a = hasItal? [ital]: []
+                , ital = token.ital? 1: 0
+                , int = token.int
+                , a = hasItal? [ital]: []
+                ;
+
             a.push(int)
             let weightStr = a.join(',')
             weightValues.add(weightStr)
@@ -419,7 +524,8 @@ const fontPackReceiver = (function(){
             }
         }
 
-        let weights = Array.from(weightValues).sort()//.join(';')
+        let weights = Array.from(weightValues).sort()
+
         let totalWeightStr = weights.join(';')
         let formatString = formatStringParts.join(',')
         let str = `${titleToken}:${formatString}@${totalWeightStr}`
@@ -499,7 +605,7 @@ const fontPackReceiver = (function(){
  * If the view is a SPA or all the possible classes are _used_ on
  * the view, this isn't required.
  */
-(()=>{
+;(()=>{
 
 let cg;
 
@@ -568,8 +674,8 @@ const classMutationDetection = function(mutation) {
     //             , mutation.target
     //             , `classes: "${classes}"`
     //         )
-    let new_spl = classes.split(' ')
-    let old_spl = old.split(' ').map((v)=>v.trim())
+    let new_spl = classes.split(/(?!\(.*)\s(?![^(]*?\))/g); //split(' ')
+    let old_spl = old == null ? []: old.split(' ').map((v)=>v.trim())
     let newItems = old_spl? difference(new_spl, old_spl): new_spl
     console.log('new', newItems)
     // let removedItems = difference(old_spl, new_spl)
@@ -627,7 +733,7 @@ Manipulating the var propagates to the view:
 
  */
 
-const varsReceiver = (function(){
+;(function(){
 
     let cg;
     let rootDeclaration = {};
@@ -734,7 +840,7 @@ const varsReceiver = (function(){
  *          "border-top": var(--primary-edges)
  *      }
  */
-const varTranslateReceiver = (function(){
+;(function(){
 
     let cg;
 

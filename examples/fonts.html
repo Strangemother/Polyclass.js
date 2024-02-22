@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCSS</title>
+    <title>Fonts</title>
     <style type="text/css">
 
         html {
@@ -18,6 +18,18 @@
     <div class="font-pack-protest+strike-400-redacted+script-300-400-alata-400
                 font-pack-Alatsi-400">
 
+        <!--
+        <script type="module">
+            import {Polyclass} from "../build/polyclass.full.js"
+            const pc = new Polyclass({
+                processOnLoad: document.body
+            })
+        </script>
+        <script type="module">
+            import polyclass from "https://cdn.jsdelivr.net/npm/polyclass@0.0.26/+esm"
+        </script>
+        -->
+        <script src="../src/tools.js"></script>
         <script src="../src/dcss.js"></script>
         <script src="../src/classgraph.js"></script>
         <script src="../src/addons/monitor.js"></script>
@@ -25,13 +37,47 @@
         <script src="../src/addons/var-translate.js"></script>
         <script src="../src/addons/vars-box.js"></script>
         <script src="../src/polyclass.js"></script>
-
+        <script src="../src/dom-property-activator.js"></script>
 
         <div>
+            <div class="background-#333 color-#DDD font-micro-5 padding-1em font-pack-micro+5-400 default-times-new-roman">
+                <h1>Polyclass auto.</h1>
+
+                <div class="">
+                    <!-- The demo workspace -->
+                    <div class="container
+                                primary-area
+                                background-#444">
+                            polyclass
+                    </div>
+                </div>
+
+                <div>
+                    <p>Hello</p>
+                </div>
+            </div>
+
+            <div class="index-0 default-monospace font-eggs item-2 background-#333 color-#DDD padding-1em font-pack-eggs-400">
+                <h1>Polyclass auto.</h1>
+
+                <div class="">
+                    <!-- The demo workspace -->
+                    <div class="container
+                                primary-area
+                                background-#444">
+                            polyclass
+                    </div>
+                </div>
+
+                <div>
+                    <p>Hello</p>
+                </div>
+            </div>
+
             <div class="font-protest+strike-400 background-#333 color-#DDD">
                 <h1>Polyclass auto.</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -47,7 +93,7 @@
             <div class="font-redacted+script-400 background-#333 color-#DDD">
                 <h1>Redacted+Script auto.</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -64,7 +110,7 @@
             <div class="font-alata-400 background-#333 color-#DDD">
                 <h1>Alata-400.</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -81,7 +127,7 @@
             <div class="font-alata background-#333 color-#DDD">
                 <h1>Alata, auto 400</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -97,7 +143,7 @@
             <div class="font-alatsi-400 background-#333 color-#DDD">
                 <h1>Alatsi auto.</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -114,7 +160,7 @@
         <div class="font-pack-alef-400 font-alef-400 background-#333 color-#ddd">
                 <h1>Alef auto.</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -135,7 +181,7 @@
                     color-#DDD">
                 <h1>Noto Sans Japanese auto.</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -179,10 +225,28 @@
                 </div>
             </div>
         </div>
-        <div class="font-pack-rubik+glitch+pop-400 font-rubik+glitch+pop-400 background-#333 color-#DDD">
+
+            <div class="font-pack-rubik+glitch+pop-400 font-rubik+glitch+pop-400 background-#333 color-#DDD">
                 <h1 class="font-weight-400 font-size-5rem">Rubik Glitch Pop auto.</h1>
 
-                <div id="demo_space" class="">
+                <div class="">
+                    <!-- The demo workspace -->
+                    <div class="container
+                                primary-area
+                                background-#444">
+                            polyclass
+                    </div>
+                </div>
+
+                <div>
+                    <p>Hello</p>
+                </div>
+            </div>
+
+            <div class="font-pack-tourney font-tourney background-#333 color-#DDD">
+                <h1 class="font-weight font-size-5rem">Tourney</h1>
+
+                <div>
                     <!-- The demo workspace -->
                     <div class="container
                                 primary-area
@@ -196,6 +260,28 @@
                 </div>
             </div>
         </div>
+
+        <div class="font-pack-bad_name
+                    font-bad_name
+                    default-times-new-roman
+                    background-#333
+                    color-#DDD">
+            <h1 class="font-weight font-size-4rem">[Poor name]</h1>
+
+            <div>
+                <!-- The demo workspace -->
+                <div class="container
+                            primary-area
+                            background-#444">
+                        This should fallback to the default font
+                </div>
+            </div>
+
+            <div>
+                <p>Hello</p>
+            </div>
+        </div>
+    </div>
 
 
         <div class="background-#333">

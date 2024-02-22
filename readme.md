@@ -7,10 +7,17 @@
 
 A procedural just-in-time declarative stylesheet for instant well-behaved CSS styling.
 
+<div align="center">
+
 <a href="https://www.npmjs.org/package/polyclass">
   <img src="https://img.shields.io/npm/v/polyclass?registry_uri=https%3A%2F%2Fregistry.npmjs.com&style=flat&logo=npm" alt="npm">
 </a>
 
+[![jsDelivr hits](https://data.jsdelivr.com/v1/package/npm/polyclass/badge)](https://www.jsdelivr.com/package/npm/polyclass)
+
+![NPM License](https://img.shields.io/npm/l/polyclass)
+
+</div>
 
 <!-- jsdeliver, license, npm downloads, stars-->
 
@@ -32,7 +39,7 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
 
 ## Table of Contents
 
-+ [Quick Install](#usage)
++ [Quick Install](#-in-a-hurry)
 + [Example](#example)
 + Extras:
   + [Fonts](./docs/font-pack.md) Install and use fonts dynamically
@@ -52,53 +59,10 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
   + [What is Declarative](#what-is-declarative-css)
   + [5 Quadrillion?](./docs/class-count.md)
 
-## Your Instant, Pluggable, Dynamic CSS Base Library
-
-Polyclass is a _just-in-time_ CSS class library, built dynamically from your class-names using "Declarative CSS".
-
-+ Eliminate in-line styles
-+ Declare CSS on-the-fly
-+ Work with any CSS measurement size and type
-+ Build custom event handled class-names
-
-```jinja
-<div class='display-flex
-            max-width-80vw
-            font-size-1.222ch
-            padding-0-10vw'>
-</div>
-```
-
-
-## Lightweight, Quick, Vast.
-
-It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS Declarations in a dynamic CSS stylesheet
-
-```jinja
-<header
-    class='display-flex
-           position-sticky
-           top-1em'>
-    Flexy Sticky Header!
-</header>
-```
-
-+ **No opinion!** factory, forced, or predefined CSS not included!
-+ Supports **any** CSS length you need, from `px` to `cqmax`
-+ **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
-+ **Less than 15 Kilobytes** (minified) including all addons.
-+ over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
-
-Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed.
-
-+ Instantly plug-and-play
-+ No Dependencies: works along-side all the major libraries.
-+ Real-time: Seamless compatibility with both pre-rendered content and live DOM changes.
-
 
 ## 🚀 In a Hurry?
 
-Include from jsdelivr:
+Include from [jsdelivr](https://www.jsdelivr.com/package/npm/polyclass):
 
 ```jinja
 <script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
@@ -116,26 +80,96 @@ Apply `polyclass` to your target, such as the `body`:
 </body>
 ```
 
-**Polyclass anything!**
+**Polyclass anything!** [More Install](#install--use)
 
 
-## Usage
+## Features
 
-Polyclass is designed to be quick to initiate.
+It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS declarations in a dynamic stylesheet:
+
++ Real-time or pre-render compatible
++ Instant plug-and-play with no compilation required
++ No dependencies, pure JavaScript
++ MIT License
 
 
-### Install
+### Your Instant, Pluggable, Dynamic CSS Base Library
 
-Include Polyclass from local source:
+Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built dynamically from your class-names using "[Declarative CSS](#what-is-declarative-css)".
+
++ **Just-in-Time** runtime to declare CSS on-the-fly
++ **No opinion** no factory, forced, or predefined CSS included!
++ Supports **any** CSS length you need, from `px` to `cqmax`
++ **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
++ **Less than 7 Kilobytes** (gzipped) including all addons.
++ over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 
 ```jinja
-<script src="dist/polyclass.full.js"></script>
+<head>
+  <script type="text/javascript" src='polyclass.full.js'></script>
+</head>
+
+<body polyclass
+  class="margin-0
+         padding-0
+         background-color-#111
+         font-roboto
+         font-pack-roboto-100-400-i400-800-900
+         color-#DDD
+         display-grid
+         grid-template-flow-columns">
+
+      <h1 class"font-size-5rem">ET VOILÀ! Polyclassed.</h1>
+</body
 ```
+
+### Invisible
+
+Consider Polyclass as the missing link for `class` attribute  your CSS stylesheet.
+
++ The `style` attribute works as expected
++ Existing classes and libraries remain unaffected
++ Override Polyclass declarations without complex selectors
++ Works along-side any JavaScript library
+
+It's an instant CSS base - use the classical CSS for your seriously cool stuff.
+
+### Don't Tree-Shake! Tree Build!
+
+Whether you're working with pre-rendered content or making live DOM changes, Polyclass ensures the stylesheet is declared as needed. No compilation steps or tree-shaking required, as Polyclass detects usage through a runtime tree immediately.
+
+```jinja
+<header polyclass
+    class='display-flex
+           position-sticky
+           top-1em'>
+    Flexy sticky header! No mess!
+</header>
+```
+
+``` js
+Polyclass.getInstance(header).asString()
+// Rendered CSS Stylesheet.
+```
+
+Polyclass possibilities are loaded from the processed HTML entity, ensuring the library is always ever-green, naturally adopting CSS engine changes as soon as they exist, such as [Use Logical Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values)
+
+```jinja
+<h2 class='scroll-margin-top-var-header-height text-wrap-balance'>
+  Text balanced h2,
+  With a scrolling margin,
+  for the page header from the CSS Var "header-height"
+</h2>
+```
+
+# Install &amp; Use
+
+Polyclass is designed to be quick to initiate.
 
 [Grab from jsdelivr](https://www.jsdelivr.com/package/npm/polyclass) and apply it directly to your HTML:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/polyclass@0.0.23/dist/polyclass.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
 ```
 
 [Grab from NPM](https://www.npmjs.com/package/polyclass) and do node things:
@@ -144,17 +178,57 @@ Include Polyclass from local source:
 npm install polyclass
 ```
 
-### Load
+An ESM import:
+
+```js
+import Polyclass from "polyclass"
+
+new Polyclass()
+```
+
+`import()` on the `node` terminal:
+
+```js
+// Fetch the esm node default using import()
+const { default: Polyclass } = await import("polyclass")
+
+new Polyclass()
+```
+
+`require()` on the terminal:
+
+```js
+// Collect a .cjs module with require()
+const polyclass = await require("polyclass")
+
+new polyclass.Polyclass()
+```
+
+
+Or if you have the source-code locally:
+
+```jinja
+<!-- All included -->
+<script src="polyclass/dist/polyclass.full.js"></script>
+
+<script type="text/javascript">
+    new Polyclass()
+</script>
+```
+
+
+## Load
 
 To load Polyclass use the automatic attribute `polyclass`, or create a new JavaScript instance `Polyclass()`. Multiple instances of Polyclass can exist in one view
 
 ---
 
-#### HTML `polyclass` attribute
+### HTML `polyclass` attribute
 
 Use the Polyclass automatic detection:
 
 ```jinja
+<!-- previously installed -->
 <body polyclass>
   <h1 class='color-#999'>Grey Title!</h1>
 </body>
@@ -164,11 +238,12 @@ Read more in [Running Polyclass: Auto](./docs/running-polyclass.md#auto-polyclas
 
 ---
 
-#### JavaScipt `Polyclass` Instance
+### JavaScipt `Polyclass` Instance
 
 Run `Polyclass` somewhere in your code. It can run in the `<head>`, the `<footer>`, or installed asynchronously.
 
 ```js
+// Run when the DOM is prepared
 const pc = Polyclass({
   processOnLoad: document.body
 })
@@ -177,15 +252,19 @@ const pc = Polyclass({
 If the page is already loaded, run the `process()` method:
 
 ```js
+// DOM Loaded
 const pc = Polyclass()
 pc.process(document.body) // detect after load
+
+// or provide a `target` to process immediately:
+const pc = Polyclass({ target: document.body })
 ```
 
-Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
+Processing isn't required when using the `<Node polyclass></Node>` attribute. Read more in [Running Polyclass: Instance](./docs/running-polyclass.md#polyclass-instance)
 
 ---
 
-#### Using Classes
+## Using Classes
 
 Once installed, populate the html classes to see it in action:
 
@@ -336,6 +415,21 @@ A declarative method for CSS styles ensure:
 Polyclass's JIT approach exemplifies how on-demand generation of styles can streamline development workflows, offering a flexible, efficient solution for real-time CSS management.
 
 
+```jinja
+<div class='display-flex
+            max-width-80vw
+            font-size-1.222ch
+            padding-0-10vw'>
+
+        <h1 class='font-size-5rem'>
+          Instant styling,
+          Immediately generated,
+          Never stale.
+        </h1>
+</div>
+```
+
+
 ## Example
 
 If there is a CSS Property, it can be defined in Polyclass. Here's some HTML, with some `Polyclass` CSS `class` attributes:
@@ -343,22 +437,22 @@ If there is a CSS Property, it can be defined in Polyclass. Here's some HTML, wi
 ```jinja
 <div class="my-container some-other-primary-area
     font-pack-roboto-100-400-i400
-    background-#333">
+    background-#333"> <!-- Load fonts, and a background-color -->
 
       <div class="demo-box
         gap-1em
         display-flex
         flex-direction-column
-        ">
+        "> <!-- convert to the flex box model, with a gap -->
 
-          <div class="text
+          <div class="my-text-thing
             background-color-#111
             border-solid-3px-green
             border-radius-.4em
             padding-.8em-1.4em
             color-#EEE
             font-roboto-400
-            margin-1em">
+            margin-1em"> <!-- A rounded border, background, color, and font changes -->
 
               Text content.
 
@@ -390,6 +484,14 @@ As expected each class exactly represents the `key:value` of any _declarable_ CS
 
 Without using any existing CSS sheets, Polyclass will generate all the expected CSS as a constructed stylesheet.
 
+## Build
+
+Polyclass utilises Rollup
+
+```bash
+npm run build
+npx rollup -c
+```
 
 
 ## License

@@ -98,3 +98,100 @@ const pc = Polyclass({
 pc.processOnLoad(document.body)
 ```
 
+### Many Instances
+
+Polyclass is a singleton designed to run automatically or manually. When automated Polyclass instance exist in a `Polyclass.units` class:
+
+```jinja
+<body polyclass>
+    <div polyclass></div>
+</body>
+```
+
+Each instance gains a unique ID:
+
+```jinja
+<body polyclass="" data-polyclass-id="c2krqoat7a">
+    <div polyclass="" data-polyclass-id="31kbnkjsaog">
+    </div>
+</body>
+```
+
+Referenced through the singleton `Polyclass.units`
+
+```js
+// Polyclass.units
+Map(1) {
+    'c2krqoat7a' => PolyObject,
+    '31kbnkjsaog' => PolyObject
+}
+```
+
+Every view instance of Polyclass has a reference to the shared `units`. JavaScript Polyclass instances do not create a unique reference:
+
+```js
+pc1 = new Polyclass()
+pc2 = new Polyclass({ target: document.body }) // will not assign a unique id.
+
+pc1.units == pc2.units == Polyclass.units
+true
+
+// Polyclass.units does not include pc1 or pc2.
+Map(1) {
+    'c2krqoat7a' => PolyObject,
+    '31kbnkjsaog' => PolyObject
+}
+```
+
+### `new` Keyword
+
+The `new` keyword will generate a fresh instance of Polyclass. Without the `new` keyword, a new or existing instance will return.
+
+We can generate a new Polyclass with or without arguments:
+
+```js
+pc1 = new Polyclass  // no target.
+pc2 = new Polyclass()
+pc3 = new Polyclass({ target: document.body })
+
+pc2 == pc3
+false
+```
+
+Without the keyword, a Polyclass singleton is returned
+
+
+```js
+pc1 = Polyclass         // does nothing
+pc2 = Polyclass({ target: document.body })  // getInstance
+pc3 = Polyclass()       // getInstance
+
+pc2 == pc3
+true
+```
+
+We can always gain the primary Polyclass instance through the singleton special `Polyclass.instance`
+
+
+```js
+pc = Polyclass({ target: document.body })  // getInstance
+
+pc == Polyclass.instance
+true
+```
+
+---
+
+This functionality allows you to generate new sub-instances of Polyclass, whilst also maintaining existing and dynamically generated Polyclass instances
+
+```jinja
+<body polyclass>
+    <div polyclass></div>
+</body>
+```
+
+```js
+pc = new Polyclass({ target: document.body })
+pc == Polyclass.instance
+false
+```
