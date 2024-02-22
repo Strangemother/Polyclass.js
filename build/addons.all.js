@@ -1,5 +1,12 @@
 /**
- * # Events mouse-[event]-*
+ * # Events event-[eventName]-[action]-[params]*
+ *
+ * Create event handlers for actions on an entity.
+ *
+ * For example on "click" event, toggle the class "border-var-generic-border"
+ *
+ *      "event-click-toggle-border-var-generic-border"
+ *
  */
 ;(function(){
 
@@ -54,7 +61,9 @@
                 /* Perform a class "toggle" in some shape. */
                 console.log(parts, others, action)
                 e.currentTarget.classList.toggle(parts.join('-'))
-
+            }
+            , setvar() {
+                /* Set the variable name to the given value */
             }
         }
 
@@ -152,10 +161,9 @@
 
         // Tokenize as a family string.
         //
-        const values = obj.values
-
-        let fonts = createFontObjects(values)
-        let familyStrings = createFamilyString(values, fonts)
+        const values = obj.values, origin = obj.origin;
+        let fonts = createFontObjects(values, origin, obj)
+        let familyStrings = createFamilyString(values, fonts, origin)
 
         // let families = tokenize(values)
 
@@ -163,12 +171,12 @@
         // console.info('Installing Google fonts: familyStrings:', familyStrings)
         generateGoogleLinks(familyStrings).forEach((x)=>document.head.appendChild(x))
 
-
         // Install additional css additions
-        installFontObjects(fonts)
+        installFontObjects(fonts, obj)
     }
 
-    const installFontObjects = function(fonts) {
+    const installFontObjects = function(fonts, splitObj) {
+
         // // For value create a font-family;
         for(let pack of Object.values(fonts)) {
             let name = pack.first
@@ -182,7 +190,6 @@
         }
     }
 
-
     const toTitleCase = function(str) {
         /*convert a string (expected font string) to a title case version
         This also title-cases +prefix string
@@ -195,8 +202,8 @@
 
     // window.toTitleCase = toTitleCase
 
-    const createFamilyString = function(values, fonts) {
-        fonts = fonts || createFontObjects(values)
+    const createFamilyString = function(values, fonts, origin) {
+        fonts = fonts || createFontObjects(values, origin)
         let fs = function(e) {
             return `family=${e.str}`
         }
@@ -231,7 +238,7 @@
             // console.log('making on token' , token)
             let def = {
                 'font-weight': token.int
-                , 'font-family': `'${pack.cleanName}', sans-serif`
+                , 'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
             let selectorBits = ['font', pack.first]
 
@@ -262,22 +269,86 @@
                         ])
 
         res[Array.from(strings).join(', ')] = {
-                'font-family': `'${pack.cleanName}', sans-serif`
+                'font-family': `'${pack.cleanName}', ${pack.defaultFonts}`
             }
         return res
     }
 
-    const createFontObjects = function(values) {
+    /*
+        Given a list of keys, return class-name properties with any
+        matching key.
+
+            "font-pack-roboto default-sans-serif"
+
+            getSiblingMutators(['default'], origin)
+
+            default: 'sans-serif
+     */
+    const getSiblingMutators = function(keys, origin) {
+        let results = cg.filterSplit(origin, keys, true)
+        console.log('getSiblingMutators', results)
+        return results
+    }
+
+    const createFontObjects = function(values, origin, splitObj) {
         // family=Roboto:wght@300
         // let familyStrings = '' //"family=Roboto:wght@300"
         let index = 0
         let fonts = {}
-
+        let _origin = splitObj?.origin || origin;
         let currentFont;
         let regex = /([a-zA-Z-]{0,}?)(\d+)/;
         let REGULAR = 'r' // a no definition (standard) font
+        /*
+           skip bad tokens
+         */
         let skipEmpty = true
+        /*
+            Enable many fonts to be applied within one class-name
+            If false, the string will be classified as a bad tokenised
+            string and any _additional_ bad token properties are
+            considered Values.
+         */
         let manyFont = true
+        /*
+            If true, allow the appliance of modifiers with an index
+            before the primary class.
+            If False, the modifier is ignored
+         */
+        let softIndex = true
+        /*
+            If true, error out if the modifier index is above the
+            primary class index.
+            If False, the contribution will continue and potentially
+            allow the softmax to continue.
+         */
+        let errorSoftIndex = false
+        // capture the default font from an additional class.
+        let sibling = getSiblingMutators(['default'], _origin)
+        let defaultFont = 'sans-serif'
+        let d = sibling['default']
+        if(d) {
+            if(d.index <= splitObj.index) {
+                // The modifier class is applied before the appliance class.
+                // if softIndex = True, allow it.
+                // if false, ignore it.
+                let func = softIndex? 'warn': 'error'
+                let s = 'font default-* modifier should be indexed after font'
+                console[func](s)
+                if(!softIndex) {
+                    // ignore this entry
+                    if(errorSoftIndex) {
+                        throw new Error(s)
+                    }
+                } else {
+                    // Apply anyway
+                    defaultFont = d.values.join(' ')
+                }
+            } else {
+                defaultFont = d.values.join(' ')
+            }
+
+        }
 
         for(let t in values) {
 
@@ -300,7 +371,7 @@
             // if token is weight, stack into the previous (current) font.
             if(index == 0) {
                 // the first token should be a font.
-                fonts[index] = { first: token, tokens:{} }
+                fonts[index] = { first: token, tokens:{}, defaultFonts: defaultFont }
                 currentFont = index
                 index++;
                 continue
@@ -603,8 +674,8 @@ const classMutationDetection = function(mutation) {
     //             , mutation.target
     //             , `classes: "${classes}"`
     //         )
-    let new_spl = classes.split(' ')
-    let old_spl = old.split(' ').map((v)=>v.trim())
+    let new_spl = classes.split(/(?!\(.*)\s(?![^(]*?\))/g); //split(' ')
+    let old_spl = old == null ? []: old.split(' ').map((v)=>v.trim())
     let newItems = old_spl? difference(new_spl, old_spl): new_spl
     console.log('new', newItems)
     // let removedItems = difference(old_spl, new_spl)

@@ -7,10 +7,17 @@
 
 A procedural just-in-time declarative stylesheet for instant well-behaved CSS styling.
 
+<div align="center">
+
 <a href="https://www.npmjs.org/package/polyclass">
   <img src="https://img.shields.io/npm/v/polyclass?registry_uri=https%3A%2F%2Fregistry.npmjs.com&style=flat&logo=npm" alt="npm">
 </a>
 
+[![jsDelivr hits](https://data.jsdelivr.com/v1/package/npm/polyclass/badge)](https://www.jsdelivr.com/package/npm/polyclass)
+
+![NPM License](https://img.shields.io/npm/l/polyclass)
+
+</div>
 
 <!-- jsdeliver, license, npm downloads, stars-->
 
@@ -94,7 +101,7 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 + **No opinion** no factory, forced, or predefined CSS included!
 + Supports **any** CSS length you need, from `px` to `cqmax`
 + **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
-+ **Less than 15 Kilobytes** (minified) including all addons.
++ **Less than 7 Kilobytes** (gzipped) including all addons.
 + over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 
 ```jinja
