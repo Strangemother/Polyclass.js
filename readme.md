@@ -16,10 +16,14 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
 </a>
 </span>
 <span>
+
 [![jsDelivr hits](https://data.jsdelivr.com/v1/package/npm/polyclass/badge)](https://www.jsdelivr.com/package/npm/polyclass)
+
 </span>
 <span>
+
 ![NPM License](https://img.shields.io/npm/l/polyclass)
+
 </span>
 
 </div>
