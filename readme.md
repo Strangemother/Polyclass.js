@@ -5,17 +5,13 @@
 
 ![Polyclass Logo](./docs/logo/1-300.png)
 
-A procedural just-in-time declarative stylesheet for instant well-behaved CSS styling.
+A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declarative-css) stylesheet for instant well-behaved _functional_ CSS styling.
 
-<div align="center">
-
-![NPM License](https://img.shields.io/npm/l/polyclass)
-[![jsDelivr hits](https://data.jsdelivr.com/v1/package/npm/polyclass/badge)](https://www.jsdelivr.com/package/npm/polyclass)
 [![npm](https://img.shields.io/npm/v/polyclass?registry_uri=https%3A%2F%2Fregistry.npmjs.com&style=flat&logo=npm)](https://www.npmjs.org/package/polyclass)
+[![jsDelivr hits](https://data.jsdelivr.com/v1/package/npm/polyclass/badge)](https://www.jsdelivr.com/package/npm/polyclass)
+![NPM License](https://img.shields.io/npm/l/polyclass)
 
-</div>
-
-<!-- jsdeliver, license, npm downloads, stars-->
+<!-- stars-->
 
 ---
 
@@ -35,7 +31,7 @@ A procedural just-in-time declarative stylesheet for instant well-behaved CSS st
 
 ## Table of Contents
 
-+ [Quick Install](#-in-a-hurry)
++ [Quick Install](#-in-a-hurry) • [More Install](#install--use)
 + [Example](#example)
 + Extras:
   + [Fonts](./docs/font-pack.md) Install and use fonts dynamically
@@ -79,16 +75,6 @@ Apply `polyclass` to your target, such as the `body`:
 **Polyclass anything!** [More Install](#install--use)
 
 
-## Features
-
-It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS declarations in a dynamic stylesheet:
-
-+ Real-time or pre-render compatible
-+ Instant plug-and-play with no compilation required
-+ No dependencies, pure JavaScript
-+ MIT License
-
-
 ### Your Instant, Pluggable, Dynamic CSS Base Library
 
 Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built dynamically from your class-names using "[Declarative CSS](#what-is-declarative-css)".
@@ -99,6 +85,7 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 + **All** CSS Properties are ready, even: `order-block-start-style-dotted`!
 + **Less than 7 Kilobytes** (gzipped) including all addons.
 + over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
++ No compilation, installation, dependencies, or IDE configurations!
 
 ```jinja
 <head>
@@ -118,6 +105,16 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
       <h1 class"font-size-5rem">ET VOILÀ! Polyclassed.</h1>
 </body
 ```
+
+## Features
+
+It's open-source, lightweight and runtime pluggable. With only HTML class names, immediately generate CSS declarations in a dynamic stylesheet:
+
++ Real-time or pre-render compatible
++ Instant plug-and-play with no compilation required
++ No dependencies, pure JavaScript
++ MIT License
+
 
 ### Invisible
 
