@@ -757,6 +757,18 @@ class ClassGraph {
         return res
     }
 
+    removeRule(splitObj, props=undefined, withParentSelector=true) {
+        let valueKey = splitObj?.props?.join('-')
+        let propStr = this.asSelectorString(splitObj, withParentSelector)
+        let exists = this.dcss.selectorExists(propStr)
+        if(!exists) {
+            // Prop doesn't exist.
+            return
+        }
+
+        let res = this.dcss.removeRuleBySelector(propStr)
+    }
+
     /*Given a special splitobject using `objectSplit()`, convert to a css
       style and insert into the dynamic stylesheet.
 
