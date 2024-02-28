@@ -953,9 +953,15 @@ class ClassGraph {
     Any detected rule of which does not exist, is created and
     applied to the class graph.
      */
-    captureNew(items, oldItems, origin) {
+    captureChanges(items, oldItems, origin) {
         let cg = this;
         // console.log('Capture new', items, oldItems)
+        this.discoverInsert(items, origin)
+        this.discoverRemove(oldItems, origin)
+    }
+
+    discoverInsert(items, origin) {
+        let cg = this;
         for(let str of items) {
             if(str.length == 0) {
                 continue
@@ -968,6 +974,22 @@ class ClassGraph {
             let res = func(splitObj)
             // console.log(str, res)
         }
+
+    }
+
+    discoverRemove(oldItems, origin) {
+        let cg = this;
+        for(let str of oldItems) {
+            if(str.length == 0) {
+                continue
+            }
+            let splitObj = cg.objectSplit(str)
+            splitObj.origin = origin
+            let n = splitObj.node?.unhandler
+            let func = n?.bind(splitObj) //: cg.removeRule.bind(cg)
+            let res = func && func(splitObj)
+        }
+
     }
 
     processOnLoad(node, watch=document) {
@@ -999,7 +1021,7 @@ class ClassGraph {
     }
 
     safeInsertMany(entity, classes) {
-        let index = 0 
+        let index = 0
         for(let name of classes) {
             this.safeInsertLine(name, entity, index++)
         }
