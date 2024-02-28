@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCSS</title>
+    <style type="text/css">
+
+        html { background: #111; }
+
+    </style>
+</head>
+<body polyclass>
+    <div>
+
+        <!--
+        <script src="../build/polyclass.full.js"></script>
+        -->
+
+        <script src="../src/tools.js"></script>
+        <script src="../src/dcss.js"></script>
+        <script src="../src/classgraph.js"></script>
+        <script src="../src/addons/monitor.js"></script>
+        <script src="../src/addons/font-pack.js"></script>
+        <script src="../src/addons/var-translate.js"></script>
+        <script src="../src/addons/vars-box.js"></script>
+        <script src="../src/addons/events.js"></script>
+        <script src="../src/addons/functions.js"></script>
+
+        <script src="../src/polyclass.js"></script>
+        <script src="../src/dom-property-activator.js"></script>
+        <script src="../src/blending-function.js"></script>
+        <script src="../src/templ-example.js"></script>
+
+        <template data-name='show-hello'>
+            <div>
+                <p>
+                  Hello, ${scope.getAttribute('name')}
+                </p>
+
+                <slot>
+                    Default slot value
+                    <p>${egg}</p>
+                </slot>
+            </div>
+        </template>
+
+        <div class="padding-1em color-#ddd">
+                <show-hello name="Apples"></show-hello>
+                <hr>
+                <show-hello name="John">Replacement Value</show-hello>
+                <hr>
+                <show-hello name="Cherries"></show-hello>
+        </div>
+
+    </div>
+</body>
+</html>
