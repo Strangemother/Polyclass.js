@@ -44,7 +44,14 @@
 
     const addHandler = function(splitObj, target, action, others) {
         // console.log('action', action, others, target)
-        target.addEventListener(action, (e)=>actionHandler(e, action, others))
+        let func = (e)=>actionHandler(e, action, others)
+        let dsn = `polyaction_${action}`;
+        if(target.dataset[dsn] === undefined) {
+            target.addEventListener(action, func)
+            target.dataset[dsn] = true
+        } else {
+            console.log('Event already exists:', action)
+        }
     }
 
     /* The generic action handler for an event.
@@ -72,7 +79,6 @@
             innerFunc()
         }
     }
-
 
     ;insertReceiver();
 })()
