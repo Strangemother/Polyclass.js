@@ -84,7 +84,7 @@ const classMutationDetection = function(mutation) {
     console.log('new', newItems)
     // let removedItems = difference(old_spl, new_spl)
     // console.log('removedItems', removedItems)
-    cg.captureNew(newItems, undefined, mutation.target)
+    cg.captureChanges(newItems, old_spl, mutation.target)
 }
 
 

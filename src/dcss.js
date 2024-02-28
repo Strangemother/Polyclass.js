@@ -208,6 +208,21 @@ class DynamicCSSStyleSheet {
         return undefined
     }
 
+    removeRuleBySelector(selector, _sheet) {
+        let sheet = this.getEnsureStyleSheet(_sheet)
+        let index = this._getIndexBySelector(selector, sheet)
+        sheet.removeRule(index)
+    }
+
+    _getIndexBySelector(selector, sheet)  {
+        let c = 0 
+        for(let rule of sheet.cssRules) {
+            if(selector == rule.selectorText) {
+                return c 
+            }
+            c++;
+        }
+    }
     /**
      * Pushes an array rule to the stylesheet.
      * @param {Object} styleSheet - The stylesheet.

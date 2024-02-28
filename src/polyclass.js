@@ -228,6 +228,7 @@ const polyclassProxy = {
     */
     safeSpace: {
         units: polyUnits
+        , addons: []
     }
 
     , get(target, property, receiver) {
