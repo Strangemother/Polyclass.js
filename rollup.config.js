@@ -12,6 +12,7 @@ const ADDONS = [
     , "./src/addons/monitor.js"
     , "./src/addons/vars-box.js"
     , "./src/addons/var-translate.js"
+    , "./src/addons/value-reduce.js"
 ]
 
 
