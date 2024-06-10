@@ -107,3 +107,6 @@ This means in the next form the map should test if a combination is valid as its
 
 This is similar to the existing version, but the popping will occur in a look-ahead manner rather than the current _forward step with no look-ahead_
 
+Property definitions can be found here:
+
++ https://github.com/chromium/chromium/blob/master/third_party/blink/renderer/core/css/css_properties.json5#L548-L553
