@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCSS</title>
+    <style type="text/css">
+
+        html {
+            background: #111;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="font-pack-roboto-100-400" polyclass>
+
+        <!--
+        <script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
+        <script src="../build/polyclass.full.js"></script>
+        -->
+        <script src="../src/tools.js"></script>
+        <script src="../src/dcss.js"></script>
+        <script src="../src/classgraph.js"></script>
+        <script src="../src/addons/monitor.js"></script>
+        <script src="../src/addons/font-pack.js"></script>
+        <script src="../src/addons/var-translate.js"></script>
+        <script src="../src/addons/vars-box.js"></script>
+        <script src="../src/polyclass.js"></script>
+        <script src="../src/dom-property-activator.js"></script>
+        <!-- <script src="../src/value-translation.js"></script> -->
+        <script src="../src/addons/value-reduce.js"></script>
+
+        <div>
+            <div class="font-pack-roboto-400 font-roboto background-#333 color-#DDD">
+                <h1>Polyclass Splits</h1>
+
+                <div id="demo_space" class="">
+                    <!-- The demo workspace -->
+                    <div class="container
+                                primary-area
+                                padding-1rem-2rem
+                                background-#444">
+
+
+                        <p>Flex direction "initial":</p>
+                        <ul class="display-flex list-style-none gap-1em padding-0 border-solid-1px flex-direction-initial">
+                            <li>Item A</li>
+                            <li>Item B</li>
+                            <li>Item C</li>
+                        </ul>
+
+                        <p>Flex direction "row-reverse":</p>
+
+                        <ul class="display-flex list-style-none gap-1em padding-0
+                        flex-direction-row-reverse border-solid-1px flex-direction-fridge-row-reverse-other-horse-chicken">
+                            <li>Item A</li>
+                            <li>Item B</li>
+                            <li>Item C</li>
+                        </ul>
+
+                        <p>"cursor-no-drop"</p>
+                        <div class="padding-1em cursor-no-drop">
+                            <p>Cursor "no-drop"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class='font-family-ui-monospace display-inline-flow-root'>
+                    <p>Hello</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
