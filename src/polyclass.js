@@ -9,11 +9,9 @@
 // ;(()=>{
 
 class PolyObject {
-
-    // constructor() {
     constructor([config]=[]) {
         this.units = polyUnits
-        console.log('me:', config)
+        // console.log('me:', config)
         let cg = new ClassGraph(config)
         cg.generate(config?.target)
         this._graph = cg
@@ -34,7 +32,7 @@ class PolyObject {
     }
 
     loadConfig(config) {
-        console.log('load', config)
+        // console.log('load', config)
         if(config?.processOnLoad) {
             this.processOnLoad(config.processOnLoad)
         }
@@ -214,7 +212,7 @@ class PolyObject {
     proxt, If called with `new Polyclass`
 */
 const polyclassHead = function(){
-    console.log('new', arguments)
+    // console.log('new', arguments)
     return polyclassProxy.newInstance.apply(polyclassProxy, arguments)
 };
 
@@ -252,7 +250,7 @@ const polyclassProxy = {
     }
 
     , newInstance() {
-        console.log('new instance', Array.from(arguments))
+        // console.log('new instance', Array.from(arguments))
         let r = new PolyObject(Array.from(arguments))
         return r
         // return r.proxy
