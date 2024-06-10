@@ -23,7 +23,7 @@
      * @return {undefined}
      */
     const insertReceiver = function(){
-        console.log('var-translate insertReceiver')
+        // console.log('var-translate insertReceiver')
         // DynamicCSSStyleSheet.addons.varTranslateReceiver = function(_cg){
             // cg = _cg;
             // cg.insertReceiver(['var'], varReceiver)

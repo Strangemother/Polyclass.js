@@ -24,7 +24,7 @@ into the units.
 */
 const onDomLoaded = function() {
     const targets = document.querySelectorAll('*[polyclass]');
-    console.log('Discovered', targets.length)
+    // console.log('Discovered', targets.length)
     for(let target of targets){
         let polyclassId = ensureId(target)
         let pc = new Polyclass({target, isInline:true})

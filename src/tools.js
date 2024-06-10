@@ -150,6 +150,7 @@ function shiftShift(f, t, shiftVal, andHex) {
         return shiftRoundNegFlip(t, shiftVal, andHex, G1)
 }
 
+
 function hexConvert(p, c0, c1) {
 
     var f = asInt(c0.slice(1), 16)

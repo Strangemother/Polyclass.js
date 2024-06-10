@@ -14,6 +14,16 @@ const generateClassGraph = function(config={}){
 }
 
 
+const clog = function(...s) {
+    console.log(`%c ${s.join(' ')} `, 'background: #111; color: #99DDAA');
+}
+
+
+const arrayMatch = (a,b) => {
+    return a.every((e,i)=>b[i]==e)
+}
+
+
 class ClassGraph {
 
     sep = '-'
@@ -73,6 +83,7 @@ class ClassGraph {
 
     addCamelString(name) {
         // convert to kebab-case, then push into the graph
+        // From ./tools.js
         let kebab = kebabCase(name)
         // console.log(name, kebab)
         let keys = kebab.split('-')
@@ -155,7 +166,6 @@ class ClassGraph {
         }
     }
 
-
     processAliases(aliases) {
         for(let key in aliases) {
             this.addAliases(key, aliases[key])
@@ -191,8 +201,8 @@ class ClassGraph {
     }
 
     /*Given a list of keys, convert any _literal_ aliases to their true
-    key.
-    Return a new list. The new list length may differ from the given list.
+     key.
+     Return a new list. The new list length may differ from the given list.
     */
     aliasConvert(rawKeys) {
 
@@ -309,6 +319,16 @@ class ClassGraph {
         // grab the next keys
         let props = keys.slice(0, c1)
         let values = keys.slice(c1)
+
+        let vg = this.valuesGraph
+        // Reshape any values, correcting for over-splitting
+        values = this.forwardReduceValues(
+                     props
+                    , values
+                    , vg.microGraph
+                    , vg.words
+                )
+
         let r = {
             props, values, str,
             node: currentNode,
@@ -318,6 +338,10 @@ class ClassGraph {
 
         // this.translateValue(r)
         return r
+    }
+
+    forwardReduceValues(props, values, graph, words) {
+        return values
     }
 
     minorCapture(str, sep=this.sep, safe=true) {
@@ -1028,14 +1052,13 @@ class ClassGraph {
     }
 
     safeInsertLine(name, entity, index=-1) {
+                     // objectSplit(str, sep, index=-1)
         let spl2 = this.objectSplit(name, undefined, undefined, index)
         if(spl2.valid) {
-            // console.log('Inserting', spl2)
             spl2.origin = entity
             this.insertRule(spl2)
         }
-        // console.log(spl2)
-        // this.isBranch(spl2)
+        return spl2
     }
 
     getAllClasses(parent=document.body, deep=false, includeParent=true) {

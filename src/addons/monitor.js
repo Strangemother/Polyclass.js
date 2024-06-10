@@ -13,8 +13,10 @@
 
 let cg;
 
+/*
+ Called at the root of this IIFE to install the functions on the classgraph.
+ */
 const insertReceiver = function(){
-
 
     ClassGraph.addons.monitorClasses = function(_cg){
         cg = _cg;
@@ -39,7 +41,7 @@ const monitorClasses = function(node) {
     (But this function is called.), restart the tab, window or browser.
      */
 
-    console.log('monitorClasses', node)
+    // console.log('monitorClasses', node)
     // configuration of the observer:
     let config = {
             attributes: true

@@ -31,7 +31,7 @@ Items I want in the lib - some in progress
 + a `clean()` function
 + Dynamic Css Import
 + _though_ key function
-
++ don't split
 
 ---
 
@@ -94,7 +94,9 @@ A first implementation of "functions" on a value.
     color-red.reshade+1
     color-red.reshade-10
 
-Allowing the reshade relative to a color stepping function (quantized step)
+Allowing
+
+## display: inline flow-root;display: inline flow-root;the reshade relative to a color stepping function (quantized step)
 
 # .revalue
 
@@ -634,3 +636,36 @@ This only activates if a parent has the class of dark
     </div>
 
 An issue may arise with the prefix within the class-name, as during the dark-phase the class-name must loose its prefix; pretty ugly.
+
+## don't split
+
+Some values should not be split, but by default the
+value matches a splittable and the result is invalid:
+
+    CSS:
+        display: inline flow-root;
+
+    Poly:
+        "display-inline-flow-root"
+
+    result:
+        {
+            display: inline flow-root
+        }
+
+To correct this, we apply a micro "dont" graph of chosen keys. If a value is in the graph, it's not split:
+
+    Keep:
+
+        display > flow > root
+
+    Poly:
+        "display-inline-flow-root"
+
+    Result:
+
+        {
+            display: inline flow-root
+        }
+
+
