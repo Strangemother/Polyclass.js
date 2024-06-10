@@ -89,6 +89,7 @@
           return shiftRoundNegFlip(t, shiftVal, andHex, G1)
   }
 
+
   function hexConvert(p, c0, c1) {
 
       var f = asInt(c0.slice(1), 16)
@@ -585,6 +586,7 @@
 
       addCamelString(name) {
           // convert to kebab-case, then push into the graph
+          // From ./tools.js
           let kebab = kebabCase(name);
           // console.log(name, kebab)
           let keys = kebab.split('-');
@@ -667,7 +669,6 @@
           }
       }
 
-
       processAliases(aliases) {
           for(let key in aliases) {
               this.addAliases(key, aliases[key]);
@@ -701,8 +702,8 @@
       }
 
       /*Given a list of keys, convert any _literal_ aliases to their true
-      key.
-      Return a new list. The new list length may differ from the given list.
+       key.
+       Return a new list. The new list length may differ from the given list.
       */
       aliasConvert(rawKeys) {
 
@@ -817,6 +818,16 @@
           // grab the next keys
           let props = keys.slice(0, c1);
           let values = keys.slice(c1);
+
+          let vg = this.valuesGraph;
+          // Reshape any values, correcting for over-splitting
+          values = this.forwardReduceValues(
+                       props
+                      , values
+                      , vg.microGraph
+                      , vg.words
+                  );
+
           let r = {
               props, values, str,
               node: currentNode,
@@ -826,6 +837,10 @@
 
           // this.translateValue(r)
           return r
+      }
+
+      forwardReduceValues(props, values, graph, words) {
+          return values
       }
 
       minorCapture(str, sep=this.sep, safe=true) {
@@ -1529,14 +1544,13 @@
       }
 
       safeInsertLine(name, entity, index=-1) {
+                       // objectSplit(str, sep, index=-1)
           let spl2 = this.objectSplit(name, undefined, undefined, index);
           if(spl2.valid) {
-              // console.log('Inserting', spl2)
               spl2.origin = entity;
               this.insertRule(spl2);
           }
-          // console.log(spl2)
-          // this.isBranch(spl2)
+          return spl2
       }
 
       getAllClasses(parent=document.body, deep=false, includeParent=true) {
@@ -1610,11 +1624,9 @@
   // ;(()=>{
 
   class PolyObject {
-
-      // constructor() {
       constructor([config]=[]) {
           this.units = polyUnits;
-          console.log('me:', config);
+          // console.log('me:', config)
           let cg = new ClassGraph(config);
           cg.generate(config?.target);
           this._graph = cg;
@@ -1635,7 +1647,7 @@
       }
 
       loadConfig(config) {
-          console.log('load', config);
+          // console.log('load', config)
           if(config?.processOnLoad) {
               this.processOnLoad(config.processOnLoad);
           }
@@ -1814,7 +1826,7 @@
       proxt, If called with `new Polyclass`
   */
   const polyclassHead = function(){
-      console.log('new', arguments);
+      // console.log('new', arguments)
       return polyclassProxy.newInstance.apply(polyclassProxy, arguments)
   };
 
@@ -1851,7 +1863,7 @@
       }
 
       , newInstance() {
-          console.log('new instance', Array.from(arguments));
+          // console.log('new instance', Array.from(arguments))
           let r = new PolyObject(Array.from(arguments));
           return r
           // return r.proxy
