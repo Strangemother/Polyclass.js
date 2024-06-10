@@ -376,6 +376,21 @@ class DynamicCSSStyleSheet {
         return undefined
     }
 
+    removeRuleBySelector(selector, _sheet) {
+        let sheet = this.getEnsureStyleSheet(_sheet);
+        let index = this._getIndexBySelector(selector, sheet);
+        sheet.removeRule(index);
+    }
+
+    _getIndexBySelector(selector, sheet)  {
+        let c = 0; 
+        for(let rule of sheet.cssRules) {
+            if(selector == rule.selectorText) {
+                return c 
+            }
+            c++;
+        }
+    }
     /**
      * Pushes an array rule to the stylesheet.
      * @param {Object} styleSheet - The stylesheet.
@@ -1240,6 +1255,18 @@ class ClassGraph {
         return res
     }
 
+    removeRule(splitObj, props=undefined, withParentSelector=true) {
+        splitObj?.props?.join('-');
+        let propStr = this.asSelectorString(splitObj, withParentSelector);
+        let exists = this.dcss.selectorExists(propStr);
+        if(!exists) {
+            // Prop doesn't exist.
+            return
+        }
+
+        this.dcss.removeRuleBySelector(propStr);
+    }
+
     /*Given a special splitobject using `objectSplit()`, convert to a css
       style and insert into the dynamic stylesheet.
 
@@ -1424,9 +1451,14 @@ class ClassGraph {
     Any detected rule of which does not exist, is created and
     applied to the class graph.
      */
-    captureNew(items, oldItems, origin) {
-        let cg = this;
+    captureChanges(items, oldItems, origin) {
         // console.log('Capture new', items, oldItems)
+        this.discoverInsert(items, origin);
+        this.discoverRemove(oldItems, origin);
+    }
+
+    discoverInsert(items, origin) {
+        let cg = this;
         for(let str of items) {
             if(str.length == 0) {
                 continue
@@ -1439,6 +1471,22 @@ class ClassGraph {
             func(splitObj);
             // console.log(str, res)
         }
+
+    }
+
+    discoverRemove(oldItems, origin) {
+        let cg = this;
+        for(let str of oldItems) {
+            if(str.length == 0) {
+                continue
+            }
+            let splitObj = cg.objectSplit(str);
+            splitObj.origin = origin;
+            let n = splitObj.node?.unhandler;
+            let func = n?.bind(splitObj); //: cg.removeRule.bind(cg)
+            func && func(splitObj);
+        }
+
     }
 
     processOnLoad(node, watch=document) {
@@ -1470,7 +1518,7 @@ class ClassGraph {
     }
 
     safeInsertMany(entity, classes) {
-        let index = 0; 
+        let index = 0;
         for(let name of classes) {
             this.safeInsertLine(name, entity, index++);
         }
@@ -1776,6 +1824,7 @@ const polyclassProxy = {
     */
     safeSpace: {
         units: polyUnits
+        , addons: []
     }
 
     , get(target, property, receiver) {
@@ -1838,9 +1887,9 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
     const insertReceiver = function(){
         console.log('event receiver');
 
-        ClassGraph.addons.varTranslateReceiver = function(_cg){
+        ClassGraph.addons.eventsReceiver = function(_cg){
             cg = _cg;
-            cg.insertReceiver(['event'], mouseReceiver);
+            cg.insertReceiver(['event'], eventReceiver);
         };
 
         // ClassGraph.addons.varTranslateReceiver = function(_cg){
@@ -1849,7 +1898,7 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
         // }
     };
 
-    const mouseReceiver =  function(splitObj, index) {
+    const eventReceiver =  function(splitObj, index) {
 
         // console.log('running on', splitObj)
         values = splitObj.values;
@@ -1867,7 +1916,14 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
 
     const addHandler = function(splitObj, target, action, others) {
         // console.log('action', action, others, target)
-        target.addEventListener(action, (e)=>actionHandler(e, action, others));
+        let func = (e)=>actionHandler(e, action, others);
+        let dsn = `polyaction_${action}`;
+        if(target.dataset[dsn] === undefined) {
+            target.addEventListener(action, func);
+            target.dataset[dsn] = true;
+        } else {
+            console.log('Event already exists:', action);
+        }
     };
 
     /* The generic action handler for an event.
@@ -1895,7 +1951,6 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
             innerFunc();
         }
     }
-
 
     ;insertReceiver();
 })()
@@ -2464,7 +2519,7 @@ const classMutationDetection = function(mutation) {
     console.log('new', newItems);
     // let removedItems = difference(old_spl, new_spl)
     // console.log('removedItems', removedItems)
-    cg.captureNew(newItems, undefined, mutation.target);
+    cg.captureChanges(newItems, old_spl, mutation.target);
 };
 
 

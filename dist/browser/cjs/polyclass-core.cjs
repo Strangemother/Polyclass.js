@@ -376,6 +376,21 @@ class DynamicCSSStyleSheet {
         return undefined
     }
 
+    removeRuleBySelector(selector, _sheet) {
+        let sheet = this.getEnsureStyleSheet(_sheet);
+        let index = this._getIndexBySelector(selector, sheet);
+        sheet.removeRule(index);
+    }
+
+    _getIndexBySelector(selector, sheet)  {
+        let c = 0; 
+        for(let rule of sheet.cssRules) {
+            if(selector == rule.selectorText) {
+                return c 
+            }
+            c++;
+        }
+    }
     /**
      * Pushes an array rule to the stylesheet.
      * @param {Object} styleSheet - The stylesheet.
@@ -1240,6 +1255,18 @@ class ClassGraph {
         return res
     }
 
+    removeRule(splitObj, props=undefined, withParentSelector=true) {
+        splitObj?.props?.join('-');
+        let propStr = this.asSelectorString(splitObj, withParentSelector);
+        let exists = this.dcss.selectorExists(propStr);
+        if(!exists) {
+            // Prop doesn't exist.
+            return
+        }
+
+        this.dcss.removeRuleBySelector(propStr);
+    }
+
     /*Given a special splitobject using `objectSplit()`, convert to a css
       style and insert into the dynamic stylesheet.
 
@@ -1424,9 +1451,14 @@ class ClassGraph {
     Any detected rule of which does not exist, is created and
     applied to the class graph.
      */
-    captureNew(items, oldItems, origin) {
-        let cg = this;
+    captureChanges(items, oldItems, origin) {
         // console.log('Capture new', items, oldItems)
+        this.discoverInsert(items, origin);
+        this.discoverRemove(oldItems, origin);
+    }
+
+    discoverInsert(items, origin) {
+        let cg = this;
         for(let str of items) {
             if(str.length == 0) {
                 continue
@@ -1439,6 +1471,22 @@ class ClassGraph {
             func(splitObj);
             // console.log(str, res)
         }
+
+    }
+
+    discoverRemove(oldItems, origin) {
+        let cg = this;
+        for(let str of oldItems) {
+            if(str.length == 0) {
+                continue
+            }
+            let splitObj = cg.objectSplit(str);
+            splitObj.origin = origin;
+            let n = splitObj.node?.unhandler;
+            let func = n?.bind(splitObj); //: cg.removeRule.bind(cg)
+            func && func(splitObj);
+        }
+
     }
 
     processOnLoad(node, watch=document) {
@@ -1470,7 +1518,7 @@ class ClassGraph {
     }
 
     safeInsertMany(entity, classes) {
-        let index = 0; 
+        let index = 0;
         for(let name of classes) {
             this.safeInsertLine(name, entity, index++);
         }
@@ -1812,6 +1860,7 @@ const polyclassProxy = {
     */
     safeSpace: {
         units: polyUnits
+        , addons: []
     }
 
     , get(target, property, receiver) {
