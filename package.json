@@ -7,7 +7,7 @@
         "default": "./dist/full/esm/polyclass-full.js"
     },
     "browser": "dist/polyclass.full.js",
-    "version": "0.0.7",
+    "version": "0.1.1",
     "scripts": {
         "build": "rollup -c"
     },
