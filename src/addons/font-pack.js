@@ -103,7 +103,7 @@
             let name = pack.first
             let replaceFunc = ($, ofs) => (ofs ? ' ' : "") //+ $.toLowerCase()
             let cleanName = toTitleCase(name.replace(/[+]/g, replaceFunc))
-            console.log('Installing Font', cleanName)//, pack)
+            // console.log('Installing Font', cleanName)//, pack)
             pack.cleanName = cleanName
             pack.definition = makeDefinitions(pack)
             let installed = cg.dcss.addStylesheetRules(pack.definition);
@@ -207,7 +207,7 @@
      */
     const getSiblingMutators = function(keys, origin) {
         let results = cg.filterSplit(origin, keys, true)
-        console.log('getSiblingMutators', results)
+        // console.log('getSiblingMutators', results)
         return results
     }
 
