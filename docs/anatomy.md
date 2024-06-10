@@ -10,13 +10,13 @@ selector {  /* declaration block */
 
 Polyclass generates class styles selectors `.selector` given the params within the class name.
 
-```html
+```jinja2
 <div class="class-name-and-params"></div>
 ```
 
 The properties and values populate after a known CSS property:
 
-```html
+```jinja2
 <div class="background-color-red color-white">
     red background, white text.
 </div>
@@ -31,7 +31,7 @@ Polyclass understand all valid properties, and parses parameters as values. Some
 ```
 
 
-```html
+```jinja2
 <div class="background-color-var-primary-bg">
     Background color is the <code>primary-bg</code> CSS variable value.
 </div>
