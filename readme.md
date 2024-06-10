@@ -49,7 +49,7 @@ A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declar
 + Knowledge
   + [What is JIT](#what-is-just-in-time)
   + [What is Declarative](#what-is-declarative-css)
-  + [5 Quadrillion?](./docs/class-count.md)
+  + [5 Quadrillion?](./docs/dev/class-count.md)
 
 
 ## 🚀 In a Hurry?
@@ -57,7 +57,8 @@ A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declar
 Include from [jsdelivr](https://www.jsdelivr.com/package/npm/polyclass):
 
 ```jinja
-<script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
+<!-- Immediate browser drop-in -->
+<script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.browser-full.js"></script>
 ```
 
 **All Done. Let's use it.**
