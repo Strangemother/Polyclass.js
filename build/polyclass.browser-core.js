@@ -919,6 +919,16 @@ class ClassGraph {
         // grab the next keys
         let props = keys.slice(0, c1)
         let values = keys.slice(c1)
+
+        let vg = this.valuesGraph || {}
+        // Reshape any values, correcting for over-splitting
+        values = this.forwardReduceValues(
+                     props
+                    , values
+                    , vg.microGraph
+                    , vg.words
+                )
+
         let r = {
             props, values, str,
             node: currentNode,
@@ -928,6 +938,10 @@ class ClassGraph {
 
         // this.translateValue(r)
         return r
+    }
+
+    forwardReduceValues(props, values, graph, words) {
+        return values
     }
 
     minorCapture(str, sep=this.sep, safe=true) {
