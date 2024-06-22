@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCSS</title>
+    <style type="text/css">
+
+        html {
+            background: #111;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="font-pack-roboto-100-400" polyclass>
+
+        <!--
+        <script src="../dist/polyclass.browser-full.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.full.js"></script>
+        -->
+
+        <script src="../src/tools.js"></script>
+        <script src="../src/dcss.js"></script>
+        <script src="../src/classgraph.js"></script>
+        <script src="../src/addons/monitor.js"></script>
+        <script src="../src/addons/font-pack.js"></script>
+        <script src="../src/addons/var-translate.js"></script>
+        <script src="../src/addons/vars-box.js"></script>
+        <script src="../src/polyclass.js"></script>
+        <script src="../src/dom-property-activator.js"></script>
+
+        <script src="../src/addons/color-values.js"></script>
+        <!--
+        -->
+
+        <div>
+            <div class="font-pack-roboto-400 font-roboto background-#333 color-#DDD">
+                <h1>Polyclass Colours</h1>
+
+                <div id="demo_space" class="">
+                    <!-- The demo workspace -->
+                    <div class="container
+                                primary-area
+                                padding-1rem-2rem
+                                background-#111">
+                        <p>Color</p>
+                        <div class="color-red">
+                            <p>red</p>
+                        </div>
+                        <div class="color-#880000">
+                            <p>#880000</p>
+                        </div>
+                        <div class="color-rgb-200-20-20">
+                            <p>rgb-200-20-20</p>
+                        </div>
+                        <div class="color-hsl-150-30%-60%/0.8">
+                            <p>hsl-150-30%-60%/0.8</p>
+                        </div>
+                        <div class="color-hwb-194-0%-0%/0.5">
+                            <p>hwb-194-0%-0%/0.5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class='font-family-ui-monospace display-inline-flow-root'>
+                    <p>Hello</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
