@@ -15,9 +15,9 @@
     const insertReceiver = function(){
         console.log('event receiver')
 
-        ClassGraph.addons.varTranslateReceiver = function(_cg){
+        ClassGraph.addons.eventsReceiver = function(_cg){
             cg = _cg;
-            cg.insertReceiver(['event'], mouseReceiver)
+            cg.insertReceiver(['event'], eventReceiver)
         }
 
         // ClassGraph.addons.varTranslateReceiver = function(_cg){
@@ -26,7 +26,7 @@
         // }
     }
 
-    const mouseReceiver =  function(splitObj, index) {
+    const eventReceiver =  function(splitObj, index) {
 
         // console.log('running on', splitObj)
         values = splitObj.values
