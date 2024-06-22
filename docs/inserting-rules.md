@@ -55,6 +55,11 @@ Create JavaScript functional handlers to detect when a class is created. The rec
 ```js
 pc.insertReceiver(['font','pack'], function(splitObj){
     console.log('font-pack receiver', arguments)
+    const values = splitObj.values
+        , origin = splitObj.origin
+        ;
+    origin.classList.add('add-a-class')
+    console.log(values.join('_'))
 })
 ```
 
