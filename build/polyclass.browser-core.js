@@ -442,6 +442,21 @@ class DynamicCSSStyleSheet {
         return undefined
     }
 
+    removeRuleBySelector(selector, _sheet) {
+        let sheet = this.getEnsureStyleSheet(_sheet)
+        let index = this._getIndexBySelector(selector, sheet)
+        sheet.removeRule(index)
+    }
+
+    _getIndexBySelector(selector, sheet)  {
+        let c = 0 
+        for(let rule of sheet.cssRules) {
+            if(selector == rule.selectorText) {
+                return c 
+            }
+            c++;
+        }
+    }
     /**
      * Pushes an array rule to the stylesheet.
      * @param {Object} styleSheet - The stylesheet.
@@ -599,6 +614,16 @@ const generateClassGraph = function(config={}){
 }
 
 
+const clog = function(...s) {
+    console.log(`%c ${s.join(' ')} `, 'background: #111; color: #99DDAA');
+}
+
+
+const arrayMatch = (a,b) => {
+    return a.every((e,i)=>b[i]==e)
+}
+
+
 class ClassGraph {
 
     sep = '-'
@@ -658,6 +683,7 @@ class ClassGraph {
 
     addCamelString(name) {
         // convert to kebab-case, then push into the graph
+        // From ./tools.js
         let kebab = kebabCase(name)
         // console.log(name, kebab)
         let keys = kebab.split('-')
@@ -740,7 +766,6 @@ class ClassGraph {
         }
     }
 
-
     processAliases(aliases) {
         for(let key in aliases) {
             this.addAliases(key, aliases[key])
@@ -776,8 +801,8 @@ class ClassGraph {
     }
 
     /*Given a list of keys, convert any _literal_ aliases to their true
-    key.
-    Return a new list. The new list length may differ from the given list.
+     key.
+     Return a new list. The new list length may differ from the given list.
     */
     aliasConvert(rawKeys) {
 
