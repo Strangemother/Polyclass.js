@@ -1,3 +1,35 @@
+/*
+
+This rollup performs all the build tasks required for all versions.
+To execute, run the npm build command
+
+    npm run build
+
+The results deploy to `build/` and `dist/` folders.
+
++ Each addon builds into a minified `dist/addons/name.js` (see addonsConfig)
+
+## How does it work
+
+The rollup tools expects configurations of assets. They're exported at the base
+of this file. Each object contains an `input`str, `output`[] and `plugins`
+
+    export default [{
+        input: "path.js"
+        output: [
+            {file: 'dist/output.js', format: 'esm'},
+            {file: 'dist/output.js', format: 'umd', name: 'polything'},
+        ]
+        , plugins: []
+    }]
+
+
+Each stage does the following:
+
++ Use the created "merge" files within the `build/`
++ Create a minified `dist/` of each file discovered
+
+*/
 import resolve from '@rollup/plugin-node-resolve'; // Helps Rollup find external modules
 import commonjs from '@rollup/plugin-commonjs'; // Converts CommonJS modules to ES6
 import terser from '@rollup/plugin-terser'; // Minifies the bundle
