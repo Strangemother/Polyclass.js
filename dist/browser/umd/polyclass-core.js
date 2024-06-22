@@ -818,7 +818,7 @@
           let props = keys.slice(0, c1);
           let values = keys.slice(c1);
 
-          let vg = this.valuesGraph;
+          let vg = this.valuesGraph || {};
           // Reshape any values, correcting for over-splitting
           values = this.forwardReduceValues(
                        props
@@ -1695,7 +1695,7 @@
               // test for active attributes
               const attrValue = this.getParsedAttrValue('monitor', config.target);
               if(attrValue !== false) {
-                  this._graph.monitor(config.target);
+                  this._graph?.monitor && this._graph.monitor(config.target);
               }
           }
 

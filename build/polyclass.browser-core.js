@@ -1381,6 +1381,18 @@ class ClassGraph {
         return res
     }
 
+    removeRule(splitObj, props=undefined, withParentSelector=true) {
+        let valueKey = splitObj?.props?.join('-')
+        let propStr = this.asSelectorString(splitObj, withParentSelector)
+        let exists = this.dcss.selectorExists(propStr)
+        if(!exists) {
+            // Prop doesn't exist.
+            return
+        }
+
+        let res = this.dcss.removeRuleBySelector(propStr)
+    }
+
     /*Given a special splitobject using `objectSplit()`, convert to a css
       style and insert into the dynamic stylesheet.
 
@@ -1565,9 +1577,15 @@ class ClassGraph {
     Any detected rule of which does not exist, is created and
     applied to the class graph.
      */
-    captureNew(items, oldItems, origin) {
+    captureChanges(items, oldItems, origin) {
         let cg = this;
         // console.log('Capture new', items, oldItems)
+        this.discoverInsert(items, origin)
+        this.discoverRemove(oldItems, origin)
+    }
+
+    discoverInsert(items, origin) {
+        let cg = this;
         for(let str of items) {
             if(str.length == 0) {
                 continue
@@ -1580,6 +1598,22 @@ class ClassGraph {
             let res = func(splitObj)
             // console.log(str, res)
         }
+
+    }
+
+    discoverRemove(oldItems, origin) {
+        let cg = this;
+        for(let str of oldItems) {
+            if(str.length == 0) {
+                continue
+            }
+            let splitObj = cg.objectSplit(str)
+            splitObj.origin = origin
+            let n = splitObj.node?.unhandler
+            let func = n?.bind(splitObj) //: cg.removeRule.bind(cg)
+            let res = func && func(splitObj)
+        }
+
     }
 
     processOnLoad(node, watch=document) {
@@ -1611,21 +1645,20 @@ class ClassGraph {
     }
 
     safeInsertMany(entity, classes) {
-        let index = 0 
+        let index = 0
         for(let name of classes) {
             this.safeInsertLine(name, entity, index++)
         }
     }
 
     safeInsertLine(name, entity, index=-1) {
+                     // objectSplit(str, sep, index=-1)
         let spl2 = this.objectSplit(name, undefined, undefined, index)
         if(spl2.valid) {
-            // console.log('Inserting', spl2)
             spl2.origin = entity
             this.insertRule(spl2)
         }
-        // console.log(spl2)
-        // this.isBranch(spl2)
+        return spl2
     }
 
     getAllClasses(parent=document.body, deep=false, includeParent=true) {
@@ -1717,7 +1750,7 @@ into the units.
 */
 const onDomLoaded = function() {
     const targets = document.querySelectorAll('*[polyclass]');
-    console.log('Discovered', targets.length)
+    // console.log('Discovered', targets.length)
     for(let target of targets){
         let polyclassId = ensureId(target)
         let pc = new Polyclass({target, isInline:true})
@@ -1738,11 +1771,9 @@ autoActivator();
 // ;(()=>{
 
 class PolyObject {
-
-    // constructor() {
     constructor([config]=[]) {
         this.units = polyUnits
-        console.log('me:', config)
+        // console.log('me:', config)
         let cg = new ClassGraph(config)
         cg.generate(config?.target)
         this._graph = cg
@@ -1763,7 +1794,7 @@ class PolyObject {
     }
 
     loadConfig(config) {
-        console.log('load', config)
+        // console.log('load', config)
         if(config?.processOnLoad) {
             this.processOnLoad(config.processOnLoad)
         }
@@ -1776,7 +1807,7 @@ class PolyObject {
             // test for active attributes
             const attrValue = this.getParsedAttrValue('monitor', config.target)
             if(attrValue !== false) {
-                this._graph.monitor(config.target)
+                this._graph?.monitor && this._graph.monitor(config.target)
             }
         }
 
@@ -1943,7 +1974,7 @@ class PolyObject {
     proxt, If called with `new Polyclass`
 */
 const polyclassHead = function(){
-    console.log('new', arguments)
+    // console.log('new', arguments)
     return polyclassProxy.newInstance.apply(polyclassProxy, arguments)
 };
 
@@ -1957,6 +1988,7 @@ const polyclassProxy = {
     */
     safeSpace: {
         units: polyUnits
+        , addons: []
     }
 
     , get(target, property, receiver) {
@@ -1980,7 +2012,7 @@ const polyclassProxy = {
     }
 
     , newInstance() {
-        console.log('new instance', Array.from(arguments))
+        // console.log('new instance', Array.from(arguments))
         let r = new PolyObject(Array.from(arguments))
         return r
         // return r.proxy
