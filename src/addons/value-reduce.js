@@ -396,8 +396,16 @@ const words = new Words()
 
 
 var installReceiver = function() {
-    ClassGraph.addons.forwardReduceValues = (cg) => words.installPropArray(dashprops)
-    ClassGraph.prototype.forwardReduceValues = forwardReduceValues
+    ClassGraph.addons.forwardReduceValues = function(cg){
+        let func = function(prop, values) {
+            return forwardReduceValues(prop, values, microGraph, words)
+        }
+        cg.reducers.push(func)
+        let res = words.installPropArray(dashprops)
+        return res;
+    }
+    // install one of many
+    // ClassGraph.prototype.forwardReduceValues = forwardReduceValues
     ClassGraph.prototype.valuesGraph =  { microGraph, words }
 }
 
@@ -478,9 +486,6 @@ const forwardReduceValues = function(props, values, microGraph, translations) {
     const _graph = microGraph || {
         'row': {
             'reverse': merge
-        }
-        , 'other': {
-            'horse': merge
         }
     }
 
