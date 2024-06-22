@@ -33,6 +33,7 @@ class ClassGraph {
     constructor(conf) {
         this.conf = conf || {}
 
+        this.announce('wake')
         /*
             A simple key -> function dictionary to capture special (simple)
             keys during the translate value phase.
@@ -41,7 +42,7 @@ class ClassGraph {
         this.translateMap = {
             // 'var': this.variableDigest,
         }
-
+        this.reducers = []
         if(this.conf.addons !== false) {
             this.installAddons(this.getPreAddons())
         }
@@ -350,13 +351,13 @@ class ClassGraph {
         let props = keys.slice(0, c1)
         let values = keys.slice(c1)
 
-        let vg = this.valuesGraph
+        let vg = this.valuesGraph || {}
         // Reshape any values, correcting for over-splitting
         values = this.forwardReduceValues(
                      props
                     , values
-                    , vg.microGraph
-                    , vg.words
+                    // , vg.microGraph
+                    // , vg.words
                 )
 
         let r = {
@@ -371,7 +372,13 @@ class ClassGraph {
     }
 
     forwardReduceValues(props, values, graph, words) {
-        return values
+        let loopProps = props;
+        let loopValues = values;
+        for(let reducer of this.reducers) {
+            let r = reducer(loopProps, loopValues)//, graph, words)
+            loopValues = r
+        }
+        return loopValues
     }
 
     minorCapture(str, sep=this.sep, safe=true) {
