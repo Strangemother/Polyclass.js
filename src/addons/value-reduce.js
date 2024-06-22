@@ -121,6 +121,75 @@ class Words extends Map {
     }
 }
 
+/*
+1. all the items have string in position
+2. the we create the flat array list
+each position is a word from the string list
+
+    "all-petite-caps",
+    "all-scroll",
+    "all-small-caps",
+
+as a string:
+
+    "  all petite caps scroll small ..."
+
+Becomes:
+    [1, [
+            [2, [
+                    [3, null]
+                ]
+            ],
+            [4, null],
+            [5, [
+                    [3,null]
+                ]
+            ]
+        ]
+    ]
+
+---
+
+When loaded, we can re-ask for the prop:
+
+    w.stringToBits("all-petite-caps")
+    [1,2,3]
+
+The last key
+
+    w.stringToBits("zoom")
+    [211]
+    w.stringToBits("zoom-out")
+    [211, 66]
+---
+
+
+    "all-petite-caps",
+    "all-scroll",
+    "all-small-caps",
+    "allow-end",
+    "alternate-reverse",
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0-1-2",
+    "0-3",
+    "0-4-5",
+    "6-7",
+    "8-9",
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0-1-2 0-3 0-4-5 6-7 8-9"
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0 1 2,0 3,0 4 5,6 7,8 9"
+
+    // radix each key through 32 bits, allowing ~1000 positions as 2bits
+    // not really helpful under 100 keys, but then saves 1 char per position (up to 1k)
+    // .. With 255~ keys thats 150~ chars saved.
+    // In a 32bit radix, the first 31 positions are single chars.
+---
+
+*/
 
 const words = new Words()
     , microGraph = {}

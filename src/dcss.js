@@ -1,15 +1,15 @@
 /**
- * A DynamicCSSStyleSheet allows the developer to manipulate the
- * CSS Style objects within the sheet, rather than switching classes
- * or using JS.
- *
- * When installed the stylesheet acts behaves like a standard stylesheet
- * We can add, update, and remove active style definitions, immediately
- * affecting the view.
- *
- * This is very useful for complex or dynamic CSS definitions, such as
- * a `path()` or font packages. We can couple view changes with style attributes
- * without a middle-man
+ A DynamicCSSStyleSheet allows the developer to manipulate the
+ CSS Style objects within the sheet, rather than switching classes
+ or using JS.
+
+ When installed the stylesheet acts behaves like a standard stylesheet
+ We can add, update, and remove active style definitions, immediately
+ affecting the view.
+
+ This is very useful for complex or dynamic CSS definitions, such as
+ a `path()` or font packages. We can couple view changes with style attributes
+ without a middle-man
  */
 class RenderArray extends Array {
     renderAll() {
@@ -215,10 +215,10 @@ class DynamicCSSStyleSheet {
     }
 
     _getIndexBySelector(selector, sheet)  {
-        let c = 0 
+        let c = 0
         for(let rule of sheet.cssRules) {
             if(selector == rule.selectorText) {
-                return c 
+                return c
             }
             c++;
         }
