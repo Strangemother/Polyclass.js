@@ -65,6 +65,8 @@
             cg = _cg;
             cg.insertReceiver(['font', 'pack'], fontPackReceiver)
         }
+        ClassGraph.prototype.generateGoogleLinks = generateGoogleLinks
+        ClassGraph.prototype.installGoogleLinks = installGoogleLinks
     }
 
     /**
