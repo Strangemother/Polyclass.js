@@ -45,7 +45,7 @@ class PolyObject {
             // test for active attributes
             const attrValue = this.getParsedAttrValue('monitor', config.target)
             if(attrValue !== false) {
-                this._graph.monitor(config.target)
+                this._graph?.monitor && this._graph.monitor(config.target)
             }
         }
 
