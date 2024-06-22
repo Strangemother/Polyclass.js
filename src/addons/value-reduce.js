@@ -78,10 +78,10 @@ class Words extends Map {
 
     wordsToArrayString(indent=0, small=false){
         if(!small) {
-            return JSON.stringify(wordsToOrderedArray(), null, indent)
+            return JSON.stringify(this.wordsToOrderedArray(), null, indent)
         }
 
-        return wordsToOrderedArray().join(' ')
+        return this.wordsToOrderedArray().join(' ')
     }
 
     wordsToObjectString(indent=0, small=false) {
