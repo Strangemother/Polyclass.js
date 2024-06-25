@@ -2,51 +2,46 @@
 //;(()=>{
 
 var installReceiver = function() {
-    ClassGraph.addons.forwardColorValues = function(cg){
+
+    let keys = new Set([
+        /* Hex is a freebie, under the special term `#` hash: #000000 */
+        // 'hex',
+        /* Color property is slightly more complicated, with the first param
+        as a forced string. */
+        // 'color',
+
+        /* Available types, each act the same way: rgb-[3 values][/A]
+        If the key is a mismatch, its ignored. */
+        'rgb',
+        'hsl',
+        'hwb',
+        'lab',
+        'lch',
+        'oklab',
+        'oklch',
+    ])
+
+    ClassGraph.addons.extendedColorValues = function(cg){
         let func = function(prop, values) {
-            return forwardReduceValues(prop, values)
+            return forwardHotWordReduce(prop, values, keys)
         }
         cg.reducers.push(func)
     }
 }
 
 
-const forwardReduceValues = function(props, values) {
-    /*
-        Key pops early, and can accept a variable amount of vars.
-     */
-    const merge = (v)=> v.join('-');
+/* Return a boolean if the detected type is a valid css value of type:
 
-    let len = values.length
-        , position = 0
-        , max = values.length + 1
-        , count = 0
-        , response = []
-        ;
-
-    while(position < len && count < max) {
-        let sliced = values.slice(position)
-        let [key, usedCount] = popOneValueForward(sliced, true)
-
-        position += usedCount
-        count += 1
-        if(Array.isArray(key)) {
-            response = response.concat(key)
-        } else {
-            response.push(key)
-        }
-    }
-
-    return response
-}
-
+    Number:     0 | 0.0
+    Percent:    0%
+    Opacity:    0/0
+    Angle:      0turn | 0rad
+*/
 const isNumOrPerc = function(value) {
-    // if(isNumber(value)) {
-    //     return true
-    // }
     return isNumber(value) || isPercent(value) || isOpacityNum(value) || isAngle(value)
 }
 
+/* Return boolean for the match of a css value with an alpha: 0/0 */
 const isOpacityNum = function(value) {
     // '60%/0.8'
     let spl = value.split('/')
@@ -62,6 +57,7 @@ const isAngle = function(value) {
     return types.has(extra)
 }
 
+
 const isPercent = function(value) {
     return value.endsWith('%') && isNumber(value.slice(0, value.length-1))
 }
@@ -73,28 +69,98 @@ const isNumber = function(value) {
     return isNum
 }
 
-const popOneValueForward = function(values, breakEarly=false) {
 
-    let items = new Set([
-        // 'hex',
-        // 'rgba',
-        // 'color',
-        'rgb',
-        'hsl',
-        'hwb',
-        'lab',
-        'lch',
-        'oklab',
-        'oklch',
-    ])
+const asThreeBitColor = function(values) {
+    let ex = values.slice(4, 5)
+    let alp = ''
+    if(ex.length>0) {
+        alp = `/${ex}`
+    }
+    return `${values[0]}(${values.slice(1, 4).join(' ')}${alp})`
+}
 
-    let keyStartMatch = (x) => items.has(x)
-    let l = values.length
+
+/* Perform a _hot word_ detection on the values recursively. A _hot word_ may be any key.
+
+    forwardHotWordReduce(
+        ['color']
+        , ['rgb', '10', '10', '10', 'eggs']
+        , new Set(['rgb'])
+    )
+
+For each forward step detect a key, if found the reducer collects as many
+forward properties as required, then releases after the first fail.
+
+This method then performs this after every release, concatenating changed and
+unchanged into a response list.
+
+    rgb-200-200-200-foo
+
+    rgb(200 200 200) foo
+
+ */
+const forwardHotWordReduce = function(props, values, keys, keyTestFunc=undefined) {
+    /*
+        Key pops early, and can accept a variable amount of vars.
+     */
+
+    let len = values.length
+        , position = 0
+        , max = values.length + 1
+        , count = 0
+        , response = []
+        ;
+
+    while(position < len && count < max) {
+        let sliced = values.slice(position)
+        let [key, usedCount] = hotWordReduce(sliced, keys, true, keyTestFunc)
+
+        position += usedCount
+        count += 1
+        if(Array.isArray(key)) {
+            response = response.concat(key)
+        } else {
+            response.push(key)
+        }
+    }
+
+    return response
+}
+
+/* Perform a _hot word_ detection on the values. A _hot word_ may be any key.
+
+    forwardHotWordReduce(
+        , ['rgb', '10', '10', '10', 'eggs']
+        , new Set(['rgb'])
+        , true
+    )
+
+    rgb(200 200 200) // break early
+    rgb(200 200 200) egg
+
+For each forward step detect a key, if found the reducer collects as many
+forward properties as required, then releases after the first fail if `breakEarly` is true.
+
+    rgb-200-200-200-foo-hsl-20-0%-10-foo
+
+    rgb(200 200 200) foo hsl(20 0% 10) foo
+
+ */
+
+const hotWordReduce = function(values, keys
+                            , breakEarly=false
+                            , callback=asThreeBitColor
+                            , keyTestFunc=undefined) {
+
     var i = 0;
-    let bits = [];
-    let kept = []
-    let lost = []
-    let max = 4; // can be 3 or 4
+    let inSet = (x) => keys.has(x)
+        , keyStartMatch = keyTestFunc != undefined? keyTestFunc: inSet
+        , l = values.length
+        , bits = []
+        , kept = []
+        , lost = []
+        , max = 4 // can be 3 or 4
+        ;
 
     for (;i < l; i++) {
         // console.log('---')
@@ -128,7 +194,7 @@ const popOneValueForward = function(values, breakEarly=false) {
             let [a,b] = [inI, j]
             // console.log('a,b ',a, b, values.slice(a,b), kept)
             let plucked = kept.slice(a, b);
-            let newEntry = asThreeBitColor(kept)
+            let newEntry = callback(kept)
             if(plucked.length < 3) {
                 // console.log('Failed.', bits)
                 bits = bits.concat(kept)
@@ -152,7 +218,7 @@ const popOneValueForward = function(values, breakEarly=false) {
                 let [a,b] = [inI, kept.length]
                 // console.log('a,b ',a, b, values.slice(a,b), kept)
                 let plucked = kept.slice(a, b);
-                let newEntry = asThreeBitColor(kept)
+                let newEntry = callback(kept)
                 // console.log('plucked', plucked)
                 // console.log('kept', kept)
                 if(kept.length < 3) {
@@ -171,17 +237,8 @@ const popOneValueForward = function(values, breakEarly=false) {
     // console.log('Done pop', i)
     // console.log('in', values, 'out', bits)
 
-    let newEntry = asThreeBitColor(kept)
+    let newEntry = callback(kept)
     return [newEntry, i+1]
-}
-
-const asThreeBitColor = function(values) {
-    let ex = values.slice(4, 5)
-    let alp = ''
-    if(ex.length>0) {
-        alp = `/${ex}`
-    }
-    return `${values[0]}(${values.slice(1, 4).join(' ')}${alp})`
 }
 
 
