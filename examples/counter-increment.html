@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCSS</title>
+    <style type="text/css">
+
+        html { background: #111; }
+        .result:after {
+            content: counter(eggs);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="font-pack-roboto-100-400">
+
+        <!--
+        <script src="../build/polyclass.full.js"></script>
+        -->
+
+        <script src="../src/tools.js"></script>
+        <script src="../src/dcss.js"></script>
+        <script src="../src/classgraph.js"></script>
+        <script src="../src/addons/monitor.js"></script>
+        <script src="../src/addons/font-pack.js"></script>
+        <script src="../src/polyclass.js"></script>
+        <script src="../src/dom-property-activator.js"></script>
+
+
+        <div polyclass monitor>
+            <div class="font-pack-roboto-400
+                        font-roboto-400
+                        background-#333
+                        color-#DDD">
+                <p>
+                    <ul>
+                        <li>
+                            The "ol" has the class "counter-reset-eggs"
+                        </li>
+                        <li>
+                            <span class='text-decoration-underline'>underlined</span>
+                            items have the class: "counter-increment-eggs-2"</p>
+                        </li>
+                    </ul>
+
+                <div class="result">counter(eggs) before iteration: </div>
+
+                <ol class='counter-reset-eggs'>
+                    <li>Octopus</li>
+                    <li>Knat</li>
+                    <li class='text-decoration-underline counter-increment-eggs-2'>Sea Lion</li>
+                    <li class='text-decoration-underline counter-increment-eggs-2'>Beetle</li>
+                    <li class='text-decoration-underline counter-increment-eggs-2'>Bear</li>
+                    <li>Sausage Dog</li>
+                </ol>
+
+                <div class="result">counter(eggs) after iteration: </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
