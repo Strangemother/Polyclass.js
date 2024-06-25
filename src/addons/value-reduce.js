@@ -78,10 +78,10 @@ class Words extends Map {
 
     wordsToArrayString(indent=0, small=false){
         if(!small) {
-            return JSON.stringify(wordsToOrderedArray(), null, indent)
+            return JSON.stringify(this.wordsToOrderedArray(), null, indent)
         }
 
-        return wordsToOrderedArray().join(' ')
+        return this.wordsToOrderedArray().join(' ')
     }
 
     wordsToObjectString(indent=0, small=false) {
@@ -121,6 +121,75 @@ class Words extends Map {
     }
 }
 
+/*
+1. all the items have string in position
+2. the we create the flat array list
+each position is a word from the string list
+
+    "all-petite-caps",
+    "all-scroll",
+    "all-small-caps",
+
+as a string:
+
+    "  all petite caps scroll small ..."
+
+Becomes:
+    [1, [
+            [2, [
+                    [3, null]
+                ]
+            ],
+            [4, null],
+            [5, [
+                    [3,null]
+                ]
+            ]
+        ]
+    ]
+
+---
+
+When loaded, we can re-ask for the prop:
+
+    w.stringToBits("all-petite-caps")
+    [1,2,3]
+
+The last key
+
+    w.stringToBits("zoom")
+    [211]
+    w.stringToBits("zoom-out")
+    [211, 66]
+---
+
+
+    "all-petite-caps",
+    "all-scroll",
+    "all-small-caps",
+    "allow-end",
+    "alternate-reverse",
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0-1-2",
+    "0-3",
+    "0-4-5",
+    "6-7",
+    "8-9",
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0-1-2 0-3 0-4-5 6-7 8-9"
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0 1 2,0 3,0 4 5,6 7,8 9"
+
+    // radix each key through 32 bits, allowing ~1000 positions as 2bits
+    // not really helpful under 100 keys, but then saves 1 char per position (up to 1k)
+    // .. With 255~ keys thats 150~ chars saved.
+    // In a 32bit radix, the first 31 positions are single chars.
+---
+
+*/
 
 const words = new Words()
     , microGraph = {}
@@ -327,61 +396,17 @@ const words = new Words()
 
 
 var installReceiver = function() {
-    ClassGraph.addons.forwardReduceValues = (cg) => words.installPropArray(dashprops)
-    ClassGraph.prototype.forwardReduceValues = forwardReduceValues
+    ClassGraph.addons.forwardReduceValues = function(cg){
+        let func = function(prop, values) {
+            return forwardReduceValues(prop, values, microGraph, words)
+        }
+        cg.reducers.push(func)
+        let res = words.installPropArray(dashprops)
+        return res;
+    }
+    // install one of many
+    // ClassGraph.prototype.forwardReduceValues = forwardReduceValues
     ClassGraph.prototype.valuesGraph =  { microGraph, words }
-}
-
-
-const arrayStringMunger = function(str) {
-    /* given the string, crush it futher.*/
-    let dmap = {
-        // '[': { active: false, current: 0, max: -1}
-        // , ']': { active: false, current: 0, max: -1}
-    }
-
-    let actives = [];
-
-    for(let c of str) {
-        if(dmap[c] == undefined) {
-            // new position
-            dmap[c] = { active: false, current: -1, max: -1, total: 0}
-        }
-
-        if(dmap[c].active) {
-            // was active. just append and continue.
-            dmap[c].current += 1;
-        } else {
-            // Close any alive, finalise the max.
-            // for(let k in dmap) {
-            //     if(k == c) {
-            //         // The same object doesn't turn off.
-            //         continue
-            //     }
-            //     dmap[k].active = false
-            //     dmap[k].max = Math.max(dmap[k].max, dmap[k].current)
-            //     // We set current to 0 here (not -1),
-            //     dmap[k].current = 0
-            // }
-            let cStash = dmap[c].current
-            for(let o of actives) {
-                o.active = false
-                o.max = Math.max(o.max, o.current)
-                o.current = 0
-            }
-
-            actives = [dmap[c]]
-            dmap[c].active = true
-            dmap[c].total += 1
-            dmap[c].current = cStash + 1;
-        }
-    }
-    for(let o of actives) {
-        o.active = false
-        o.max = Math.max(o.max, o.current)
-        o.current = 0
-    }
-    return dmap
 }
 
 
@@ -409,9 +434,6 @@ const forwardReduceValues = function(props, values, microGraph, translations) {
     const _graph = microGraph || {
         'row': {
             'reverse': merge
-        }
-        , 'other': {
-            'horse': merge
         }
     }
 

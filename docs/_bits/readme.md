@@ -7,27 +7,14 @@
 
 A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declarative-css) stylesheet for instant well-behaved _functional_ CSS styling.
 
-[![npm](https://img.shields.io/npm/v/polyclass?registry_uri=https%3A%2F%2Fregistry.npmjs.com&style=flat&logo=npm)](https://www.npmjs.org/package/polyclass)
-[![jsDelivr hits](https://data.jsdelivr.com/v1/package/npm/polyclass/badge)](https://www.jsdelivr.com/package/npm/polyclass)
-![NPM License](https://img.shields.io/npm/l/polyclass)
-
-<!-- stars-->
+{% include "./badges.md" %}
 
 ---
 
 </div>
 
-```jinja
-<body polyclass> <!-- Activate -->
-  <div class="margin-1em-20vw
-              background-color-#111
-              padding-2em">  <!-- Write classes -->
-      <h1 class='color-#EEE'>
-          Instant CSS margin, padding, background and text color - with zero effort.
-      </h1>
-  </div>
-</body>
-```
+{% include "./primary-examples.md" %}
+
 
 ## Table of Contents
 
@@ -54,26 +41,7 @@ A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declar
   + [5 Quadrillion?](./docs/dev/class-count.md)
 
 
-## 🚀 In a Hurry?
-
-Include from [jsdelivr](https://www.jsdelivr.com/package/npm/polyclass):
-
-```jinja
-<!-- Immediate browser drop-in -->
-<script src="https://cdn.jsdelivr.net/npm/polyclass@latest/dist/polyclass.browser-full.js"></script>
-```
-
-**All Done. Let's use it.**
-
-Apply `polyclass` to your target, such as the `body`:
-
-```jinja
-<body polyclass> <!-- Activate -->
-  <h1 class='color-rebeccapurple'> <!-- Write classes -->
-    Purple Title!
-  </h1>
-</body>
-```
+{% include "./install-in-a-hurry.md" %}
 
 **Polyclass anything!** [More Install](#install--use)
 
@@ -90,24 +58,7 @@ Polyclass is a [_just-in-time_](#what-is-just-in-time) CSS class library, built 
 + over 5 quadrillion available properties *\*([and counting](./docs/class-count.md))* 😅
 + No compilation, installation, dependencies, or IDE configurations!
 
-```jinja
-<head>
-  <script type="text/javascript" src='polyclass.full.js'></script>
-</head>
-
-<body polyclass
-  class="margin-0
-         padding-0
-         background-color-#111
-         font-roboto
-         font-pack-roboto-100-400-i400-800-900
-         color-#DDD
-         display-grid
-         grid-template-flow-columns">
-
-      <h1 class"font-size-5rem">ET VOILÀ! Polyclassed.</h1>
-</body
-```
+{% include "./secondary-example.md" %}
 
 ## Features
 

@@ -1,40 +1,3 @@
-/*
-
-vars box. To assign key variables as accessible CSS varialbes through a js
-definition. The definition is bound to DCSS, so edits to the vars manipulates
-the view automatically.
-
-    vars({
-        primary: "#880000" # company red
-        , secondary: "#111" # dark
-        , accent: "red"
-    })
-
-In the node, we access the vars reciever
-
-    <div class="background-color-var-secondary
-                color-primary">
-        <p>An elk called Elk lives here.</p>
-    </div>
-
-Manipulating the var propagates to the view:
-
-    vars.primary = "#EEE" # off white
-
----
-
-## Secondary App
-
-    `swatch()`
-    and colors.js
-
-    Assign "colors" to a swatch of colors, each color is a function from the
-    colors.js module and can assign math relations to swatches.
-    Chaning a swatch (such as its base color), can manipulate the other
-    colours according to the chosen swatch type, e.g. "Diachromic".
-
- */
-
 ;(function(){
 
     let cg;
@@ -42,17 +5,7 @@ Manipulating the var propagates to the view:
     let definition = undefined
     let rootRule;
 
-    /**
-     * The _automatic_ function called at the base of this iffe to
-     * install the `font-pack-*` tokens into the class graph.
-     *
-     * @return {undefined}
-     */
     const insertReceiver = function(){
-        // DynamicCSSStyleSheet.addons.varTranslateReceiver = function(_cg){
-            // cg = _cg;
-            // cg.insertReceiver(['var'], varReceiver)
-        // }
 
         ClassGraph.addons.functionsReceiver = function(_cg){
             cg = _cg;

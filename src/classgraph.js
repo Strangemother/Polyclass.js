@@ -33,6 +33,7 @@ class ClassGraph {
     constructor(conf) {
         this.conf = conf || {}
 
+        this.announce('wake')
         /*
             A simple key -> function dictionary to capture special (simple)
             keys during the translate value phase.
@@ -41,7 +42,7 @@ class ClassGraph {
         this.translateMap = {
             // 'var': this.variableDigest,
         }
-
+        this.reducers = []
         if(this.conf.addons !== false) {
             this.installAddons(this.getPreAddons())
         }
@@ -51,8 +52,38 @@ class ClassGraph {
         this.aliasMap = {}
         this.parentSelector = conf?.parentSelector
         this.processAliases(this.conf?.aliases)
+        this.announce('ready')
     }
 
+    announce(name) {
+        let e = new CustomEvent(`classgraph-${name}`, {
+            detail: {
+                entity: this
+            }
+        })
+        dispatchEvent(e)
+    }
+    /* Insert a literal translation to the translateMap for detection single
+    words within a class string. for example detect `var` in "color-var-foo"
+
+        const variableDigest2 =  function(splitObj, inStack, outStack, currentIndex) {
+            /* Convert the value keys to a var representation.
+                 `var-name-switch` -> [var, name, switch]
+             to
+                 `var(--name-switch)`
+            *\/
+
+            let keys = inStack.slice(currentIndex)
+            let k1 = keys.slice(1)
+            let word = `var(--${k1.join("-")})`
+
+            outStack.push(word)
+            // return [inStack, outStack, currentIndex]
+            return [[], outStack, currentIndex + k1.length]
+        }
+
+        cg.insertTranslator('var', variableDigest2)
+    */
     insertTranslator(key, func) {
         this.translateMap[key] = func
     }
@@ -320,13 +351,13 @@ class ClassGraph {
         let props = keys.slice(0, c1)
         let values = keys.slice(c1)
 
-        let vg = this.valuesGraph
+        let vg = this.valuesGraph || {}
         // Reshape any values, correcting for over-splitting
         values = this.forwardReduceValues(
                      props
                     , values
-                    , vg.microGraph
-                    , vg.words
+                    // , vg.microGraph
+                    // , vg.words
                 )
 
         let r = {
@@ -341,7 +372,13 @@ class ClassGraph {
     }
 
     forwardReduceValues(props, values, graph, words) {
-        return values
+        let loopProps = props;
+        let loopValues = values;
+        for(let reducer of this.reducers) {
+            let r = reducer(loopProps, loopValues)//, graph, words)
+            loopValues = r
+        }
+        return loopValues
     }
 
     minorCapture(str, sep=this.sep, safe=true) {

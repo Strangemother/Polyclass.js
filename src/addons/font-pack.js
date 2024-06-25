@@ -65,6 +65,8 @@
             cg = _cg;
             cg.insertReceiver(['font', 'pack'], fontPackReceiver)
         }
+        ClassGraph.prototype.generateGoogleLinks = generateGoogleLinks
+        ClassGraph.prototype.installGoogleLinks = installGoogleLinks
     }
 
     /**
@@ -87,13 +89,16 @@
         let familyStrings = createFamilyString(values, fonts, origin)
 
         // let families = tokenize(values)
-
-        // install as header <link> items
-        // console.info('Installing Google fonts: familyStrings:', familyStrings)
-        generateGoogleLinks(familyStrings).forEach((x)=>document.head.appendChild(x))
+        installGoogleLinks(familyStrings)
 
         // Install additional css additions
         installFontObjects(fonts, obj)
+    }
+
+    const installGoogleLinks = function(familyStrings, display) {
+        // install as header <link> items
+        // console.info('Installing Google fonts: familyStrings:', familyStrings)
+        return generateGoogleLinks(familyStrings, display).forEach((x)=>document.head.appendChild(x))
     }
 
     const installFontObjects = function(fonts, splitObj) {
@@ -459,7 +464,7 @@
         })
     }
 
-    const generateGoogleLinks = function(familyStrings){
+    const generateGoogleLinks = function(familyStrings, display='swap'){
 
         let a = getOrCreateLink('link', 'preconnect', {
             href: "https://fonts.googleapis.com"
@@ -470,8 +475,10 @@
             , crossorigin: ''
         })
 
+        let ds = display == null? '': `&display=${display}`
+
         let c = getOrCreateLink('link', "stylesheet", {
-            href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
+            href:`https://fonts.googleapis.com/css2?${familyStrings}${ds}`
         })
 
         return [a,b,c]
@@ -479,6 +486,18 @@
 
     let linkCache = {}
 
+    /*
+        Create a link node
+
+            let b = getOrCreateLink('link', 'preconnect', {
+                href: "https://fonts.gstatic.com"
+                , crossorigin: ''
+            })
+
+            let c = getOrCreateLink('link', "stylesheet", {
+                href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
+            })
+     */
     const getOrCreateLink = function(href, rel, opts) {
         let v = {
             rel, href
