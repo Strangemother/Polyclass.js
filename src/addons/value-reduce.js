@@ -410,58 +410,6 @@ var installReceiver = function() {
 }
 
 
-const arrayStringMunger = function(str) {
-    /* given the string, crush it futher.*/
-    let dmap = {
-        // '[': { active: false, current: 0, max: -1}
-        // , ']': { active: false, current: 0, max: -1}
-    }
-
-    let actives = [];
-
-    for(let c of str) {
-        if(dmap[c] == undefined) {
-            // new position
-            dmap[c] = { active: false, current: -1, max: -1, total: 0}
-        }
-
-        if(dmap[c].active) {
-            // was active. just append and continue.
-            dmap[c].current += 1;
-        } else {
-            // Close any alive, finalise the max.
-            // for(let k in dmap) {
-            //     if(k == c) {
-            //         // The same object doesn't turn off.
-            //         continue
-            //     }
-            //     dmap[k].active = false
-            //     dmap[k].max = Math.max(dmap[k].max, dmap[k].current)
-            //     // We set current to 0 here (not -1),
-            //     dmap[k].current = 0
-            // }
-            let cStash = dmap[c].current
-            for(let o of actives) {
-                o.active = false
-                o.max = Math.max(o.max, o.current)
-                o.current = 0
-            }
-
-            actives = [dmap[c]]
-            dmap[c].active = true
-            dmap[c].total += 1
-            dmap[c].current = cStash + 1;
-        }
-    }
-    for(let o of actives) {
-        o.active = false
-        o.max = Math.max(o.max, o.current)
-        o.current = 0
-    }
-    return dmap
-}
-
-
 /*
  Return a list of `values` to replace the given `values` , used as the
  key-sets used for the css class generation.

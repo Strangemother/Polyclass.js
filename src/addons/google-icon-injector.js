@@ -60,7 +60,7 @@
     }
 
     const installSheetRules = function(obj, fontSettings){
-         /*.material-symbols-sharp  {
+        /*.material-symbols-sharp  {
                 font-variation-settings:
                     'FILL' 0,
                     'wght' 500,
