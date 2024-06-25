@@ -38,7 +38,9 @@ A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declar
   + [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
   + [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
   + [Events](./docs/events.md) Apply JavaScript event listeners using class-names
-  + [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions.
+  + [Icons](./docs/icons.md) Instant Google material icons
+  + [Extended Colors](./docs/extended-colors.md) Use all other CSS color types
+  + [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions
   + Variables
     + [CSS `var()`](./docs/css-var.md) Utilise variables for declarative properties and values
     + [Polyclass `vars()` object](./docs/vars-object.md) Use JavaScript objects as CSS vars
@@ -304,13 +306,14 @@ Here's the CSS Polyclass created:
 Useful Functionality:
 
 + [Fonts](./docs/font-pack.md) Install and use fonts dynamically
++ [Icons](./docs/icons.md) Install and use Google material dynamically
 + [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
 + [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
 + [Events](./docs/events.md) Apply JavaScript event listeners using class-names
++ [More Colors](./docs/extended-colors.md) Expanded color types, such as `hsl` and `rgb` ...
 + [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions.
 + [CSS `var()`](./docs/css-var.md) Utilise `--vars` for declarative properties and values
 + [Polyclass `vars()` object](./docs/vars-object.md) Use JavaScript objects as CSS vars
-
 
 
 ## Who is this for?
