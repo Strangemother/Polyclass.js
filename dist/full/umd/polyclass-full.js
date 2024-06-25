@@ -172,17 +172,17 @@
   })();
 
   /**
-   * A DynamicCSSStyleSheet allows the developer to manipulate the
-   * CSS Style objects within the sheet, rather than switching classes
-   * or using JS.
-   *
-   * When installed the stylesheet acts behaves like a standard stylesheet
-   * We can add, update, and remove active style definitions, immediately
-   * affecting the view.
-   *
-   * This is very useful for complex or dynamic CSS definitions, such as
-   * a `path()` or font packages. We can couple view changes with style attributes
-   * without a middle-man
+   A DynamicCSSStyleSheet allows the developer to manipulate the
+   CSS Style objects within the sheet, rather than switching classes
+   or using JS.
+
+   When installed the stylesheet acts behaves like a standard stylesheet
+   We can add, update, and remove active style definitions, immediately
+   affecting the view.
+
+   This is very useful for complex or dynamic CSS definitions, such as
+   a `path()` or font packages. We can couple view changes with style attributes
+   without a middle-man
    */
   class RenderArray extends Array {
       renderAll() {
@@ -388,10 +388,10 @@
       }
 
       _getIndexBySelector(selector, sheet)  {
-          let c = 0; 
+          let c = 0;
           for(let rule of sheet.cssRules) {
               if(selector == rule.selectorText) {
-                  return c 
+                  return c
               }
               c++;
           }
@@ -536,6 +536,7 @@
       constructor(conf) {
           this.conf = conf || {};
 
+          this.announce('wake');
           /*
               A simple key -> function dictionary to capture special (simple)
               keys during the translate value phase.
@@ -544,7 +545,7 @@
           this.translateMap = {
               // 'var': this.variableDigest,
           };
-
+          this.reducers = [];
           if(this.conf.addons !== false) {
               this.installAddons(this.getPreAddons());
           }
@@ -554,8 +555,38 @@
           this.aliasMap = {};
           this.parentSelector = conf?.parentSelector;
           this.processAliases(this.conf?.aliases);
+          this.announce('ready');
       }
 
+      announce(name) {
+          let e = new CustomEvent(`classgraph-${name}`, {
+              detail: {
+                  entity: this
+              }
+          });
+          dispatchEvent(e);
+      }
+      /* Insert a literal translation to the translateMap for detection single
+      words within a class string. for example detect `var` in "color-var-foo"
+
+          const variableDigest2 =  function(splitObj, inStack, outStack, currentIndex) {
+              /* Convert the value keys to a var representation.
+                   `var-name-switch` -> [var, name, switch]
+               to
+                   `var(--name-switch)`
+              *\/
+
+              let keys = inStack.slice(currentIndex)
+              let k1 = keys.slice(1)
+              let word = `var(--${k1.join("-")})`
+
+              outStack.push(word)
+              // return [inStack, outStack, currentIndex]
+              return [[], outStack, currentIndex + k1.length]
+          }
+
+          cg.insertTranslator('var', variableDigest2)
+      */
       insertTranslator(key, func) {
           this.translateMap[key] = func;
       }
@@ -819,13 +850,13 @@
           let props = keys.slice(0, c1);
           let values = keys.slice(c1);
 
-          let vg = this.valuesGraph || {};
+          this.valuesGraph || {};
           // Reshape any values, correcting for over-splitting
           values = this.forwardReduceValues(
                        props
                       , values
-                      , vg.microGraph
-                      , vg.words
+                      // , vg.microGraph
+                      // , vg.words
                   );
 
           let r = {
@@ -840,7 +871,13 @@
       }
 
       forwardReduceValues(props, values, graph, words) {
-          return values
+          let loopProps = props;
+          let loopValues = values;
+          for(let reducer of this.reducers) {
+              let r = reducer(loopProps, loopValues);//, graph, words)
+              loopValues = r;
+          }
+          return loopValues
       }
 
       minorCapture(str, sep=this.sep, safe=true) {
@@ -2038,6 +2075,8 @@
               cg = _cg;
               cg.insertReceiver(['font', 'pack'], fontPackReceiver);
           };
+          ClassGraph.prototype.generateGoogleLinks = generateGoogleLinks;
+          ClassGraph.prototype.installGoogleLinks = installGoogleLinks;
       };
 
       /**
@@ -2060,13 +2099,16 @@
           let familyStrings = createFamilyString(values, fonts, origin);
 
           // let families = tokenize(values)
-
-          // install as header <link> items
-          // console.info('Installing Google fonts: familyStrings:', familyStrings)
-          generateGoogleLinks(familyStrings).forEach((x)=>document.head.appendChild(x));
+          installGoogleLinks(familyStrings);
 
           // Install additional css additions
           installFontObjects(fonts);
+      };
+
+      const installGoogleLinks = function(familyStrings, display) {
+          // install as header <link> items
+          // console.info('Installing Google fonts: familyStrings:', familyStrings)
+          return generateGoogleLinks(familyStrings, display).forEach((x)=>document.head.appendChild(x))
       };
 
       const installFontObjects = function(fonts, splitObj) {
@@ -2393,7 +2435,7 @@
           });
       };
 
-      const generateGoogleLinks = function(familyStrings){
+      const generateGoogleLinks = function(familyStrings, display='swap'){
 
           let a = getOrCreateLink('link', 'preconnect', {
               href: "https://fonts.googleapis.com"
@@ -2404,8 +2446,10 @@
               , crossorigin: ''
           });
 
+          let ds = display == null? '': `&display=${display}`;
+
           let c = getOrCreateLink('link', "stylesheet", {
-              href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
+              href:`https://fonts.googleapis.com/css2?${familyStrings}${ds}`
           });
 
           return [a,b,c]
@@ -2413,6 +2457,18 @@
 
       let linkCache = {};
 
+      /*
+          Create a link node
+
+              let b = getOrCreateLink('link', 'preconnect', {
+                  href: "https://fonts.gstatic.com"
+                  , crossorigin: ''
+              })
+
+              let c = getOrCreateLink('link', "stylesheet", {
+                  href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
+              })
+       */
       const getOrCreateLink = function(href, rel, opts) {
           let v = {
               rel, href
@@ -2822,10 +2878,10 @@
 
       wordsToArrayString(indent=0, small=false){
           if(!small) {
-              return JSON.stringify(wordsToOrderedArray(), null, indent)
+              return JSON.stringify(this.wordsToOrderedArray(), null, indent)
           }
 
-          return wordsToOrderedArray().join(' ')
+          return this.wordsToOrderedArray().join(' ')
       }
 
       wordsToObjectString(indent=0, small=false) {
@@ -2865,6 +2921,75 @@
       }
   }
 
+  /*
+  1. all the items have string in position
+  2. the we create the flat array list
+  each position is a word from the string list
+
+      "all-petite-caps",
+      "all-scroll",
+      "all-small-caps",
+
+  as a string:
+
+      "  all petite caps scroll small ..."
+
+  Becomes:
+      [1, [
+              [2, [
+                      [3, null]
+                  ]
+              ],
+              [4, null],
+              [5, [
+                      [3,null]
+                  ]
+              ]
+          ]
+      ]
+
+  ---
+
+  When loaded, we can re-ask for the prop:
+
+      w.stringToBits("all-petite-caps")
+      [1,2,3]
+
+  The last key
+
+      w.stringToBits("zoom")
+      [211]
+      w.stringToBits("zoom-out")
+      [211, 66]
+  ---
+
+
+      "all-petite-caps",
+      "all-scroll",
+      "all-small-caps",
+      "allow-end",
+      "alternate-reverse",
+
+      "all petite caps scroll small allow end alternate reverse",
+      "0-1-2",
+      "0-3",
+      "0-4-5",
+      "6-7",
+      "8-9",
+
+      "all petite caps scroll small allow end alternate reverse",
+      "0-1-2 0-3 0-4-5 6-7 8-9"
+
+      "all petite caps scroll small allow end alternate reverse",
+      "0 1 2,0 3,0 4 5,6 7,8 9"
+
+      // radix each key through 32 bits, allowing ~1000 positions as 2bits
+      // not really helpful under 100 keys, but then saves 1 char per position (up to 1k)
+      // .. With 255~ keys thats 150~ chars saved.
+      // In a 32bit radix, the first 31 positions are single chars.
+  ---
+
+  */
 
   const words = new Words()
       , microGraph = {}
@@ -3071,8 +3196,16 @@
 
 
   var installReceiver = function() {
-      ClassGraph.addons.forwardReduceValues = (cg) => words.installPropArray(dashprops);
-      ClassGraph.prototype.forwardReduceValues = forwardReduceValues;
+      ClassGraph.addons.forwardReduceValues = function(cg){
+          let func = function(prop, values) {
+              return forwardReduceValues(prop, values, microGraph, words)
+          };
+          cg.reducers.push(func);
+          let res = words.installPropArray(dashprops);
+          return res;
+      };
+      // install one of many
+      // ClassGraph.prototype.forwardReduceValues = forwardReduceValues
       ClassGraph.prototype.valuesGraph =  { microGraph, words };
   };
 
@@ -3101,9 +3234,6 @@
       const _graph = microGraph || {
           'row': {
               'reverse': merge
-          }
-          , 'other': {
-              'horse': merge
           }
       };
 
