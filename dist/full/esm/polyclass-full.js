@@ -166,17 +166,17 @@ console.log(blendedcolor, blendedcolor2);
 })();
 
 /**
- * A DynamicCSSStyleSheet allows the developer to manipulate the
- * CSS Style objects within the sheet, rather than switching classes
- * or using JS.
- *
- * When installed the stylesheet acts behaves like a standard stylesheet
- * We can add, update, and remove active style definitions, immediately
- * affecting the view.
- *
- * This is very useful for complex or dynamic CSS definitions, such as
- * a `path()` or font packages. We can couple view changes with style attributes
- * without a middle-man
+ A DynamicCSSStyleSheet allows the developer to manipulate the
+ CSS Style objects within the sheet, rather than switching classes
+ or using JS.
+
+ When installed the stylesheet acts behaves like a standard stylesheet
+ We can add, update, and remove active style definitions, immediately
+ affecting the view.
+
+ This is very useful for complex or dynamic CSS definitions, such as
+ a `path()` or font packages. We can couple view changes with style attributes
+ without a middle-man
  */
 class RenderArray extends Array {
     renderAll() {
@@ -382,10 +382,10 @@ class DynamicCSSStyleSheet {
     }
 
     _getIndexBySelector(selector, sheet)  {
-        let c = 0; 
+        let c = 0;
         for(let rule of sheet.cssRules) {
             if(selector == rule.selectorText) {
-                return c 
+                return c
             }
             c++;
         }
@@ -530,6 +530,7 @@ class ClassGraph {
     constructor(conf) {
         this.conf = conf || {};
 
+        this.announce('wake');
         /*
             A simple key -> function dictionary to capture special (simple)
             keys during the translate value phase.
@@ -538,7 +539,7 @@ class ClassGraph {
         this.translateMap = {
             // 'var': this.variableDigest,
         };
-
+        this.reducers = [];
         if(this.conf.addons !== false) {
             this.installAddons(this.getPreAddons());
         }
@@ -548,8 +549,38 @@ class ClassGraph {
         this.aliasMap = {};
         this.parentSelector = conf?.parentSelector;
         this.processAliases(this.conf?.aliases);
+        this.announce('ready');
     }
 
+    announce(name) {
+        let e = new CustomEvent(`classgraph-${name}`, {
+            detail: {
+                entity: this
+            }
+        });
+        dispatchEvent(e);
+    }
+    /* Insert a literal translation to the translateMap for detection single
+    words within a class string. for example detect `var` in "color-var-foo"
+
+        const variableDigest2 =  function(splitObj, inStack, outStack, currentIndex) {
+            /* Convert the value keys to a var representation.
+                 `var-name-switch` -> [var, name, switch]
+             to
+                 `var(--name-switch)`
+            *\/
+
+            let keys = inStack.slice(currentIndex)
+            let k1 = keys.slice(1)
+            let word = `var(--${k1.join("-")})`
+
+            outStack.push(word)
+            // return [inStack, outStack, currentIndex]
+            return [[], outStack, currentIndex + k1.length]
+        }
+
+        cg.insertTranslator('var', variableDigest2)
+    */
     insertTranslator(key, func) {
         this.translateMap[key] = func;
     }
@@ -813,13 +844,13 @@ class ClassGraph {
         let props = keys.slice(0, c1);
         let values = keys.slice(c1);
 
-        let vg = this.valuesGraph || {};
+        this.valuesGraph || {};
         // Reshape any values, correcting for over-splitting
         values = this.forwardReduceValues(
                      props
                     , values
-                    , vg.microGraph
-                    , vg.words
+                    // , vg.microGraph
+                    // , vg.words
                 );
 
         let r = {
@@ -834,7 +865,13 @@ class ClassGraph {
     }
 
     forwardReduceValues(props, values, graph, words) {
-        return values
+        let loopProps = props;
+        let loopValues = values;
+        for(let reducer of this.reducers) {
+            let r = reducer(loopProps, loopValues);//, graph, words)
+            loopValues = r;
+        }
+        return loopValues
     }
 
     minorCapture(str, sep=this.sep, safe=true) {
@@ -1890,6 +1927,248 @@ const polyclassProxy = {
 
 
 const Polyclass = new Proxy(polyclassHead, polyclassProxy);
+
+//;(()=>{
+
+var installReceiver = function() {
+
+    let keys = new Set([
+        /* Hex is a freebie, under the special term `#` hash: #000000 */
+        // 'hex',
+        /* Color property is slightly more complicated, with the first param
+        as a forced string. */
+        // 'color',
+
+        /* Available types, each act the same way: rgb-[3 values][/A]
+        If the key is a mismatch, its ignored. */
+        'rgb',
+        'hsl',
+        'hwb',
+        'lab',
+        'lch',
+        'oklab',
+        'oklch',
+    ]);
+
+    ClassGraph.addons.extendedColorValues = function(cg){
+        let func = function(prop, values) {
+            return forwardHotWordReduce(prop, values, keys)
+        };
+        cg.reducers.push(func);
+    };
+};
+
+
+/* Return a boolean if the detected type is a valid css value of type:
+
+    Number:     0 | 0.0
+    Percent:    0%
+    Opacity:    0/0
+    Angle:      0turn | 0rad
+*/
+const isNumOrPerc = function(value) {
+    return isNumber(value) || isPercent(value) || isOpacityNum(value) || isAngle(value)
+};
+
+/* Return boolean for the match of a css value with an alpha: 0/0 */
+const isOpacityNum = function(value) {
+    // '60%/0.8'
+    let spl = value.split('/');
+    if(spl.length == 2) {
+        return isNumOrPerc(spl[0]) && isNumber(spl[1])
+    }
+    return false
+};
+
+const isAngle = function(value) {
+    let types = new Set(["deg","grad","rad","turn"]);
+    let extra = value.slice(parseFloat(value).toString().length, value.length);
+    return types.has(extra)
+};
+
+
+const isPercent = function(value) {
+    return value.endsWith('%') && isNumber(value.slice(0, value.length-1))
+};
+
+
+const isNumber = function(value) {
+    if(value == undefined || value.length == 0){ return false }    let isNum = !isNaN(Number(value));
+    return isNum
+};
+
+
+const asThreeBitColor = function(values) {
+    let ex = values.slice(4, 5);
+    let alp = '';
+    if(ex.length>0) {
+        alp = `/${ex}`;
+    }
+    return `${values[0]}(${values.slice(1, 4).join(' ')}${alp})`
+};
+
+
+/* Perform a _hot word_ detection on the values recursively. A _hot word_ may be any key.
+
+    forwardHotWordReduce(
+        ['color']
+        , ['rgb', '10', '10', '10', 'eggs']
+        , new Set(['rgb'])
+    )
+
+For each forward step detect a key, if found the reducer collects as many
+forward properties as required, then releases after the first fail.
+
+This method then performs this after every release, concatenating changed and
+unchanged into a response list.
+
+    rgb-200-200-200-foo
+
+    rgb(200 200 200) foo
+
+ */
+const forwardHotWordReduce = function(props, values, keys, keyTestFunc=undefined) {
+    /*
+        Key pops early, and can accept a variable amount of vars.
+     */
+
+    let len = values.length
+        , position = 0
+        , max = values.length + 1
+        , count = 0
+        , response = []
+        ;
+
+    while(position < len && count < max) {
+        let sliced = values.slice(position);
+        let [key, usedCount] = hotWordReduce(sliced, keys, true, keyTestFunc);
+
+        position += usedCount;
+        count += 1;
+        if(Array.isArray(key)) {
+            response = response.concat(key);
+        } else {
+            response.push(key);
+        }
+    }
+
+    return response
+};
+
+/* Perform a _hot word_ detection on the values. A _hot word_ may be any key.
+
+    forwardHotWordReduce(
+        , ['rgb', '10', '10', '10', 'eggs']
+        , new Set(['rgb'])
+        , true
+    )
+
+    rgb(200 200 200) // break early
+    rgb(200 200 200) egg
+
+For each forward step detect a key, if found the reducer collects as many
+forward properties as required, then releases after the first fail if `breakEarly` is true.
+
+    rgb-200-200-200-foo-hsl-20-0%-10-foo
+
+    rgb(200 200 200) foo hsl(20 0% 10) foo
+
+ */
+
+const hotWordReduce = function(values, keys
+                            , breakEarly=false
+                            , callback=asThreeBitColor
+                            , keyTestFunc=undefined) {
+
+    var i = 0;
+    let inSet = (x) => keys.has(x)
+        , keyStartMatch = keyTestFunc != undefined? keyTestFunc: inSet
+        , l = values.length
+        , bits = []
+        , kept = []
+        , lost = []
+        , max = 4 // can be 3 or 4
+        ;
+
+    for (;i < l; i++) {
+        // console.log('---')
+        let k = values[i];
+        let inI = i;
+        if(keyStartMatch(k)) {
+            // console.log(i, 'MATCH', k)
+            let j = i+1;
+            kept = [k];
+            lost = [];
+            let ok = true;
+            while(ok && j < l) {
+                let subI = j;
+                let subK = values[subI];
+                let isNum = isNumOrPerc(subK);
+                ok = isNum && j < l && kept.length <= (max-1); // +1 for the original key
+                if(isNum) {
+                    // console.log('Push', subK)
+                    j += 1;
+                    kept.push(subK);
+                    ok = ok && kept.length <= max; // +1 for the original key
+                } else {
+                    // Lost stack
+                    // console.log('Lost stack on', subK)
+                    // j = 1
+                    lost.push(subK);
+                }
+                // console.log('S', subI, subK, isNum, ok)
+            }
+
+            let [a,b] = [inI, j];
+            // console.log('a,b ',a, b, values.slice(a,b), kept)
+            let plucked = kept.slice(a, b);
+            let newEntry = callback(kept);
+            if(plucked.length < 3) {
+                // console.log('Failed.', bits)
+                bits = bits.concat(kept);
+                if(breakEarly) {
+                    return [bits, j]
+                }
+            } else {
+                // console.log('kept', kept, newEntry)
+                // console.log('plucked', plucked)
+                bits.push(newEntry);
+                // Push back 2, as we landed on the bad node,
+                // and we need step into this node, to stack it.
+                //
+                i = j-1;
+            }
+        } else {
+            // console.log(i, k)
+            bits.push(k);
+
+            if(breakEarly) {
+                let [a,b] = [inI, kept.length];
+                // console.log('a,b ',a, b, values.slice(a,b), kept)
+                kept.slice(a, b);
+                let newEntry = callback(kept);
+                // console.log('plucked', plucked)
+                // console.log('kept', kept)
+                if(kept.length < 3) {
+                    // console.log('Failed.', 'kept', kept, 'plucked', plucked)
+                    return [values[b], kept.length+1]
+                } else {
+                    // console.log('success.')
+                    return [newEntry, kept.length]
+                }
+            }
+        }
+    }
+
+    // console.log('Done pop', i)
+    // console.log('in', values, 'out', bits)
+
+    let newEntry = callback(kept);
+    return [newEntry, i+1]
+}
+
+
+;installReceiver();
 (function(){
 
     let cg;
@@ -2032,6 +2311,8 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
             cg = _cg;
             cg.insertReceiver(['font', 'pack'], fontPackReceiver);
         };
+        ClassGraph.prototype.generateGoogleLinks = generateGoogleLinks;
+        ClassGraph.prototype.installGoogleLinks = installGoogleLinks;
     };
 
     /**
@@ -2054,13 +2335,16 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
         let familyStrings = createFamilyString(values, fonts, origin);
 
         // let families = tokenize(values)
-
-        // install as header <link> items
-        // console.info('Installing Google fonts: familyStrings:', familyStrings)
-        generateGoogleLinks(familyStrings).forEach((x)=>document.head.appendChild(x));
+        installGoogleLinks(familyStrings);
 
         // Install additional css additions
         installFontObjects(fonts);
+    };
+
+    const installGoogleLinks = function(familyStrings, display) {
+        // install as header <link> items
+        // console.info('Installing Google fonts: familyStrings:', familyStrings)
+        return generateGoogleLinks(familyStrings, display).forEach((x)=>document.head.appendChild(x))
     };
 
     const installFontObjects = function(fonts, splitObj) {
@@ -2387,7 +2671,7 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
         });
     };
 
-    const generateGoogleLinks = function(familyStrings){
+    const generateGoogleLinks = function(familyStrings, display='swap'){
 
         let a = getOrCreateLink('link', 'preconnect', {
             href: "https://fonts.googleapis.com"
@@ -2398,8 +2682,10 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
             , crossorigin: ''
         });
 
+        let ds = display == null? '': `&display=${display}`;
+
         let c = getOrCreateLink('link', "stylesheet", {
-            href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
+            href:`https://fonts.googleapis.com/css2?${familyStrings}${ds}`
         });
 
         return [a,b,c]
@@ -2407,6 +2693,18 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
 
     let linkCache = {};
 
+    /*
+        Create a link node
+
+            let b = getOrCreateLink('link', 'preconnect', {
+                href: "https://fonts.gstatic.com"
+                , crossorigin: ''
+            })
+
+            let c = getOrCreateLink('link', "stylesheet", {
+                href:`https://fonts.googleapis.com/css2?${familyStrings}&display=swap`
+            })
+     */
     const getOrCreateLink = function(href, rel, opts) {
         let v = {
             rel, href
@@ -2441,6 +2739,343 @@ const Polyclass = new Proxy(polyclassHead, polyclassProxy);
 
     return fontPackReceiver
 
+})()
+
+;(function(){
+
+    let cg;
+
+    const insertReceiver = function(){
+
+        ClassGraph.addons.functionsReceiver = function(_cg){
+            cg = _cg;
+            cg.keyValueFunctions.set('forceGreen', forceHook);
+            cg.keyValueFunctions.set('force', forceHook);
+            cg.keyValueFunctions.set('raise', raiseHook);
+        };
+    };
+
+    const forceHook = function(value, token, index, splitObj) {
+        // console.log('Force green hook', token, splitObj)
+        token.value.slice(0, token.match.start);
+        // console.log(res)
+        // return res
+
+        return token.args.length > 0? token.args[0]: 'green'
+    };
+
+    const raiseHook = function(value, token, index, splitObj) {
+        console.log('raise hook', token, splitObj);
+        let res = token.value.slice(0, token.match.start);
+        console.log(res);
+        // return res
+    };
+insertReceiver();
+})();
+(function(){
+
+    let cg;
+    const insertReceiver = function(){
+
+        ClassGraph.addons.iconReceiver = function(_cg){
+            cg = _cg;
+
+            // Capture a single key
+            // cg.insertTranslator('var', variableDigest2)
+            cg.insertReceiver(['icon', 'pack'], iconPackReceiver);
+            // cg.insertReceiver(['icon'], iconReceiver)
+        };
+    };
+
+    const titleCase = (words) => words.map(function(word) {
+            return word.charAt(0).toUpperCase() + word.substring(1, word.length);
+        });
+
+    const iconPackReceiver =  function(obj) {
+
+        let key = titleCase(obj.values).join('+');
+        let family = `Material+Symbols+${key}`;
+        /* Options for the _variable font_ These don't change.*/
+        let opts=  {
+            opsz: "20..48",
+            wght: "100..700",
+            FILL: "0..1",
+            GRAD: "-50..200",
+        };
+        let familyString = toGoogleFontParamsStr(opts);
+        let fontStr = `family=${family}:${familyString}`;
+
+        let receiverBits = [...obj.values, 'icon'];
+
+        /* Install a new class, capturing: `[variant]-icon-*`
+        The variant is the _style_ of icon, such as "outlined" or "sharp". */
+        cg.insertReceiver(receiverBits, iconReceiver);
+
+
+        /*Leverage the font installer, using the fonter and  the name given.*/
+        Polyclass.graph.installGoogleLinks(fontStr, null);
+
+        /* Install the css class rule object */
+        installSheetRules(obj, fontSettings);
+
+        // let opts = `opsz,wght,FILL,GRAD
+        //             @20..48,100..700,0..1,-50..200`
+        //
+        // let example = `https://fonts.googleapis.com/css2?
+        //         family=Material+Symbols+Outlined:
+        //         opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200`
+        //
+    };
+
+    const installSheetRules = function(obj, fontSettings){
+         /*.material-symbols-sharp  {
+                font-variation-settings:
+                    'FILL' 0,
+                    'wght' 500,
+                    'GRAD' 200,
+                    'opsz' 48;
+                font-size: inherit;
+            }*/
+        let key = obj.values[0];
+        let rules = {};
+
+        let fontSettingsStr = toObjectParamStr(fontSettings);
+        let conf = {
+                'font-variation-settings': `${fontSettingsStr}`,
+                'font-size': 'inherit',
+            };
+
+        rules[`.material-symbols-${key}`] = conf;
+        let items = cg.dcss.addStylesheetRules(rules);
+
+        items.renderAll();
+    };
+
+    const toObjectParamStr = function(obj) {
+        /*Given an object, convert it to a string, compatible with an object-like
+        CSS String:
+
+            {
+                FILL: 1,
+                wght: 500,
+                GRAD: 200,
+                opsz: 48
+            }
+
+        Return a multiline string, with the properties string wrapped:
+
+            'FILL' 1,
+            'wght' 500,
+            'GRAD' 200,
+            'opsz' 48
+        */
+        let fontSettingsStr = '';
+        let fKeys = Object.keys(obj);
+        for (var i = 0; i < fKeys.length; i++) {
+            let k = fKeys[i];
+            let v = obj[k];
+            let last = i == fKeys.length-1;
+            let end = last? '': ',\n';
+            fontSettingsStr += `'${k}' ${v}${end}`;
+        }
+        return fontSettingsStr
+
+    };
+
+    const toGoogleFontParamsStr = function(obj) {
+        /* Given an object, convert to a string compatible with the google font
+            in =  {
+                opsz: "20..48",
+                wght: "100..,700",
+                FILL: "0..1",
+                GRAD: "-50..200",
+            }
+
+            out = `opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200`
+        */
+        let k = Object.keys(obj).join(',');
+        let v = Object.values(obj).join(',');
+        return `${k}@${v}`
+    };
+
+    const iconReceiver =  function(obj) {
+
+        // Tokenize as a family string.
+        //
+        obj.values; obj.origin;
+        console.log('render icon', obj);
+
+        return contentInjection(obj)
+    };
+
+    const contentInjection = function(obj) {
+        const values = obj.values, origin = obj.origin;
+        origin.classList.add(getInjectClass(obj));
+        origin.innerText += `${values.join('_')}`;
+    };
+
+    const getInjectClass = function(obj) {
+        let k = obj.props[0];
+        return `material-symbols-${k}`
+    }
+
+    ;insertReceiver();
+})()
+
+;(function(){
+
+    let cg;
+    const insertReceiver = function(){
+
+        ClassGraph.addons.iconReceiver = function(_cg){
+            cg = _cg;
+
+            // Capture a single key
+            // cg.insertTranslator('var', variableDigest2)
+            cg.insertReceiver(['icon', 'pack'], iconPackReceiver);
+            // cg.insertReceiver(['icon'], iconReceiver)
+        };
+    };
+
+    const titleCase = (words) => words.map(function(word) {
+            return word.charAt(0).toUpperCase() + word.substring(1, word.length);
+        });
+
+    const iconPackReceiver =  function(obj) {
+        console.log('Install the font', obj);
+        let key = titleCase(obj.values).join('+');
+        let family = `Material+Symbols+${key}`;
+        let fontSettings = {
+            FILL: 1,
+            wght: 500,
+            GRAD: 200,
+            opsz: 48
+        };
+        /* Options for the _variable font_ These don't change.*/
+        let opts=  {
+            opsz: "20..48",
+            wght: "100..700",
+            FILL: "0..1",
+            GRAD: "-50..200",
+        };
+        let familyString = toGoogleFontParamsStr(opts);
+        let fontStr = `family=${family}:${familyString}`;
+
+        let receiverBits = [...obj.values, 'icon'];
+
+        /* Install a new class, capturing: `[variant]-icon-*`
+        The variant is the _style_ of icon, such as "outlined" or "sharp". */
+        cg.insertReceiver(receiverBits, iconReceiver);
+
+
+        /*Leverage the font installer, using the fonter and  the name given.*/
+        Polyclass.graph.installGoogleLinks(fontStr, null);
+
+        /* Install the css class rule object */
+        installSheetRules(obj, fontSettings);
+
+        // let opts = `opsz,wght,FILL,GRAD
+        //             @20..48,100..700,0..1,-50..200`
+        //
+        // let example = `https://fonts.googleapis.com/css2?
+        //         family=Material+Symbols+Outlined:
+        //         opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200`
+        //
+    };
+
+    const installSheetRules = function(obj, fontSettings){
+        /*.material-symbols-sharp  {
+                font-variation-settings:
+                    'FILL' 0,
+                    'wght' 500,
+                    'GRAD' 200,
+                    'opsz' 48;
+                font-size: inherit;
+            }*/
+        let key = obj.values[0];
+        let rules = {};
+
+        let fontSettingsStr = toObjectParamStr(fontSettings);
+        let conf = {
+                'font-variation-settings': `${fontSettingsStr}`,
+                'font-size': 'inherit',
+            };
+
+        rules[`.material-symbols-${key}`] = conf;
+        let items = cg.dcss.addStylesheetRules(rules);
+
+        items.renderAll();
+    };
+
+    const toObjectParamStr = function(obj) {
+        /*Given an object, convert it to a string, compatible with an object-like
+        CSS String:
+
+            {
+                FILL: 1,
+                wght: 500,
+                GRAD: 200,
+                opsz: 48
+            }
+
+        Return a multiline string, with the properties string wrapped:
+
+            'FILL' 1,
+            'wght' 500,
+            'GRAD' 200,
+            'opsz' 48
+        */
+        let fontSettingsStr = '';
+        let fKeys = Object.keys(obj);
+        for (var i = 0; i < fKeys.length; i++) {
+            let k = fKeys[i];
+            let v = obj[k];
+            let last = i == fKeys.length-1;
+            let end = last? '': ',\n';
+            fontSettingsStr += `'${k}' ${v}${end}`;
+        }
+        return fontSettingsStr
+
+    };
+
+    const toGoogleFontParamsStr = function(obj) {
+        /* Given an object, convert to a string compatible with the google font
+            in =  {
+                opsz: "20..48",
+                wght: "100..,700",
+                FILL: "0..1",
+                GRAD: "-50..200",
+            }
+
+            out = `opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200`
+        */
+        let k = Object.keys(obj).join(',');
+        let v = Object.values(obj).join(',');
+        return `${k}@${v}`
+    };
+
+    const iconReceiver =  function(obj) {
+
+        // Tokenize as a family string.
+        //
+        obj.values; obj.origin;
+        console.log('render icon', obj);
+
+        return contentInjection(obj)
+    };
+
+    const contentInjection = function(obj) {
+        const values = obj.values, origin = obj.origin;
+        origin.classList.add(getInjectClass(obj));
+        origin.innerText += `${values.join('_')}`;
+    };
+
+    const getInjectClass = function(obj) {
+        let k = obj.props[0];
+        return `material-symbols-${k}`
+    }
+
+    ;insertReceiver();
 })()
 
 /**
@@ -2548,194 +3183,34 @@ const difference = function(setA, setB) {
 })()
 
 /*
+Convert discovered nodes and bind them to a selector. The assigned classes
+are the declarations assigned to the css class.
 
-vars box. To assign key variables as accessible CSS varialbes through a js
-definition. The definition is bound to DCSS, so edits to the vars manipulates
-the view automatically.
+The discovery may descend children, allowing for depth setup.
 
-    vars({
-        primary: "#880000" # company red
-        , secondary: "#111" # dark
-        , accent: "red"
-    })
+    <dcss-setup
+        selector='.card'
+        class='background-color-#111
+            border-solid-3px-green
+            border-radius-.4em
+            padding-.8em-1.4em
+            color-#EEE
+            margin-1em'>
 
-In the node, we access the vars reciever
+            <dcss-setup
+                selector='.single-page'
+                sub-selector='.page'
+                class='color-#EECCDD
+                padding-1em
+                border-solid-3px-#00cc00'
+                >
+            </dcss-setup>
 
-    <div class="background-color-var-secondary
-                color-primary">
-        <p>An elk called Elk lives here.</p>
-    </div>
+        </dcss-setup>
 
-Manipulating the var propagates to the view:
 
-    vars.primary = "#EEE" # off white
-
----
-
-## Secondary App
-
-    `swatch()`
-    and colors.js
-
-    Assign "colors" to a swatch of colors, each color is a function from the
-    colors.js module and can assign math relations to swatches.
-    Chaning a swatch (such as its base color), can manipulate the other
-    colours according to the chosen swatch type, e.g. "Diachromic".
-
+Notably this may be easier as real CSS.
  */
-
-;(function(){
-
-    let cg;
-    let rootRule;
-
-    /**
-     * The _automatic_ function called at the base of this iffe to
-     * install the `font-pack-*` tokens into the class graph.
-     *
-     * @return {undefined}
-     */
-    const insertReceiver = function(){
-        // DynamicCSSStyleSheet.addons.varTranslateReceiver = function(_cg){
-            // cg = _cg;
-            // cg.insertReceiver(['var'], varReceiver)
-        // }
-
-        ClassGraph.addons.varsReceiver = function(_cg){
-            cg = _cg;
-            cg.vars = varsHook.bind(cg);
-            // cg.varsRootDelaration = rootDeclaration
-            cg.varsRoot = rootRule;
-            // cg.insertTranslator('var', variableDigest)
-        };
-    };
-
-
-    const varsHook = function(d, target=':root') {
-        /** vars() function bound to the classgraph. _this_ is the classgraph
-         instance `cg.vars = varsHook.bind(cg)`
-
-         each key is a var, value is the param
-
-            {
-                apples: green
-                , foo: 10
-                , bar: 1em
-                , baz: #444
-            }
-
-        Each var is installed on the target node:
-
-            :root {
-                --apples: green
-                ...
-                --baz: #444
-            }
-
-        if an existing "vars" object exists, it's updated.
-
-        */
-        // target = document.querySelector(target)
-        console.log('Hook', d);
-
-        if(rootRule == undefined) {
-            let rootDeclaration = {};
-
-            for(let key in d) {
-                let prop = `--${key}`;
-                let value = d[key];
-                rootDeclaration[prop] = value;
-            }
-
-            let rules = cg.dcss.addStylesheetRules({
-                    [target]: rootDeclaration
-                });
-
-            rules.renderAll();
-            rootRule = rules[0];
-            cg.varsRoot = rootRule;
-        } else {
-
-            // rootRule
-            // let pr = rootRule.getPropStr([target,Object.entries(definition)])
-            // rootRule.sheetRule.cssText = `${target} { ${pr} }`
-            // rootRule.replace(`${target} { ${pr} }`)
-
-            for(let key in d) {
-                let prop = `--${key}`;
-                let value = d[key];
-                rootRule.sheetRule.style.setProperty(prop, value);
-            }
-            // rootRule.render()
-            // console.log(rootRule)
-            // window.varsRule = rootRule
-        }
-    }
-
-    ;insertReceiver();
-})()
-
-/**
- * # var-* Translate
- *
- * https://developer.mozilla.org/en-US/docs/Web/CSS/var
- *
- * Discover and rewrite class names values with `var-*` to the CSS function
- * `var(*)`. e.g.
- *
- *     "border-top-var-primary-edges"
- *
- *      {
- *          "border-top": var(--primary-edges)
- *      }
- */
-;(function(){
-
-    let cg;
-
-    /**
-     * The _automatic_ function called at the base of this iffe to
-     * install the `font-pack-*` tokens into the class graph.
-     *
-     * @return {undefined}
-     */
-    const insertReceiver = function(){
-        // console.log('var-translate insertReceiver')
-        // DynamicCSSStyleSheet.addons.varTranslateReceiver = function(_cg){
-            // cg = _cg;
-            // cg.insertReceiver(['var'], varReceiver)
-        // }
-
-        ClassGraph.addons.varTranslateReceiver = function(_cg){
-            cg = _cg;
-            cg.insertTranslator('var', variableDigest2);
-            // cg.insertTranslator('var', variableDigest)
-        };
-    };
-
-
-    const variableDigest2 =  function(splitObj, inStack, outStack, currentIndex) {
-        /*
-            Convert the value keys to a var representation.
-                `var-name-switch` -> [var, name, switch]
-            to
-                `var(--name-switch)`
-         */
-
-        let keys = inStack.slice(currentIndex);
-        let k1 = keys.slice(1);
-        let word = `var(--${k1.join("-")})`;
-
-        outStack.push(word);
-        // return [inStack, outStack, currentIndex]
-        return [[], outStack, currentIndex + k1.length]
-    }
-
-
-
-    ;insertReceiver();
-})()
-
 
 
 /* The words map lists all the unique string CSS values. Each word maps to an
@@ -2816,10 +3291,10 @@ class Words extends Map {
 
     wordsToArrayString(indent=0, small=false){
         if(!small) {
-            return JSON.stringify(wordsToOrderedArray(), null, indent)
+            return JSON.stringify(this.wordsToOrderedArray(), null, indent)
         }
 
-        return wordsToOrderedArray().join(' ')
+        return this.wordsToOrderedArray().join(' ')
     }
 
     wordsToObjectString(indent=0, small=false) {
@@ -2859,6 +3334,75 @@ class Words extends Map {
     }
 }
 
+/*
+1. all the items have string in position
+2. the we create the flat array list
+each position is a word from the string list
+
+    "all-petite-caps",
+    "all-scroll",
+    "all-small-caps",
+
+as a string:
+
+    "  all petite caps scroll small ..."
+
+Becomes:
+    [1, [
+            [2, [
+                    [3, null]
+                ]
+            ],
+            [4, null],
+            [5, [
+                    [3,null]
+                ]
+            ]
+        ]
+    ]
+
+---
+
+When loaded, we can re-ask for the prop:
+
+    w.stringToBits("all-petite-caps")
+    [1,2,3]
+
+The last key
+
+    w.stringToBits("zoom")
+    [211]
+    w.stringToBits("zoom-out")
+    [211, 66]
+---
+
+
+    "all-petite-caps",
+    "all-scroll",
+    "all-small-caps",
+    "allow-end",
+    "alternate-reverse",
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0-1-2",
+    "0-3",
+    "0-4-5",
+    "6-7",
+    "8-9",
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0-1-2 0-3 0-4-5 6-7 8-9"
+
+    "all petite caps scroll small allow end alternate reverse",
+    "0 1 2,0 3,0 4 5,6 7,8 9"
+
+    // radix each key through 32 bits, allowing ~1000 positions as 2bits
+    // not really helpful under 100 keys, but then saves 1 char per position (up to 1k)
+    // .. With 255~ keys thats 150~ chars saved.
+    // In a 32bit radix, the first 31 positions are single chars.
+---
+
+*/
 
 const words = new Words()
     , microGraph = {}
@@ -3065,8 +3609,16 @@ const words = new Words()
 
 
 var installReceiver = function() {
-    ClassGraph.addons.forwardReduceValues = (cg) => words.installPropArray(dashprops);
-    ClassGraph.prototype.forwardReduceValues = forwardReduceValues;
+    ClassGraph.addons.forwardReduceValues = function(cg){
+        let func = function(prop, values) {
+            return forwardReduceValues(prop, values, microGraph, words)
+        };
+        cg.reducers.push(func);
+        let res = words.installPropArray(dashprops);
+        return res;
+    };
+    // install one of many
+    // ClassGraph.prototype.forwardReduceValues = forwardReduceValues
     ClassGraph.prototype.valuesGraph =  { microGraph, words };
 };
 
@@ -3095,9 +3647,6 @@ const forwardReduceValues = function(props, values, microGraph, translations) {
     const _graph = microGraph || {
         'row': {
             'reverse': merge
-        }
-        , 'other': {
-            'horse': merge
         }
     };
 
@@ -3154,6 +3703,194 @@ const popOneValueForward = function(values, microGraph, translations) {
 
 ;installReceiver();
 
+})()
+/**
+ * # var-* Translate
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/var
+ *
+ * Discover and rewrite class names values with `var-*` to the CSS function
+ * `var(*)`. e.g.
+ *
+ *     "border-top-var-primary-edges"
+ *
+ *      {
+ *          "border-top": var(--primary-edges)
+ *      }
+ */
+;(function(){
+
+    let cg;
+
+    /**
+     * The _automatic_ function called at the base of this iffe to
+     * install the `font-pack-*` tokens into the class graph.
+     *
+     * @return {undefined}
+     */
+    const insertReceiver = function(){
+        // console.log('var-translate insertReceiver')
+        // DynamicCSSStyleSheet.addons.varTranslateReceiver = function(_cg){
+            // cg = _cg;
+            // cg.insertReceiver(['var'], varReceiver)
+        // }
+
+        ClassGraph.addons.varTranslateReceiver = function(_cg){
+            cg = _cg;
+            cg.insertTranslator('var', variableDigest2);
+            // cg.insertTranslator('var', variableDigest)
+        };
+    };
+
+
+    const variableDigest2 =  function(splitObj, inStack, outStack, currentIndex) {
+        /*
+            Convert the value keys to a var representation.
+                `var-name-switch` -> [var, name, switch]
+            to
+                `var(--name-switch)`
+         */
+
+        let keys = inStack.slice(currentIndex);
+        let k1 = keys.slice(1);
+        let word = `var(--${k1.join("-")})`;
+
+        outStack.push(word);
+        // return [inStack, outStack, currentIndex]
+        return [[], outStack, currentIndex + k1.length]
+    }
+
+
+
+    ;insertReceiver();
+})()
+
+/*
+
+vars box. To assign key variables as accessible CSS varialbes through a js
+definition. The definition is bound to DCSS, so edits to the vars manipulates
+the view automatically.
+
+    vars({
+        primary: "#880000" # company red
+        , secondary: "#111" # dark
+        , accent: "red"
+    })
+
+In the node, we access the vars reciever
+
+    <div class="background-color-var-secondary
+                color-primary">
+        <p>An elk called Elk lives here.</p>
+    </div>
+
+Manipulating the var propagates to the view:
+
+    vars.primary = "#EEE" # off white
+
+---
+
+## Secondary App
+
+    `swatch()`
+    and colors.js
+
+    Assign "colors" to a swatch of colors, each color is a function from the
+    colors.js module and can assign math relations to swatches.
+    Chaning a swatch (such as its base color), can manipulate the other
+    colours according to the chosen swatch type, e.g. "Diachromic".
+
+ */
+
+;(function(){
+
+    let cg;
+    let rootRule;
+
+    /**
+     * The _automatic_ function called at the base of this iffe to
+     * install the `font-pack-*` tokens into the class graph.
+     *
+     * @return {undefined}
+     */
+    const insertReceiver = function(){
+        // DynamicCSSStyleSheet.addons.varTranslateReceiver = function(_cg){
+            // cg = _cg;
+            // cg.insertReceiver(['var'], varReceiver)
+        // }
+
+        ClassGraph.addons.varsReceiver = function(_cg){
+            cg = _cg;
+            cg.vars = varsHook.bind(cg);
+            // cg.varsRootDelaration = rootDeclaration
+            cg.varsRoot = rootRule;
+            // cg.insertTranslator('var', variableDigest)
+        };
+    };
+
+
+    const varsHook = function(d, target=':root') {
+        /** vars() function bound to the classgraph. _this_ is the classgraph
+         instance `cg.vars = varsHook.bind(cg)`
+
+         each key is a var, value is the param
+
+            {
+                apples: green
+                , foo: 10
+                , bar: 1em
+                , baz: #444
+            }
+
+        Each var is installed on the target node:
+
+            :root {
+                --apples: green
+                ...
+                --baz: #444
+            }
+
+        if an existing "vars" object exists, it's updated.
+
+        */
+        // target = document.querySelector(target)
+        console.log('Hook', d);
+
+        if(rootRule == undefined) {
+            let rootDeclaration = {};
+
+            for(let key in d) {
+                let prop = `--${key}`;
+                let value = d[key];
+                rootDeclaration[prop] = value;
+            }
+
+            let rules = cg.dcss.addStylesheetRules({
+                    [target]: rootDeclaration
+                });
+
+            rules.renderAll();
+            rootRule = rules[0];
+            cg.varsRoot = rootRule;
+        } else {
+
+            // rootRule
+            // let pr = rootRule.getPropStr([target,Object.entries(definition)])
+            // rootRule.sheetRule.cssText = `${target} { ${pr} }`
+            // rootRule.replace(`${target} { ${pr} }`)
+
+            for(let key in d) {
+                let prop = `--${key}`;
+                let value = d[key];
+                rootRule.sheetRule.style.setProperty(prop, value);
+            }
+            // rootRule.render()
+            // console.log(rootRule)
+            // window.varsRule = rootRule
+        }
+    }
+
+    ;insertReceiver();
 })();
 
 export { ClassGraph, DynamicCSSStyleSheet, Polyclass, RenderArray };

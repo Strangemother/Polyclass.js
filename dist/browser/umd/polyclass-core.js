@@ -171,17 +171,17 @@
   })();
 
   /**
-   * A DynamicCSSStyleSheet allows the developer to manipulate the
-   * CSS Style objects within the sheet, rather than switching classes
-   * or using JS.
-   *
-   * When installed the stylesheet acts behaves like a standard stylesheet
-   * We can add, update, and remove active style definitions, immediately
-   * affecting the view.
-   *
-   * This is very useful for complex or dynamic CSS definitions, such as
-   * a `path()` or font packages. We can couple view changes with style attributes
-   * without a middle-man
+   A DynamicCSSStyleSheet allows the developer to manipulate the
+   CSS Style objects within the sheet, rather than switching classes
+   or using JS.
+
+   When installed the stylesheet acts behaves like a standard stylesheet
+   We can add, update, and remove active style definitions, immediately
+   affecting the view.
+
+   This is very useful for complex or dynamic CSS definitions, such as
+   a `path()` or font packages. We can couple view changes with style attributes
+   without a middle-man
    */
   class RenderArray extends Array {
       renderAll() {
@@ -387,10 +387,10 @@
       }
 
       _getIndexBySelector(selector, sheet)  {
-          let c = 0; 
+          let c = 0;
           for(let rule of sheet.cssRules) {
               if(selector == rule.selectorText) {
-                  return c 
+                  return c
               }
               c++;
           }
@@ -535,6 +535,7 @@
       constructor(conf) {
           this.conf = conf || {};
 
+          this.announce('wake');
           /*
               A simple key -> function dictionary to capture special (simple)
               keys during the translate value phase.
@@ -543,7 +544,7 @@
           this.translateMap = {
               // 'var': this.variableDigest,
           };
-
+          this.reducers = [];
           if(this.conf.addons !== false) {
               this.installAddons(this.getPreAddons());
           }
@@ -553,8 +554,38 @@
           this.aliasMap = {};
           this.parentSelector = conf?.parentSelector;
           this.processAliases(this.conf?.aliases);
+          this.announce('ready');
       }
 
+      announce(name) {
+          let e = new CustomEvent(`classgraph-${name}`, {
+              detail: {
+                  entity: this
+              }
+          });
+          dispatchEvent(e);
+      }
+      /* Insert a literal translation to the translateMap for detection single
+      words within a class string. for example detect `var` in "color-var-foo"
+
+          const variableDigest2 =  function(splitObj, inStack, outStack, currentIndex) {
+              /* Convert the value keys to a var representation.
+                   `var-name-switch` -> [var, name, switch]
+               to
+                   `var(--name-switch)`
+              *\/
+
+              let keys = inStack.slice(currentIndex)
+              let k1 = keys.slice(1)
+              let word = `var(--${k1.join("-")})`
+
+              outStack.push(word)
+              // return [inStack, outStack, currentIndex]
+              return [[], outStack, currentIndex + k1.length]
+          }
+
+          cg.insertTranslator('var', variableDigest2)
+      */
       insertTranslator(key, func) {
           this.translateMap[key] = func;
       }
@@ -818,13 +849,13 @@
           let props = keys.slice(0, c1);
           let values = keys.slice(c1);
 
-          let vg = this.valuesGraph || {};
+          this.valuesGraph || {};
           // Reshape any values, correcting for over-splitting
           values = this.forwardReduceValues(
                        props
                       , values
-                      , vg.microGraph
-                      , vg.words
+                      // , vg.microGraph
+                      // , vg.words
                   );
 
           let r = {
@@ -839,7 +870,13 @@
       }
 
       forwardReduceValues(props, values, graph, words) {
-          return values
+          let loopProps = props;
+          let loopValues = values;
+          for(let reducer of this.reducers) {
+              let r = reducer(loopProps, loopValues);//, graph, words)
+              loopValues = r;
+          }
+          return loopValues
       }
 
       minorCapture(str, sep=this.sep, safe=true) {
@@ -1612,12 +1649,13 @@
   // }
 
 
+  /* DOM Loader
 
-  /*
-      Upon document load, process and *[polyclass] entity. Similar to process()
+  Upon document load, process and *[polyclass] entity. Similar to process()
+
+      <body polyclass></body>
   */
   const autoActivator = function(watch=document){
-
       watch.addEventListener('DOMContentLoaded', function(){
           onDomLoaded();
       }.bind(this));

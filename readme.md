@@ -35,11 +35,11 @@ A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declar
 + [Example](#example)
 + Extras:
   + [Fonts](./docs/font-pack.md) Install and use fonts dynamically
-  + [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
-  + [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
-  + [Events](./docs/events.md) Apply JavaScript event listeners using class-names
   + [Icons](./docs/icons.md) Instant Google material icons
   + [Extended Colors](./docs/extended-colors.md) Use all other CSS color types
+  + [Events](./docs/events.md) Apply JavaScript event listeners using class-names
+  + [Aliases](./docs/aliases.md) Reduce typing by aliasing long word
+  + [Vendor Prefix](./docs/vendor-prefix.md) Scope Polyclass usage to a prefix
   + [Inserting Rules](./docs/inserting-rules.md) Inject CSS declarations and custom detection functions
   + Variables
     + [CSS `var()`](./docs/css-var.md) Utilise variables for declarative properties and values

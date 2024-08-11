@@ -1,5 +1,5 @@
 # Sibling Operator
-
+https://developer.mozilla.org/en-US/docs/Web/CSS/Next-sibling_combinator
 Currently properties are assigned to their given node
 
     <div class="display-grid gap-2em grid-auto-flow-column">

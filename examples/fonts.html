@@ -5,6 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fonts</title>
+    <script src="../src/devtools/asset-switch.js" data-load='dev'>
+        {
+            "dev": [
+                "../src/tools.js"
+                , "../src/dcss.js"
+                , "../src/classgraph.js"
+                , "../src/addons/monitor.js"
+                , "../src/addons/font-pack.js"
+                , "../src/addons/var-translate.js"
+                , "../src/addons/vars-box.js"
+                , "../src/polyclass.js"
+                , "../src/dom-property-activator.js"
+            ]
+            , "build": [
+                "../build/polyclass.full.js"
+            ]
+        }
+    </script>
     <style type="text/css">
 
         html {
@@ -28,13 +46,15 @@
         -->
 
         <!--
-        -->
         <script src="../build/polyclass.full.js"></script>
+        -->
         <!--
         <script type="module">
             import polyclass from "https://cdn.jsdelivr.net/npm/polyclass@0.0.6/+esm"
         </script>
         -->
+        <!--
+
         <script src="../src/tools.js"></script>
         <script src="../src/dcss.js"></script>
         <script src="../src/classgraph.js"></script>
@@ -44,6 +64,7 @@
         <script src="../src/addons/vars-box.js"></script>
         <script src="../src/polyclass.js"></script>
         <script src="../src/dom-property-activator.js"></script>
+        -->
 
         <div>
             <div class="background-#333 color-#DDD font-micro-5 padding-1em font-pack-micro+5-400 default-times-new-roman">
