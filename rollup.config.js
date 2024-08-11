@@ -38,23 +38,42 @@ import terser from '@rollup/plugin-terser'; // Minifies the bundle
 import concat from 'rollup-plugin-concat';
 
 
+/* Each addon/ to be processed.
+Each item builds as a separate file, merged into the _full_ version, or  imported individually
+*/
 const ADDONS = [
-    "./src/addons/events.js"
-    , "./src/addons/font-pack.js"
-    , "./src/addons/monitor.js"
-    , "./src/addons/vars-box.js"
-    , "./src/addons/var-translate.js"
-    , "./src/addons/value-reduce.js"
+    // "./src/addons/events.js"
+    // , "./src/addons/font-pack.js"
+    // , "./src/addons/monitor.js"
+    // , "./src/addons/vars-box.js"
+    // , "./src/addons/var-translate.js"
+    // , "./src/addons/value-reduce.js"
 ]
 
 
+// import readdirSync from 'fs';
+import { readdirSync } from 'fs';
+
+// const fs = require('fs');
+const addonsFolder = "./src/addons/"
+readdirSync(addonsFolder).forEach(file => {
+    ADDONS.push(`${addonsFolder}${file}`)
+});
+console.log('Addons', ADDONS)
+
+
+/* Core tool are fundamental to the base functionality for all units.
+ */
 const CORE = [
     "./src/tools.js"
     , "./src/dcss.js"
     , "./src/classgraph.js"
 ]
 
+/* Polyclass (The library) is a wrapper around the core tools.
+Exported as a single file as "core" - the primary import
 
+Notably this includes the `export statements` for ES6 */
 const POLYCLASS = [
     ...CORE
     , "./src/polyclass.js"
@@ -62,34 +81,44 @@ const POLYCLASS = [
 ]
 
 
+/* Browser version includes the dom detection tool - but _is not_ an ES6 module
+for immediate import. */
 const POLYCLASS_BROWSER = [
     ...CORE
     , "./src/dom-property-activator.js"
     , "./src/polyclass.js"
 ]
 
-
+/*
+Each entry results in a single file, using the arrays of source files
+and generating build/ files.
+ */
 const groupedFiles =  {
     core: {
         files: POLYCLASS
         // files: CORE.concat(POLYCLASS)
         , outputFile: './build/polyclass.core.js'
     }
+
+    /* Merge all addon files into a single file. */
     , addons: {
         files: ADDONS
         , outputFile: './build/addons.all.js'
     }
+
+
     , full: {
         files: POLYCLASS.concat(ADDONS)
         , outputFile: './build/polyclass.full.js'
     }
 
-    // The browser requires the DOM loader and no ESM export.
+    /* The browser requires the DOM loader and no ESM export. */
     , browser: {
         files: POLYCLASS_BROWSER
         , outputFile: './build/polyclass.browser-core.js'
     }
 
+    /* Browser version (DOM Loader, no ES6), but includes all addons. */
     , browserFull: {
         files: POLYCLASS_BROWSER.concat(ADDONS)
         , outputFile: './build/polyclass.browser-full.js'
@@ -104,6 +133,18 @@ const groupedFileOutputs = function(){
     }
     return res;
 }
+
+/*
+
+Distribution Builds
+
+The export objects for rollup defines a build for generating dist/ files;
+
+    src -> build -> [dist]
+
+A rollup config reads an input file (defined in the build stage), and generates
+output files to `dist/` using the given config.
+*/
 
 
 const coreConfig = {
@@ -124,6 +165,9 @@ const coreConfig = {
 
     ]
     , plugins: [
+        /* call upon rollup.concat to merge a list of key names.
+        I forget why :(
+        */
         concat({
             groupedFiles: Object.values(groupedFiles)
         })
@@ -136,6 +180,7 @@ const coreConfig = {
     ]
 }
 
+/* The minified version of the above, running `terser()` on the output file[s]. */
 const coreConfigMin = {
     input: groupedFiles.core.outputFile
     , output: [
@@ -154,14 +199,6 @@ const coreConfigMin = {
 
     ]
     , plugins: [
-        // concat({
-        //     groupedFiles: Object.values(groupedFiles)
-        // })
-        // Resolve external modules from node_modules
-        // resolve(),
-        // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
-        // commonjs(),
-        // Minify the output
         terser()
     ]
 }
@@ -197,6 +234,7 @@ const coreConfigBrowser = {
     ]
 }
 
+/* The minified version of the above, running `terser()` on the output file[s]. */
 const coreConfigBrowserMin = {
     input: groupedFiles.browser.outputFile
     , output: [
@@ -215,14 +253,6 @@ const coreConfigBrowserMin = {
 
     ]
     , plugins: [
-        // concat({
-        //     groupedFiles: Object.values(groupedFiles)
-        // })
-        // Resolve external modules from node_modules
-        // resolve(),
-        // Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
-        // commonjs(),
-        // Minify the output
         terser()
     ]
 }
