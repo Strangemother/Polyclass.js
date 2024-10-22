@@ -18,7 +18,11 @@ A procedural [just-in-time](#what-is-just-in-time) [declarative](#what-is-declar
 </div>
 
 
-Listen to a podcast of how this works: [Polyclass.wav](./polyclass.wav)
+Listen to a podcast of how this works: 
+
+https://github.com/user-attachments/assets/a65ddfea-2904-4809-8852-9ea78714e323
+
+
 
 ---
 
