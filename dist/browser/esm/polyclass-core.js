@@ -1651,7 +1651,14 @@ Upon document load, process and *[polyclass] entity. Similar to process()
     <body polyclass></body>
 */
 const autoActivator = function(watch=document){
+    // console.log('dom-property-activator ready')
+    if(["complete", "interactive"].indexOf(document.readyState) > -1) {
+        // console.log('dom-property-activator call early')
+        onDomLoaded();
+    }
+
     watch.addEventListener('DOMContentLoaded', function(){
+        // console.log('dom-property-activator called')
         onDomLoaded();
     }.bind(this));
 };
@@ -1679,6 +1686,7 @@ const onDomLoaded = function() {
     }
 };
 
+// console.log('Installing dom-property-activator')
 autoActivator();
 
 /**
